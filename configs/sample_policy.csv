@@ -1,0 +1,6 @@
+p, role:admin, *, users, get, *, allow
+p, role:admin, *, sprints, *, *, allow
+p, role:owner, foo.bar, users, *, *, allow
+
+g, mohsen, role:admin
+g, mina, role:owner, foo.bar

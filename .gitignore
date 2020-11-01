@@ -1,0 +1,9 @@
+.idea
+.pid
+fswatch.cfg
+dist
+tmp
+*.db
+coverage-all.out
+coverage.out
+config.yaml

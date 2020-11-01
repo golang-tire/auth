@@ -1,0 +1,93 @@
+syntax = "proto3";
+
+package authV1;
+
+option go_package = "protobuf;auth";
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+message Rule {
+    string uuid = 1;
+    string subject = 2;
+    string domain = 3;
+    string object = 4;
+    string action = 5;
+    google.protobuf.Timestamp created_at = 6;
+    google.protobuf.Timestamp updated_at = 7;
+}
+
+message ListRulesRequest {
+    int64 limit = 1;
+    int64 offset = 2;
+}
+
+message ListRulesResponse {
+    repeated Rule rules = 1;
+    int64 total_count = 2;
+    int64 limit = 3;
+    int64 offset = 4;
+}
+
+message GetRuleRequest {
+    string uuid = 1;
+}
+
+message CreateRuleRequest {
+    string subject = 1;
+    string domain = 2;
+    string object = 3;
+    string action = 4;
+}
+
+message UpdateRuleRequest {
+    string uuid = 1;
+    string subject = 2;
+    string domain = 3;
+    string object = 4;
+    string action = 5;
+}
+
+message DeleteRuleRequest {
+    string uuid = 1;
+}
+
+service RuleService {
+
+    // List Rules
+    rpc ListRules (ListRulesRequest) returns (ListRulesResponse) {
+        option (google.api.http) = {
+            get: "/v1/rules"
+        };
+    }
+    // Get Rule
+    rpc GetRule (GetRuleRequest) returns (Rule) {
+        option (google.api.http) = {
+          get: "/v1/rules/{uuid}"
+        };
+    }
+
+    // Create Rule object request
+    rpc CreateRule (CreateRuleRequest) returns (Rule) {
+        option (google.api.http) = {
+            post: "/v1/rules"
+            body: "*"
+        };
+    }
+
+    // Update Rule object request
+    rpc UpdateRule (UpdateRuleRequest) returns (Rule) {
+        option (google.api.http) = {
+            put: "/v1/rules/{uuid}"
+            body: "*"
+        };
+    }
+
+    // Delete Rule object request
+    rpc DeleteRule (DeleteRuleRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+          delete: "/v1/rules/{uuid}"
+        };
+    }
+}

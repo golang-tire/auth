@@ -1,0 +1,209 @@
+syntax = "proto3";
+
+package authV1;
+
+option go_package = "protobuf;auth";
+
+import "google/protobuf/timestamp.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+import "protobuf/roles.proto";
+import "protobuf/rules.proto";
+
+message DomainRole {
+    string uuid = 1;
+    Role role = 2;
+    string domain = 3;
+    bool enable = 4;
+}
+
+message User {
+    string uuid = 1;
+    string firstname = 2;
+    string lastname = 3;
+    string gender = 4;
+    string avatar_url = 5;
+    string username = 6;
+    string password = 7;
+    string email = 8;
+    bool enable = 9;
+    string raw_data = 10;
+    repeated DomainRole domain_roles = 11;
+    repeated Rule rules = 12;
+    google.protobuf.Timestamp created_at = 13;
+    google.protobuf.Timestamp updated_at = 14;
+}
+// User ----------------
+message ListUsersRequest {
+    int64 limit = 1;
+    int64 offset = 2;
+}
+
+message ListUsersResponse {
+    repeated User users = 1;
+    int64 total_count = 2;
+    int64 limit = 3;
+    int64 offset = 4;
+}
+
+message GetUserRequest {
+    string uuid = 1;
+}
+
+message CreateUserRequest {
+    string firstname = 1;
+    string lastname = 2;
+    string gender = 3;
+    string avatar_url = 4;
+    string username = 5;
+    string password = 6;
+    string email = 7;
+    bool enable = 8;
+    string raw_data = 9;
+}
+
+message UpdateUserRequest {
+    string uuid = 1;
+    string firstname = 2;
+    string lastname = 3;
+    string gender = 4;
+    string avatar_url = 5;
+    string username = 6;
+    string password = 7;
+    string email = 8;
+    bool enable = 9;
+    string raw_data = 10;
+}
+
+message DeleteUserRequest {
+    string uuid = 1;
+}
+
+message AddUserRuleRequest {
+    string user_uuid = 1;
+    string role_uuid = 2;
+}
+
+message AddUserRuleResponse {
+    Rule rule = 1;
+}
+
+message UpdateUserRuleRequest {
+    string user_uuid = 1;
+    string rule_uuid = 2;
+}
+
+message DeleteUserRuleRequest {
+    string user_uuid = 1;
+    string rule_uuid = 2;
+}
+
+message AddDomainRoleRequest {
+    string user_uuid = 1;
+    string role_uuid = 2;
+    string domain = 3;
+    bool enable = 4;
+}
+
+message AddDomainRoleResponse {
+    Role role = 1;
+    string domain = 2;
+    bool enable = 3;
+}
+
+message UpdateDomainRoleRequest {
+    string user_uuid = 1;
+    string domain_role_uuid = 2;
+    string domain = 3;
+    bool enable = 4;
+}
+
+message DeleteDomainRoleRequest {
+    string user_uuid = 1;
+    string domain_role_uuid = 2;
+}
+
+service UserService {
+
+    // List Users
+    rpc ListUsers (ListUsersRequest) returns (ListUsersResponse) {
+        option (google.api.http) = {
+            get: "/v1/users"
+        };
+    }
+    // Get User
+    rpc GetUser (GetUserRequest) returns (User) {
+        option (google.api.http) = {
+          get: "/v1/users/{uuid}"
+        };
+    }
+
+    // Create User object request
+    rpc CreateUser (CreateUserRequest) returns (User) {
+        option (google.api.http) = {
+            post: "/v1/users"
+            body: "*"
+        };
+    }
+
+    // Update User object request
+    rpc UpdateUser (UpdateUserRequest) returns (User) {
+        option (google.api.http) = {
+            put: "/v1/users/{uuid}"
+            body: "*"
+        };
+    }
+
+    // Delete User object request
+    rpc DeleteUser (DeleteUserRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+          delete: "/v1/users/{uuid}"
+        };
+    }
+
+    // AddRule assign a role to a user
+    rpc AddRule (AddUserRuleRequest) returns (AddUserRuleResponse) {
+        option (google.api.http) = {
+            post: "/v1/users/{user_uuid}/rules"
+            body: "*"
+        };
+    }
+
+    // UpdateRule User rule object request
+    rpc UpdateRule (UpdateUserRuleRequest) returns (User) {
+        option (google.api.http) = {
+            put: "/v1/users/{user_uuid}/rules/{rule_uuid}"
+            body: "*"
+        };
+    }
+
+    // DeleteRole remove user role
+    rpc DeleteRule (DeleteUserRuleRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/users/{user_uuid}/rules/{rule_uuid}"
+        };
+    }
+
+    // AddDomainRole assign a domain_role to a user
+    rpc AddDomainRole (AddDomainRoleRequest) returns (AddDomainRoleResponse) {
+        option (google.api.http) = {
+            post: "/v1/users/{user_uuid}/domain-roles"
+            body: "*"
+        };
+    }
+
+    // UpdateDomainRole update user domain_rule
+    rpc UpdateDomainRole (UpdateDomainRoleRequest) returns (User) {
+        option (google.api.http) = {
+            put: "/v1/users/{user_uuid}/domain-roles/{domain_role_uuid}"
+            body: "*"
+        };
+    }
+
+    // DeleteDomainRole remove user domain_role role
+    rpc DeleteDomainRole (DeleteDomainRoleRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/users/{user_uuid}/domain-roles/{domain_role_uuid}"
+        };
+    }
+}

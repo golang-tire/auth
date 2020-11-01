@@ -1,0 +1,22 @@
+excludes:
+  - ./third_party
+  - ./tmp
+  - ./vendor
+protoc:
+  version: 3.8.0
+  includes:
+    - ./third_party
+generate:
+  go_options:
+    import_path: github.com/golang-tire/auth
+  plugins:
+    - name: go
+      type: go
+      flags: plugins=grpc
+      output: .
+    - name: grpc-gateway
+      type: go
+      output: .
+    - name: swagger
+      type: go
+      output: .

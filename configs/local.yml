@@ -1,0 +1,22 @@
+apiVersion: v0.1
+server:
+  host: 0.0.0.0
+  httpPort: 8080
+  grpcPort: 9090
+  swaggerBaseURL: "/v1/swagger"
+
+db:
+  host: localhost
+  port: 5432
+  db: task_manager
+  user: postgres
+  password: postgres
+  testDSN: ""
+
+redis:
+  host: 127.0.0.1
+  port: 6379
+  user: redis
+  password: redis
+
+

@@ -1,0 +1,104 @@
+syntax = "proto3";
+
+package authV1;
+
+option go_package = "protobuf;auth";
+
+import "google/api/annotations.proto";
+
+message LoginRequest {
+    string username = 1;
+    string password = 2;
+}
+
+message LoginResponse {
+    string access_token = 1;
+    string refresh_token = 2;
+}
+
+message LogoutRequest {}
+
+message LogoutResponse {}
+
+message RegisterRequest {
+    string firstname = 1;
+    string lastname = 2;
+    string gender = 3;
+    string avatar_url = 4;
+    string username = 5;
+    string password = 6;
+    string email = 7;
+    string raw_data = 8;
+}
+
+message RegisterResponse {
+    string uuid = 1;
+    string firstname = 2;
+    string lastname = 3;
+    string gender = 4;
+    string avatar_url = 5;
+    string username = 6;
+    string password = 7;
+    string email = 8;
+    string raw_data = 9;
+}
+
+message VerifyTokenRequest {
+    string access_token = 1;
+}
+
+message VerifyTokenResponse {
+    string access_token = 1;
+}
+
+message RefreshTokenRequest {
+    string refresh_token = 1;
+}
+
+message RefreshTokenResponse {
+    string access_token = 1;
+    string refresh_token = 2;
+}
+
+service AuthService {
+
+    // Login login user
+    rpc Login(LoginRequest) returns (LoginResponse) {
+        option (google.api.http) = {
+            post: "/v1/auth/login"
+            body: "*"
+        };
+    }
+
+    // Login login user
+    rpc Register(RegisterRequest) returns (RegisterResponse) {
+        option (google.api.http) = {
+            post: "/v1/auth/register"
+            body: "*"
+        };
+    }
+
+    // Logout will close user session
+    rpc Logout(LogoutRequest) returns (LogoutResponse) {
+        option (google.api.http) = {
+            post: "/v1/auth/logout"
+            body: "*"
+        };
+    }
+
+    // VerifyToken will verify and return token
+    rpc VerifyToken(VerifyTokenRequest) returns (VerifyTokenResponse) {
+        option (google.api.http) = {
+            post: "/v1/auth/token/verify"
+            body: "*"
+        };
+    }
+
+    // RefreshToken will check and return new token
+    rpc RefreshToken(RefreshTokenRequest) returns (RefreshTokenResponse) {
+        option (google.api.http) = {
+            post: "/v1/auth/token/refresh"
+            body: "*"
+        };
+    }
+}
