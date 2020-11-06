@@ -20,7 +20,7 @@ func NewForTest(t *testing.T, models []interface{}) *DB {
 		return testDB
 	}
 
-	testDSN = config.RegisterString("db.testDSN", "postgres://postgres:postgres@localhost:5432/task_manager_test?sslmode=disable")
+	testDSN = config.RegisterString("db.testDSN", "postgres://postgres:postgres@localhost:5432/auth_test?sslmode=disable")
 	opt, err := pg.ParseURL(testDSN.String())
 	if err != nil {
 		t.Error(err)
