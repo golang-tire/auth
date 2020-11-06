@@ -6,7 +6,7 @@ import (
 
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/golang-tire/auth/internal/entity"
-	auth "github.com/golang-tire/auth/protobuf"
+	auth "github.com/golang-tire/auth/internal/proto/v1"
 )
 
 // Service encapsulates use case logic for rules.
@@ -64,7 +64,6 @@ func (s service) Create(ctx context.Context, req *auth.CreateRuleRequest) (*auth
 	}
 	id, err := s.repo.Create(ctx, entity.Rule{
 		Subject: req.Subject,
-		Domain:  req.Domain,
 		Object:  req.Object,
 		Action:  req.Action,
 	})
@@ -86,7 +85,6 @@ func (s service) Update(ctx context.Context, req *auth.UpdateRuleRequest) (*auth
 	}
 	now := time.Now()
 	rule.Subject = req.Subject
-	rule.Domain = req.Domain
 	rule.Object = req.Object
 	rule.Action = req.Action
 	rule.UpdatedAt = now
@@ -95,7 +93,6 @@ func (s service) Update(ctx context.Context, req *auth.UpdateRuleRequest) (*auth
 		ID:        rule.ID,
 		UUID:      rule.UUID,
 		Subject:   req.Subject,
-		Domain:    req.Domain,
 		Object:    req.Object,
 		Action:    req.Action,
 		CreatedAt: rule.CreatedAt,

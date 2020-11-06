@@ -3,6 +3,10 @@ package main
 import (
 	"context"
 
+	"github.com/golang-tire/auth/internal/domains"
+
+	"github.com/golang-tire/auth/internal/users"
+
 	"github.com/golang-tire/auth/internal/rules"
 
 	"github.com/golang-tire/pkg/config"
@@ -42,8 +46,12 @@ func setupModules(ctx context.Context) error {
 	}
 
 	models := []interface{}{
+		&entity.Domain{},
 		&entity.Role{},
 		&entity.Rule{},
+		&entity.User{},
+		&entity.DomainRole{},
+		&entity.UserRule{},
 	}
 
 	err = db.CreateSchema(dbInstance.DB(), models)
@@ -51,13 +59,21 @@ func setupModules(ctx context.Context) error {
 		return err
 	}
 
-	roleRepo := roles.NewRepository(dbInstance)
-	roleSrv := roles.NewService(roleRepo)
-	roles.New(roleSrv)
+	domainsRepo := domains.NewRepository(dbInstance)
+	domainsSrv := domains.NewService(domainsRepo)
+	domains.New(domainsSrv)
 
-	ruleRepo := rules.NewRepository(dbInstance)
-	ruleSrv := rules.NewService(ruleRepo)
-	rules.New(ruleSrv)
+	rolesRepo := roles.NewRepository(dbInstance)
+	rolesSrv := roles.NewService(rolesRepo)
+	roles.New(rolesSrv)
+
+	rulesRepo := rules.NewRepository(dbInstance)
+	rulesSrv := rules.NewService(rulesRepo)
+	rules.New(rulesSrv)
+
+	usersRepo := users.NewRepository(dbInstance)
+	usersSrv := users.NewService(usersRepo)
+	users.New(usersSrv)
 
 	err = grpcgw.Serve(ctx,
 		grpcgw.GrpcPort(grpcPort.Int()),

@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package authV1;
 
-option go_package = "protobuf;auth";
+option go_package = "internal/proto/v1;auth";
 
 import "google/api/annotations.proto";
 

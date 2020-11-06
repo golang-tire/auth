@@ -1,0 +1,87 @@
+syntax = "proto3";
+
+package authV1;
+
+option go_package = "internal/proto/v1;auth";
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+message Domain {
+    string uuid = 1;
+    string name = 2;
+    bool enable = 3;
+    google.protobuf.Timestamp created_at = 4;
+    google.protobuf.Timestamp updated_at = 5;
+}
+
+message ListDomainsRequest {
+    int64 limit = 1;
+    int64 offset = 2;
+}
+
+message ListDomainsResponse {
+    repeated Domain domains = 1;
+    int64 total_count = 2;
+    int64 limit = 3;
+    int64 offset = 4;
+}
+
+message GetDomainRequest {
+    string uuid = 1;
+}
+
+message CreateDomainRequest {
+    string name = 1;
+    bool enable = 2;
+}
+
+message UpdateDomainRequest {
+    string uuid = 1;
+    string name = 2;
+    bool enable = 3;
+}
+
+message DeleteDomainRequest {
+    string uuid = 1;
+}
+
+service DomainService {
+
+    // List Domains
+    rpc ListDomains (ListDomainsRequest) returns (ListDomainsResponse) {
+        option (google.api.http) = {
+            get: "/v1/domains"
+        };
+    }
+    // Get Domain
+    rpc GetDomain (GetDomainRequest) returns (Domain) {
+        option (google.api.http) = {
+          get: "/v1/domains/{uuid}"
+        };
+    }
+
+    // Create Domain object request
+    rpc CreateDomain (CreateDomainRequest) returns (Domain) {
+        option (google.api.http) = {
+            post: "/v1/domains"
+            body: "*"
+        };
+    }
+
+    // Update Domain object request
+    rpc UpdateDomain (UpdateDomainRequest) returns (Domain) {
+        option (google.api.http) = {
+            put: "/v1/domains/{uuid}"
+            body: "*"
+        };
+    }
+
+    // Delete Domain object request
+    rpc DeleteDomain (DeleteDomainRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+          delete: "/v1/domains/{uuid}"
+        };
+    }
+}

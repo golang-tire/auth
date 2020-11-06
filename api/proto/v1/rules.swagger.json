@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "protobuf/roles.proto",
+    "title": "api/proto/v1/rules.proto",
     "version": "version not set"
   },
   "consumes": [
@@ -11,15 +11,15 @@
     "application/json"
   ],
   "paths": {
-    "/v1/roles": {
+    "/v1/rules": {
       "get": {
-        "summary": "List Roles",
-        "operationId": "RoleService_ListRoles",
+        "summary": "List Rules",
+        "operationId": "RuleService_ListRules",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/authV1ListRolesResponse"
+              "$ref": "#/definitions/authV1ListRulesResponse"
             }
           },
           "default": {
@@ -46,17 +46,17 @@
           }
         ],
         "tags": [
-          "RoleService"
+          "RuleService"
         ]
       },
       "post": {
-        "summary": "Create Role object request",
-        "operationId": "RoleService_CreateRole",
+        "summary": "Create Rule object request",
+        "operationId": "RuleService_CreateRule",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/authV1Role"
+              "$ref": "#/definitions/authV1Rule"
             }
           },
           "default": {
@@ -72,24 +72,24 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/authV1CreateRoleRequest"
+              "$ref": "#/definitions/authV1CreateRuleRequest"
             }
           }
         ],
         "tags": [
-          "RoleService"
+          "RuleService"
         ]
       }
     },
-    "/v1/roles/{uuid}": {
+    "/v1/rules/{uuid}": {
       "get": {
-        "summary": "Get Role",
-        "operationId": "RoleService_GetRole",
+        "summary": "Get Rule",
+        "operationId": "RuleService_GetRule",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/authV1Role"
+              "$ref": "#/definitions/authV1Rule"
             }
           },
           "default": {
@@ -108,12 +108,12 @@
           }
         ],
         "tags": [
-          "RoleService"
+          "RuleService"
         ]
       },
       "delete": {
-        "summary": "Delete Role object request",
-        "operationId": "RoleService_DeleteRole",
+        "summary": "Delete Rule object request",
+        "operationId": "RuleService_DeleteRule",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -137,17 +137,17 @@
           }
         ],
         "tags": [
-          "RoleService"
+          "RuleService"
         ]
       },
       "put": {
-        "summary": "Update Role object request",
-        "operationId": "RoleService_UpdateRole",
+        "summary": "Update Rule object request",
+        "operationId": "RuleService_UpdateRule",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/authV1Role"
+              "$ref": "#/definitions/authV1Rule"
             }
           },
           "default": {
@@ -169,35 +169,41 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/authV1UpdateRoleRequest"
+              "$ref": "#/definitions/authV1UpdateRuleRequest"
             }
           }
         ],
         "tags": [
-          "RoleService"
+          "RuleService"
         ]
       }
     }
   },
   "definitions": {
-    "authV1CreateRoleRequest": {
+    "authV1CreateRuleRequest": {
       "type": "object",
       "properties": {
-        "title": {
+        "subject": {
           "type": "string"
         },
-        "enable": {
-          "type": "boolean"
+        "domain": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "action": {
+          "type": "string"
         }
       }
     },
-    "authV1ListRolesResponse": {
+    "authV1ListRulesResponse": {
       "type": "object",
       "properties": {
-        "roles": {
+        "rules": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/authV1Role"
+            "$ref": "#/definitions/authV1Rule"
           }
         },
         "total_count": {
@@ -214,17 +220,23 @@
         }
       }
     },
-    "authV1Role": {
+    "authV1Rule": {
       "type": "object",
       "properties": {
         "uuid": {
           "type": "string"
         },
-        "title": {
+        "subject": {
           "type": "string"
         },
-        "enable": {
-          "type": "boolean"
+        "domain": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "action": {
+          "type": "string"
         },
         "created_at": {
           "type": "string",
@@ -236,17 +248,23 @@
         }
       }
     },
-    "authV1UpdateRoleRequest": {
+    "authV1UpdateRuleRequest": {
       "type": "object",
       "properties": {
         "uuid": {
           "type": "string"
         },
-        "title": {
+        "subject": {
           "type": "string"
         },
-        "enable": {
-          "type": "boolean"
+        "domain": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "action": {
+          "type": "string"
         }
       }
     },

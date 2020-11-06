@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "protobuf/auth.proto",
+    "title": "api/proto/v1/roles.proto",
     "version": "version not set"
   },
   "consumes": [
@@ -11,15 +11,52 @@
     "application/json"
   ],
   "paths": {
-    "/v1/auth/login": {
-      "post": {
-        "summary": "Login login user",
-        "operationId": "AuthService_Login",
+    "/v1/roles": {
+      "get": {
+        "summary": "List Roles",
+        "operationId": "RoleService_ListRoles",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/authV1LoginResponse"
+              "$ref": "#/definitions/authV1ListRolesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "RoleService"
+        ]
+      },
+      "post": {
+        "summary": "Create Role object request",
+        "operationId": "RoleService_CreateRole",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/authV1Role"
             }
           },
           "default": {
@@ -35,24 +72,24 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/authV1LoginRequest"
+              "$ref": "#/definitions/authV1CreateRoleRequest"
             }
           }
         ],
         "tags": [
-          "AuthService"
+          "RoleService"
         ]
       }
     },
-    "/v1/auth/logout": {
-      "post": {
-        "summary": "Logout will close user session",
-        "operationId": "AuthService_Logout",
+    "/v1/roles/{uuid}": {
+      "get": {
+        "summary": "Get Role",
+        "operationId": "RoleService_GetRole",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/authV1LogoutResponse"
+              "$ref": "#/definitions/authV1Role"
             }
           },
           "default": {
@@ -64,28 +101,24 @@
         },
         "parameters": [
           {
-            "name": "body",
-            "in": "body",
+            "name": "uuid",
+            "in": "path",
             "required": true,
-            "schema": {
-              "$ref": "#/definitions/authV1LogoutRequest"
-            }
+            "type": "string"
           }
         ],
         "tags": [
-          "AuthService"
+          "RoleService"
         ]
-      }
-    },
-    "/v1/auth/register": {
-      "post": {
-        "summary": "Login login user",
-        "operationId": "AuthService_Register",
+      },
+      "delete": {
+        "summary": "Delete Role object request",
+        "operationId": "RoleService_DeleteRole",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/authV1RegisterResponse"
+              "properties": {}
             }
           },
           "default": {
@@ -97,28 +130,24 @@
         },
         "parameters": [
           {
-            "name": "body",
-            "in": "body",
+            "name": "uuid",
+            "in": "path",
             "required": true,
-            "schema": {
-              "$ref": "#/definitions/authV1RegisterRequest"
-            }
+            "type": "string"
           }
         ],
         "tags": [
-          "AuthService"
+          "RoleService"
         ]
-      }
-    },
-    "/v1/auth/token/refresh": {
-      "post": {
-        "summary": "RefreshToken will check and return new token",
-        "operationId": "AuthService_RefreshToken",
+      },
+      "put": {
+        "summary": "Update Role object request",
+        "operationId": "RoleService_UpdateRole",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/authV1RefreshTokenResponse"
+              "$ref": "#/definitions/authV1Role"
             }
           },
           "default": {
@@ -130,175 +159,94 @@
         },
         "parameters": [
           {
-            "name": "body",
-            "in": "body",
+            "name": "uuid",
+            "in": "path",
             "required": true,
-            "schema": {
-              "$ref": "#/definitions/authV1RefreshTokenRequest"
-            }
-          }
-        ],
-        "tags": [
-          "AuthService"
-        ]
-      }
-    },
-    "/v1/auth/token/verify": {
-      "post": {
-        "summary": "VerifyToken will verify and return token",
-        "operationId": "AuthService_VerifyToken",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/authV1VerifyTokenResponse"
-            }
+            "type": "string"
           },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/runtimeError"
-            }
-          }
-        },
-        "parameters": [
           {
             "name": "body",
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/authV1VerifyTokenRequest"
+              "$ref": "#/definitions/authV1UpdateRoleRequest"
             }
           }
         ],
         "tags": [
-          "AuthService"
+          "RoleService"
         ]
       }
     }
   },
   "definitions": {
-    "authV1LoginRequest": {
+    "authV1CreateRoleRequest": {
       "type": "object",
       "properties": {
-        "username": {
+        "title": {
           "type": "string"
         },
-        "password": {
-          "type": "string"
+        "enable": {
+          "type": "boolean"
         }
       }
     },
-    "authV1LoginResponse": {
+    "authV1ListRolesResponse": {
       "type": "object",
       "properties": {
-        "access_token": {
-          "type": "string"
+        "roles": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/authV1Role"
+          }
         },
-        "refresh_token": {
-          "type": "string"
+        "total_count": {
+          "type": "string",
+          "format": "int64"
+        },
+        "limit": {
+          "type": "string",
+          "format": "int64"
+        },
+        "offset": {
+          "type": "string",
+          "format": "int64"
         }
       }
     },
-    "authV1LogoutRequest": {
-      "type": "object"
-    },
-    "authV1LogoutResponse": {
-      "type": "object"
-    },
-    "authV1RefreshTokenRequest": {
-      "type": "object",
-      "properties": {
-        "refresh_token": {
-          "type": "string"
-        }
-      }
-    },
-    "authV1RefreshTokenResponse": {
-      "type": "object",
-      "properties": {
-        "access_token": {
-          "type": "string"
-        },
-        "refresh_token": {
-          "type": "string"
-        }
-      }
-    },
-    "authV1RegisterRequest": {
-      "type": "object",
-      "properties": {
-        "firstname": {
-          "type": "string"
-        },
-        "lastname": {
-          "type": "string"
-        },
-        "gender": {
-          "type": "string"
-        },
-        "avatar_url": {
-          "type": "string"
-        },
-        "username": {
-          "type": "string"
-        },
-        "password": {
-          "type": "string"
-        },
-        "email": {
-          "type": "string"
-        },
-        "raw_data": {
-          "type": "string"
-        }
-      }
-    },
-    "authV1RegisterResponse": {
+    "authV1Role": {
       "type": "object",
       "properties": {
         "uuid": {
           "type": "string"
         },
-        "firstname": {
+        "title": {
           "type": "string"
         },
-        "lastname": {
-          "type": "string"
+        "enable": {
+          "type": "boolean"
         },
-        "gender": {
-          "type": "string"
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
         },
-        "avatar_url": {
-          "type": "string"
-        },
-        "username": {
-          "type": "string"
-        },
-        "password": {
-          "type": "string"
-        },
-        "email": {
-          "type": "string"
-        },
-        "raw_data": {
-          "type": "string"
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
         }
       }
     },
-    "authV1VerifyTokenRequest": {
+    "authV1UpdateRoleRequest": {
       "type": "object",
       "properties": {
-        "access_token": {
+        "uuid": {
           "type": "string"
-        }
-      }
-    },
-    "authV1VerifyTokenResponse": {
-      "type": "object",
-      "properties": {
-        "access_token": {
+        },
+        "title": {
           "type": "string"
+        },
+        "enable": {
+          "type": "boolean"
         }
       }
     },

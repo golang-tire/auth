@@ -1,4 +1,4 @@
-package roles
+package domains
 
 import (
 	"context"
@@ -15,15 +15,15 @@ import (
 
 var errCRUD = errors.New("error crud")
 
-func TestCreateRoleRequest_Validate(t *testing.T) {
+func TestCreateDomainRequest_Validate(t *testing.T) {
 	tests := []struct {
 		name      string
-		model     auth.CreateRoleRequest
+		model     auth.CreateDomainRequest
 		wantError bool
 	}{
-		{"success", auth.CreateRoleRequest{Title: "test"}, false},
-		{"required", auth.CreateRoleRequest{Title: ""}, true},
-		{"too long", auth.CreateRoleRequest{Title: "1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890"}, true},
+		{"success", auth.CreateDomainRequest{Name: "test"}, false},
+		{"required", auth.CreateDomainRequest{Name: ""}, true},
+		{"too long", auth.CreateDomainRequest{Name: "1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890"}, true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -33,15 +33,15 @@ func TestCreateRoleRequest_Validate(t *testing.T) {
 	}
 }
 
-func TestUpdateRoleRequest_Validate(t *testing.T) {
+func TestUpdateDomainRequest_Validate(t *testing.T) {
 	tests := []struct {
 		name      string
-		model     auth.UpdateRoleRequest
+		model     auth.UpdateDomainRequest
 		wantError bool
 	}{
-		{"success", auth.UpdateRoleRequest{Title: "test"}, false},
-		{"required", auth.UpdateRoleRequest{Title: ""}, true},
-		{"too long", auth.UpdateRoleRequest{Title: "1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890"}, true},
+		{"success", auth.UpdateDomainRequest{Name: "test"}, false},
+		{"required", auth.UpdateDomainRequest{Name: ""}, true},
+		{"too long", auth.UpdateDomainRequest{Name: "1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890"}, true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -60,45 +60,45 @@ func Test_service_CRUD(t *testing.T) {
 	assert.Equal(t, int64(0), count)
 
 	// successful creation
-	role, err := s.Create(ctx, &auth.CreateRoleRequest{Title: "test"})
+	domain, err := s.Create(ctx, &auth.CreateDomainRequest{Name: "test"})
 	assert.Nil(t, err)
-	assert.NotEmpty(t, role.Uuid)
-	id := role.Uuid
-	assert.Equal(t, "test", role.Title)
-	assert.NotEmpty(t, role.CreatedAt)
-	assert.NotEmpty(t, role.UpdatedAt)
+	assert.NotEmpty(t, domain.Uuid)
+	id := domain.Uuid
+	assert.Equal(t, "test", domain.Name)
+	assert.NotEmpty(t, domain.CreatedAt)
+	assert.NotEmpty(t, domain.UpdatedAt)
 	count, _ = s.Count(ctx)
 	assert.Equal(t, int64(1), count)
 
 	// validation error in creation
-	_, err = s.Create(ctx, &auth.CreateRoleRequest{Title: ""})
+	_, err = s.Create(ctx, &auth.CreateDomainRequest{Name: ""})
 	assert.NotNil(t, err)
 	count, _ = s.Count(ctx)
 	assert.Equal(t, int64(1), count)
 
 	// unexpected error in creation
-	_, err = s.Create(ctx, &auth.CreateRoleRequest{Title: "error"})
+	_, err = s.Create(ctx, &auth.CreateDomainRequest{Name: "error"})
 	assert.Equal(t, errCRUD, err)
 	count, _ = s.Count(ctx)
 	assert.Equal(t, int64(1), count)
 
-	_, _ = s.Create(ctx, &auth.CreateRoleRequest{Title: "test2"})
+	_, _ = s.Create(ctx, &auth.CreateDomainRequest{Name: "test2"})
 
 	// update
-	role, err = s.Update(ctx, &auth.UpdateRoleRequest{Title: "test updated", Uuid: id})
+	domain, err = s.Update(ctx, &auth.UpdateDomainRequest{Name: "test updated", Uuid: id})
 	assert.Nil(t, err)
-	assert.Equal(t, "test updated", role.Title)
-	_, err = s.Update(ctx, &auth.UpdateRoleRequest{Title: "test updated", Uuid: "none"})
+	assert.Equal(t, "test updated", domain.Name)
+	_, err = s.Update(ctx, &auth.UpdateDomainRequest{Name: "test updated", Uuid: "none"})
 	assert.NotNil(t, err)
 
 	// validation error in update
-	_, err = s.Update(ctx, &auth.UpdateRoleRequest{Title: "", Uuid: id})
+	_, err = s.Update(ctx, &auth.UpdateDomainRequest{Name: "", Uuid: id})
 	assert.NotNil(t, err)
 	count, _ = s.Count(ctx)
 	assert.Equal(t, int64(2), count)
 
 	// unexpected error in update
-	_, err = s.Update(ctx, &auth.UpdateRoleRequest{Title: "error", Uuid: id})
+	_, err = s.Update(ctx, &auth.UpdateDomainRequest{Name: "error", Uuid: id})
 	assert.Equal(t, errCRUD, err)
 	count, _ = s.Count(ctx)
 	assert.Equal(t, int64(2), count)
@@ -106,62 +106,62 @@ func Test_service_CRUD(t *testing.T) {
 	// get
 	_, err = s.Get(ctx, "none")
 	assert.NotNil(t, err)
-	role, err = s.Get(ctx, id)
+	domain, err = s.Get(ctx, id)
 	assert.Nil(t, err)
-	assert.Equal(t, "test updated", role.Title)
-	assert.Equal(t, id, role.Uuid)
+	assert.Equal(t, "test updated", domain.Name)
+	assert.Equal(t, id, domain.Uuid)
 
 	// query
-	_roles, _ := s.Query(ctx, 0, 0)
-	assert.Equal(t, 2, int(_roles.TotalCount))
+	_domains, _ := s.Query(ctx, 0, 0)
+	assert.Equal(t, 2, int(_domains.TotalCount))
 
 	// delete
 	_, err = s.Delete(ctx, "none")
 	assert.NotNil(t, err)
-	role, err = s.Delete(ctx, id)
+	domain, err = s.Delete(ctx, id)
 	assert.Nil(t, err)
-	assert.Equal(t, id, role.Uuid)
+	assert.Equal(t, id, domain.Uuid)
 	count, _ = s.Count(ctx)
 	assert.Equal(t, int64(1), count)
 }
 
 type mockRepository struct {
-	items []entity.Role
+	items []entity.Domain
 }
 
-func (m mockRepository) Get(ctx context.Context, id string) (entity.Role, error) {
+func (m mockRepository) Get(ctx context.Context, id string) (entity.Domain, error) {
 	for _, item := range m.items {
 		if item.UUID == id {
 			return item, nil
 		}
 	}
-	return entity.Role{}, pg.ErrNoRows
+	return entity.Domain{}, pg.ErrNoRows
 }
 
 func (m mockRepository) Count(ctx context.Context) (int64, error) {
 	return int64(len(m.items)), nil
 }
 
-func (m mockRepository) Query(ctx context.Context, offset, limit int64) ([]entity.Role, int, error) {
+func (m mockRepository) Query(ctx context.Context, offset, limit int64) ([]entity.Domain, int, error) {
 	return m.items, len(m.items), nil
 }
 
-func (m *mockRepository) Create(ctx context.Context, role entity.Role) (string, error) {
+func (m *mockRepository) Create(ctx context.Context, domain entity.Domain) (string, error) {
 	Uuid := uuid.New().String()
-	if role.Title == "error" {
+	if domain.Name == "error" {
 		return Uuid, errCRUD
 	}
-	m.items = append(m.items, role)
+	m.items = append(m.items, domain)
 	return Uuid, nil
 }
 
-func (m *mockRepository) Update(ctx context.Context, role entity.Role) error {
-	if role.Title == "error" {
+func (m *mockRepository) Update(ctx context.Context, domain entity.Domain) error {
+	if domain.Name == "error" {
 		return errCRUD
 	}
 	for i, item := range m.items {
-		if item.UUID == role.UUID {
-			m.items[i] = role
+		if item.UUID == domain.UUID {
+			m.items[i] = domain
 			break
 		}
 	}

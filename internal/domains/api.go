@@ -1,4 +1,4 @@
-package rules
+package domains
 
 import (
 	"context"
@@ -15,7 +15,7 @@ import (
 
 type API interface {
 	grpcgw.Controller
-	auth.RuleServiceServer
+	auth.DomainServiceServer
 }
 
 type api struct {
@@ -23,15 +23,15 @@ type api struct {
 }
 
 func (a api) InitRest(ctx context.Context, conn *grpc.ClientConn, mux *runtime.ServeMux) {
-	cl := auth.NewRuleServiceClient(conn)
-	_ = auth.RegisterRuleServiceHandlerClient(ctx, mux, cl)
+	cl := auth.NewDomainServiceClient(conn)
+	_ = auth.RegisterDomainServiceHandlerClient(ctx, mux, cl)
 }
 
 func (a api) InitGrpc(ctx context.Context, server *grpc.Server) {
-	auth.RegisterRuleServiceServer(server, a)
+	auth.RegisterDomainServiceServer(server, a)
 }
 
-func (a api) ListRules(ctx context.Context, request *auth.ListRulesRequest) (*auth.ListRulesResponse, error) {
+func (a api) ListDomains(ctx context.Context, request *auth.ListDomainsRequest) (*auth.ListDomainsResponse, error) {
 	offset, limit := helpers.GetOffsetAndLimit(request.Offset, request.Limit)
 	res, err := a.service.Query(ctx, offset, limit)
 	if err != nil {
@@ -40,7 +40,7 @@ func (a api) ListRules(ctx context.Context, request *auth.ListRulesRequest) (*au
 	return res, err
 }
 
-func (a api) GetRule(ctx context.Context, request *auth.GetRuleRequest) (*auth.Rule, error) {
+func (a api) GetDomain(ctx context.Context, request *auth.GetDomainRequest) (*auth.Domain, error) {
 	res, err := a.service.Get(ctx, request.Uuid)
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
@@ -48,7 +48,7 @@ func (a api) GetRule(ctx context.Context, request *auth.GetRuleRequest) (*auth.R
 	return res, err
 }
 
-func (a api) CreateRule(ctx context.Context, request *auth.CreateRuleRequest) (*auth.Rule, error) {
+func (a api) CreateDomain(ctx context.Context, request *auth.CreateDomainRequest) (*auth.Domain, error) {
 	res, err := a.service.Create(ctx, request)
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
@@ -56,7 +56,7 @@ func (a api) CreateRule(ctx context.Context, request *auth.CreateRuleRequest) (*
 	return res, err
 }
 
-func (a api) UpdateRule(ctx context.Context, request *auth.UpdateRuleRequest) (*auth.Rule, error) {
+func (a api) UpdateDomain(ctx context.Context, request *auth.UpdateDomainRequest) (*auth.Domain, error) {
 	res, err := a.service.Update(ctx, request)
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
@@ -64,7 +64,7 @@ func (a api) UpdateRule(ctx context.Context, request *auth.UpdateRuleRequest) (*
 	return res, err
 }
 
-func (a api) DeleteRule(ctx context.Context, request *auth.DeleteRuleRequest) (*empty.Empty, error) {
+func (a api) DeleteDomain(ctx context.Context, request *auth.DeleteDomainRequest) (*empty.Empty, error) {
 	_, err := a.service.Delete(ctx, request.Uuid)
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())

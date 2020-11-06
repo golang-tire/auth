@@ -6,7 +6,7 @@ import (
 
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/golang-tire/auth/internal/entity"
-	auth "github.com/golang-tire/auth/protobuf"
+	auth "github.com/golang-tire/auth/internal/proto/v1"
 )
 
 // Service encapsulates use case logic for roles.

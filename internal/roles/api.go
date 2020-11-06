@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/golang-tire/auth/internal/helpers"
-	auth "github.com/golang-tire/auth/protobuf"
+	auth "github.com/golang-tire/auth/internal/proto/v1"
 	"github.com/golang-tire/pkg/grpcgw"
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"

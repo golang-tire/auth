@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "protobuf/users.proto",
+    "title": "api/proto/v1/users.proto",
     "version": "version not set"
   },
   "consumes": [
@@ -427,7 +427,7 @@
         "role_uuid": {
           "type": "string"
         },
-        "domain": {
+        "domain_uuid": {
           "type": "string"
         },
         "enable": {
@@ -441,7 +441,7 @@
         "role": {
           "$ref": "#/definitions/authV1Role"
         },
-        "domain": {
+        "domain_uuid": {
           "type": "string"
         },
         "enable": {
@@ -500,6 +500,28 @@
         }
       }
     },
+    "authV1Domain": {
+      "type": "object",
+      "properties": {
+        "uuid": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "enable": {
+          "type": "boolean"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
     "authV1DomainRole": {
       "type": "object",
       "properties": {
@@ -510,10 +532,18 @@
           "$ref": "#/definitions/authV1Role"
         },
         "domain": {
-          "type": "string"
+          "$ref": "#/definitions/authV1Domain"
         },
         "enable": {
           "type": "boolean"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
         }
       }
     },
@@ -599,7 +629,7 @@
         "domain_role_uuid": {
           "type": "string"
         },
-        "domain": {
+        "domain_uuid": {
           "type": "string"
         },
         "enable": {

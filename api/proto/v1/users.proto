@@ -2,19 +2,22 @@ syntax = "proto3";
 
 package authV1;
 
-option go_package = "protobuf;auth";
+option go_package = "internal/proto/v1;auth";
 
 import "google/protobuf/timestamp.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
-import "protobuf/roles.proto";
-import "protobuf/rules.proto";
+import "api/proto/v1/roles.proto";
+import "api/proto/v1/rules.proto";
+import "api/proto/v1/domains.proto";
 
 message DomainRole {
     string uuid = 1;
     Role role = 2;
-    string domain = 3;
+    Domain domain = 3;
     bool enable = 4;
+    google.protobuf.Timestamp created_at = 5;
+    google.protobuf.Timestamp updated_at = 6;
 }
 
 message User {
@@ -101,20 +104,20 @@ message DeleteUserRuleRequest {
 message AddDomainRoleRequest {
     string user_uuid = 1;
     string role_uuid = 2;
-    string domain = 3;
+    string domain_uuid = 3;
     bool enable = 4;
 }
 
 message AddDomainRoleResponse {
     Role role = 1;
-    string domain = 2;
+    string domain_uuid = 2;
     bool enable = 3;
 }
 
 message UpdateDomainRoleRequest {
     string user_uuid = 1;
     string domain_role_uuid = 2;
-    string domain = 3;
+    string domain_uuid = 3;
     bool enable = 4;
 }
 

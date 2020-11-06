@@ -9,7 +9,7 @@ import (
 
 	"github.com/go-pg/pg/v10"
 	"github.com/golang-tire/auth/internal/entity"
-	auth "github.com/golang-tire/auth/protobuf"
+	auth "github.com/golang-tire/auth/internal/proto/v1"
 	"github.com/stretchr/testify/assert"
 )
 

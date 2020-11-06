@@ -98,10 +98,22 @@ lint: ## run golint on all Go package
 fmt: ## run "go fmt" on all Go packages
 	@go fmt $(PACKAGES)
 
+.PHONY: swagger-to-go
+swagger-to-go:
+	@$(foreach file,$(shell find -type f -name "*.json"), \
+		tire swagger-to-go $(ROOT)/${file} --pkg "auth" --out "$(ROOT)/internal/proto/v1/$(${file}).go" ;)
+
 .PHONY: proto
 proto:  ## run "prototool generate"
 	@echo "Running prototool generate..."
 	@prototool generate
+
+.PHONY: gen
+gen:  ## run proto and swagger-to-go
+	@echo "generate..."
+	proto
+	swagget-to-go
+
 
 .PHONY: migrate
 migrate: ## run all new database migrations
@@ -133,8 +145,3 @@ install-swagger-ui:
 	rm -rf ./tmp/swagger-ui
 	sed -i -e 's/https:\/\/petstore.swagger.io\/v2\/swagger\.json/\/v1\/swagger\/index\.json/g' ./third_party/swagger-ui/index.html
 	cd $(ROOT)/third_party/swagger-ui && go-bindata -nometadata -o $(ROOT)/pkg/grpcgw/swagger.gen.go -nomemcopy=true -pkg=grpcgw ./...
-
-.PHONY: swagger-to-go
-swagger-to-go:
-	@$(foreach file,$(shell find -type f -name "*.json"), \
-		tire swagger-to-go $(ROOT)/${file} --pkg "auth" --out $(ROOT)/${file}.go ;)

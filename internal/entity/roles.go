@@ -3,7 +3,7 @@ package entity
 import (
 	"time"
 
-	auth "github.com/golang-tire/auth/protobuf"
+	auth "github.com/golang-tire/auth/internal/proto/v1"
 	"github.com/golang/protobuf/ptypes"
 )
 

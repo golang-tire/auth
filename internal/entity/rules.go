@@ -3,7 +3,7 @@ package entity
 import (
 	"time"
 
-	auth "github.com/golang-tire/auth/protobuf"
+	auth "github.com/golang-tire/auth/internal/proto/v1"
 	"github.com/golang/protobuf/ptypes"
 )
 
@@ -12,7 +12,8 @@ type Rule struct {
 	ID        uint64   `pg:",pk"`
 	UUID      string   `pg:"default:gen_random_uuid()"`
 	Subject   string
-	Domain    string
+	DomainId  uint64
+	Domain    *Domain `pg:"rel:has-one"`
 	Object    string
 	Action    string
 	CreatedAt time.Time
@@ -26,7 +27,6 @@ func (r Rule) ToProto() *auth.Rule {
 	rule := &auth.Rule{
 		Uuid:      r.UUID,
 		Subject:   r.Subject,
-		Domain:    r.Domain,
 		Object:    r.Object,
 		Action:    r.Action,
 		CreatedAt: c,
@@ -50,10 +50,18 @@ func RuleFromProto(rule *auth.Rule) Rule {
 	return Rule{
 		UUID:      rule.Uuid,
 		Subject:   rule.Subject,
-		Domain:    rule.Domain,
 		Object:    rule.Object,
 		Action:    rule.Action,
 		CreatedAt: c,
 		UpdatedAt: u,
 	}
+}
+
+func RuleListFromProto(rules []*auth.Rule) []*Rule {
+	var d []*Rule
+	for _, i := range rules {
+		dr := RuleFromProto(i)
+		d = append(d, &dr)
+	}
+	return d
 }

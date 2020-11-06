@@ -1,4 +1,4 @@
-package rules
+package domains
 
 import (
 	"context"
@@ -13,8 +13,8 @@ import (
 )
 
 func TestRepository(t *testing.T) {
-	database := db.NewForTest(t, []interface{}{(*entity.Rule)(nil)})
-	db.ResetTables(t, database, "rules")
+	database := db.NewForTest(t, []interface{}{(*entity.Domain)(nil)})
+	db.ResetTables(t, database, "domains")
 	repo := NewRepository(database)
 
 	ctx := context.Background()
@@ -24,36 +24,34 @@ func TestRepository(t *testing.T) {
 
 	// create
 	now := time.Now()
-	testUuid, err := repo.Create(ctx, entity.Rule{
-		Subject: "admin",
-		Object:  "rules",
-		Action:  "get",
+	testUuid, err := repo.Create(ctx, entity.Domain{
+		Name:   "foo.bar",
+		Enable: true,
 	})
 	assert.Nil(t, err)
 	count2, _ := repo.Count(ctx)
 	assert.Equal(t, int64(1), count2-count)
 
 	// get
-	rule, err := repo.Get(ctx, testUuid)
+	domain, err := repo.Get(ctx, testUuid)
 	assert.Nil(t, err)
-	assert.Equal(t, "admin", rule.Subject)
+	assert.Equal(t, "foo.bar", domain.Name)
 	_, err = repo.Get(ctx, "test0")
 	assert.NotNil(t, err)
 	assert.EqualError(t, pg.ErrNoRows, err.Error())
 
 	// update
-	err = repo.Update(ctx, entity.Rule{
-		ID:        rule.ID,
+	err = repo.Update(ctx, entity.Domain{
+		ID:        domain.ID,
 		UUID:      testUuid,
-		Subject:   "manager",
-		Object:    "rules",
-		Action:    "get",
+		Name:      "bar.foo",
+		Enable:    true,
 		CreatedAt: now,
 		UpdatedAt: now,
 	})
 	assert.Nil(t, err)
-	rule, _ = repo.Get(ctx, testUuid)
-	assert.Equal(t, "manager", rule.Subject)
+	domain, _ = repo.Get(ctx, testUuid)
+	assert.Equal(t, "bar.foo", domain.Name)
 
 	// query
 	_, count3, err := repo.Query(ctx, 0, count2)

@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "protobuf/rules.proto",
+    "title": "api/proto/v1/auth.proto",
     "version": "version not set"
   },
   "consumes": [
@@ -11,52 +11,15 @@
     "application/json"
   ],
   "paths": {
-    "/v1/rules": {
-      "get": {
-        "summary": "List Rules",
-        "operationId": "RuleService_ListRules",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/authV1ListRulesResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/runtimeError"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "limit",
-            "in": "query",
-            "required": false,
-            "type": "string",
-            "format": "int64"
-          },
-          {
-            "name": "offset",
-            "in": "query",
-            "required": false,
-            "type": "string",
-            "format": "int64"
-          }
-        ],
-        "tags": [
-          "RuleService"
-        ]
-      },
+    "/v1/auth/login": {
       "post": {
-        "summary": "Create Rule object request",
-        "operationId": "RuleService_CreateRule",
+        "summary": "Login login user",
+        "operationId": "AuthService_Login",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/authV1Rule"
+              "$ref": "#/definitions/authV1LoginResponse"
             }
           },
           "default": {
@@ -72,24 +35,24 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/authV1CreateRuleRequest"
+              "$ref": "#/definitions/authV1LoginRequest"
             }
           }
         ],
         "tags": [
-          "RuleService"
+          "AuthService"
         ]
       }
     },
-    "/v1/rules/{uuid}": {
-      "get": {
-        "summary": "Get Rule",
-        "operationId": "RuleService_GetRule",
+    "/v1/auth/logout": {
+      "post": {
+        "summary": "Logout will close user session",
+        "operationId": "AuthService_Logout",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/authV1Rule"
+              "$ref": "#/definitions/authV1LogoutResponse"
             }
           },
           "default": {
@@ -100,170 +63,241 @@
           }
         },
         "parameters": [
-          {
-            "name": "uuid",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "RuleService"
-        ]
-      },
-      "delete": {
-        "summary": "Delete Rule object request",
-        "operationId": "RuleService_DeleteRule",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "properties": {}
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/runtimeError"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "uuid",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "RuleService"
-        ]
-      },
-      "put": {
-        "summary": "Update Rule object request",
-        "operationId": "RuleService_UpdateRule",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/authV1Rule"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/runtimeError"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "uuid",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
           {
             "name": "body",
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/authV1UpdateRuleRequest"
+              "$ref": "#/definitions/authV1LogoutRequest"
             }
           }
         ],
         "tags": [
-          "RuleService"
+          "AuthService"
+        ]
+      }
+    },
+    "/v1/auth/register": {
+      "post": {
+        "summary": "Login login user",
+        "operationId": "AuthService_Register",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/authV1RegisterResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/authV1RegisterRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/v1/auth/token/refresh": {
+      "post": {
+        "summary": "RefreshToken will check and return new token",
+        "operationId": "AuthService_RefreshToken",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/authV1RefreshTokenResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/authV1RefreshTokenRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/v1/auth/token/verify": {
+      "post": {
+        "summary": "VerifyToken will verify and return token",
+        "operationId": "AuthService_VerifyToken",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/authV1VerifyTokenResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/authV1VerifyTokenRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AuthService"
         ]
       }
     }
   },
   "definitions": {
-    "authV1CreateRuleRequest": {
+    "authV1LoginRequest": {
       "type": "object",
       "properties": {
-        "subject": {
+        "username": {
           "type": "string"
         },
-        "domain": {
-          "type": "string"
-        },
-        "object": {
-          "type": "string"
-        },
-        "action": {
+        "password": {
           "type": "string"
         }
       }
     },
-    "authV1ListRulesResponse": {
+    "authV1LoginResponse": {
       "type": "object",
       "properties": {
-        "rules": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/authV1Rule"
-          }
+        "access_token": {
+          "type": "string"
         },
-        "total_count": {
-          "type": "string",
-          "format": "int64"
-        },
-        "limit": {
-          "type": "string",
-          "format": "int64"
-        },
-        "offset": {
-          "type": "string",
-          "format": "int64"
+        "refresh_token": {
+          "type": "string"
         }
       }
     },
-    "authV1Rule": {
+    "authV1LogoutRequest": {
+      "type": "object"
+    },
+    "authV1LogoutResponse": {
+      "type": "object"
+    },
+    "authV1RefreshTokenRequest": {
+      "type": "object",
+      "properties": {
+        "refresh_token": {
+          "type": "string"
+        }
+      }
+    },
+    "authV1RefreshTokenResponse": {
+      "type": "object",
+      "properties": {
+        "access_token": {
+          "type": "string"
+        },
+        "refresh_token": {
+          "type": "string"
+        }
+      }
+    },
+    "authV1RegisterRequest": {
+      "type": "object",
+      "properties": {
+        "firstname": {
+          "type": "string"
+        },
+        "lastname": {
+          "type": "string"
+        },
+        "gender": {
+          "type": "string"
+        },
+        "avatar_url": {
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "raw_data": {
+          "type": "string"
+        }
+      }
+    },
+    "authV1RegisterResponse": {
       "type": "object",
       "properties": {
         "uuid": {
           "type": "string"
         },
-        "subject": {
+        "firstname": {
           "type": "string"
         },
-        "domain": {
+        "lastname": {
           "type": "string"
         },
-        "object": {
+        "gender": {
           "type": "string"
         },
-        "action": {
+        "avatar_url": {
           "type": "string"
         },
-        "created_at": {
-          "type": "string",
-          "format": "date-time"
+        "username": {
+          "type": "string"
         },
-        "updated_at": {
-          "type": "string",
-          "format": "date-time"
+        "password": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "raw_data": {
+          "type": "string"
         }
       }
     },
-    "authV1UpdateRuleRequest": {
+    "authV1VerifyTokenRequest": {
       "type": "object",
       "properties": {
-        "uuid": {
+        "access_token": {
           "type": "string"
-        },
-        "subject": {
-          "type": "string"
-        },
-        "domain": {
-          "type": "string"
-        },
-        "object": {
-          "type": "string"
-        },
-        "action": {
+        }
+      }
+    },
+    "authV1VerifyTokenResponse": {
+      "type": "object",
+      "properties": {
+        "access_token": {
           "type": "string"
         }
       }
