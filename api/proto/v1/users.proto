@@ -20,6 +20,14 @@ message DomainRole {
     google.protobuf.Timestamp updated_at = 6;
 }
 
+message UserRule {
+    string uuid = 1;
+    string user_uuid = 2;
+    Rule rule = 3;
+    google.protobuf.Timestamp created_at = 4;
+    google.protobuf.Timestamp updated_at = 5;
+}
+
 message User {
     string uuid = 1;
     string firstname = 2;
@@ -36,7 +44,7 @@ message User {
     google.protobuf.Timestamp created_at = 13;
     google.protobuf.Timestamp updated_at = 14;
 }
-// User ----------------
+
 message ListUsersRequest {
     int64 limit = 1;
     int64 offset = 2;
@@ -84,21 +92,18 @@ message DeleteUserRequest {
 
 message AddUserRuleRequest {
     string user_uuid = 1;
-    string role_uuid = 2;
-}
-
-message AddUserRuleResponse {
-    Rule rule = 1;
+    string rule_uuid = 2;
 }
 
 message UpdateUserRuleRequest {
     string user_uuid = 1;
     string rule_uuid = 2;
+    string user_rule_uuid = 3;
 }
 
 message DeleteUserRuleRequest {
     string user_uuid = 1;
-    string rule_uuid = 2;
+    string user_rule_uuid = 2;
 }
 
 message AddDomainRoleRequest {
@@ -112,6 +117,7 @@ message AddDomainRoleResponse {
     Role role = 1;
     string domain_uuid = 2;
     bool enable = 3;
+    string domain_role_uuid = 4;
 }
 
 message UpdateDomainRoleRequest {
@@ -165,7 +171,7 @@ service UserService {
     }
 
     // AddRule assign a role to a user
-    rpc AddRule (AddUserRuleRequest) returns (AddUserRuleResponse) {
+    rpc AddRule (AddUserRuleRequest) returns (UserRule) {
         option (google.api.http) = {
             post: "/v1/users/{user_uuid}/rules"
             body: "*"
@@ -173,9 +179,9 @@ service UserService {
     }
 
     // UpdateRule User rule object request
-    rpc UpdateRule (UpdateUserRuleRequest) returns (User) {
+    rpc UpdateRule (UpdateUserRuleRequest) returns (UserRule) {
         option (google.api.http) = {
-            put: "/v1/users/{user_uuid}/rules/{rule_uuid}"
+            put: "/v1/users/{user_uuid}/rules/{user_rule_uuid}"
             body: "*"
         };
     }
@@ -183,7 +189,7 @@ service UserService {
     // DeleteRole remove user role
     rpc DeleteRule (DeleteUserRuleRequest) returns (google.protobuf.Empty) {
         option (google.api.http) = {
-            delete: "/v1/users/{user_uuid}/rules/{rule_uuid}"
+            delete: "/v1/users/{user_uuid}/rules/{user_rule_uuid}"
         };
     }
 

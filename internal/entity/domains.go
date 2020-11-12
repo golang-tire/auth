@@ -8,11 +8,11 @@ import (
 )
 
 type Domain struct {
-	tableName struct{} `pg:"domains,alias:d"` //nolint
+	tableName struct{} `pg:"domains,alias:domain"` //nolint
 	ID        uint64   `pg:",pk"`
-	UUID      string   `pg:"default:gen_random_uuid()"`
-	Name      string
-	Enable    bool
+	UUID      string
+	Name      string `pg:",unique"`
+	Enable    bool   `pg:"default:FALSE,notnull,use_zero"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }

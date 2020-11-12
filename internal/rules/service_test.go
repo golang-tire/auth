@@ -2,18 +2,11 @@ package rules
 
 import (
 	"context"
-	"errors"
 	"testing"
 
-	"github.com/google/uuid"
-
-	"github.com/go-pg/pg/v10"
-	"github.com/golang-tire/auth/internal/entity"
 	auth "github.com/golang-tire/auth/internal/proto/v1"
 	"github.com/stretchr/testify/assert"
 )
-
-var errCRUD = errors.New("error crud")
 
 func TestCreateRuleRequest_Validate(t *testing.T) {
 	tests := []struct {
@@ -195,58 +188,4 @@ func Test_service_CRUD(t *testing.T) {
 	assert.Equal(t, id, rule.Uuid)
 	count, _ = s.Count(ctx)
 	assert.Equal(t, int64(1), count)
-}
-
-type mockRepository struct {
-	items []entity.Rule
-}
-
-func (m mockRepository) Get(ctx context.Context, id string) (entity.Rule, error) {
-	for _, item := range m.items {
-		if item.UUID == id {
-			return item, nil
-		}
-	}
-	return entity.Rule{}, pg.ErrNoRows
-}
-
-func (m mockRepository) Count(ctx context.Context) (int64, error) {
-	return int64(len(m.items)), nil
-}
-
-func (m mockRepository) Query(ctx context.Context, offset, limit int64) ([]entity.Rule, int, error) {
-	return m.items, len(m.items), nil
-}
-
-func (m *mockRepository) Create(ctx context.Context, rule entity.Rule) (string, error) {
-	Uuid := uuid.New().String()
-	if rule.Subject == "error" {
-		return Uuid, errCRUD
-	}
-	m.items = append(m.items, rule)
-	return Uuid, nil
-}
-
-func (m *mockRepository) Update(ctx context.Context, rule entity.Rule) error {
-	if rule.Subject == "error" {
-		return errCRUD
-	}
-	for i, item := range m.items {
-		if item.UUID == rule.UUID {
-			m.items[i] = rule
-			break
-		}
-	}
-	return nil
-}
-
-func (m *mockRepository) Delete(ctx context.Context, id string) error {
-	for i, item := range m.items {
-		if item.UUID == id {
-			m.items[i] = m.items[len(m.items)-1]
-			m.items = m.items[:len(m.items)-1]
-			break
-		}
-	}
-	return nil
 }

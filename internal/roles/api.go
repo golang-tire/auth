@@ -69,7 +69,7 @@ func (a api) DeleteRole(ctx context.Context, request *auth.DeleteRoleRequest) (*
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
-	return nil, err
+	return &empty.Empty{}, nil
 }
 
 func New(srv Service) API {

@@ -8,11 +8,11 @@ import (
 )
 
 type Role struct {
-	tableName struct{} `pg:"roles,alias:r"` //nolint
+	tableName struct{} `pg:"roles,alias:role"` //nolint
 	ID        uint64   `pg:",pk"`
-	UUID      string   `pg:"default:gen_random_uuid()"`
-	Title     string
-	Enable    bool
+	UUID      string
+	Title     string `pg:",unique"`
+	Enable    bool   `pg:"default:FALSE,notnull,use_zero"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }

@@ -78,18 +78,9 @@ func (s service) Update(ctx context.Context, req *auth.UpdateRoleRequest) (*auth
 	}
 	now := time.Now()
 	role.Title = req.Title
+	role.Enable = req.Enable
 	role.UpdatedAt = now
-
-	roleModel := entity.Role{
-		ID:        role.ID,
-		UUID:      role.UUID,
-		Title:     req.Title,
-		Enable:    req.Enable,
-		CreatedAt: role.CreatedAt,
-		UpdatedAt: now,
-	}
-
-	if err := s.repo.Update(ctx, roleModel); err != nil {
+	if err := s.repo.Update(ctx, role); err != nil {
 		return nil, err
 	}
 	return role.ToProto(), nil
@@ -97,14 +88,14 @@ func (s service) Update(ctx context.Context, req *auth.UpdateRoleRequest) (*auth
 
 // Delete deletes the role with the specified UUID.
 func (s service) Delete(ctx context.Context, UUID string) (*auth.Role, error) {
-	role, err := s.Get(ctx, UUID)
+	role, err := s.repo.Get(ctx, UUID)
 	if err != nil {
 		return nil, err
 	}
-	if err = s.repo.Delete(ctx, UUID); err != nil {
+	if err = s.repo.Delete(ctx, role); err != nil {
 		return nil, err
 	}
-	return role, nil
+	return role.ToProto(), nil
 }
 
 // Count returns the number of roles.

@@ -4,6 +4,8 @@ import (
 	"context"
 	"time"
 
+	"github.com/golang-tire/auth/internal/domains"
+
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/golang-tire/auth/internal/entity"
 	auth "github.com/golang-tire/auth/internal/proto/v1"
@@ -40,12 +42,13 @@ func ValidateUpdateRequest(u *auth.UpdateRuleRequest) error {
 }
 
 type service struct {
-	repo Repository
+	repo        Repository
+	domainsRepo domains.Repository
 }
 
 // NewService creates a new rule service.
-func NewService(repo Repository) Service {
-	return service{repo}
+func NewService(repo Repository, domainsRepo domains.Repository) Service {
+	return service{repo, domainsRepo}
 }
 
 // Get returns the rule with the specified the rule UUID.
@@ -62,10 +65,18 @@ func (s service) Create(ctx context.Context, req *auth.CreateRuleRequest) (*auth
 	if err := ValidateCreateRequest(req); err != nil {
 		return nil, err
 	}
+
+	domain, err := s.domainsRepo.GetByName(ctx, req.Domain)
+	if err != nil {
+		return nil, err
+	}
+
 	id, err := s.repo.Create(ctx, entity.Rule{
-		Subject: req.Subject,
-		Object:  req.Object,
-		Action:  req.Action,
+		Subject:  req.Subject,
+		DomainID: domain.ID,
+		Domain:   &domain,
+		Object:   req.Object,
+		Action:   req.Action,
 	})
 	if err != nil {
 		return nil, err
@@ -83,23 +94,21 @@ func (s service) Update(ctx context.Context, req *auth.UpdateRuleRequest) (*auth
 	if err != nil {
 		return nil, err
 	}
+
+	domain, err := s.domainsRepo.GetByName(ctx, req.Domain)
+	if err != nil {
+		return nil, err
+	}
+
 	now := time.Now()
 	rule.Subject = req.Subject
+	rule.Domain = &domain
+	rule.DomainID = domain.ID
 	rule.Object = req.Object
 	rule.Action = req.Action
 	rule.UpdatedAt = now
 
-	ruleModel := entity.Rule{
-		ID:        rule.ID,
-		UUID:      rule.UUID,
-		Subject:   req.Subject,
-		Object:    req.Object,
-		Action:    req.Action,
-		CreatedAt: rule.CreatedAt,
-		UpdatedAt: now,
-	}
-
-	if err := s.repo.Update(ctx, ruleModel); err != nil {
+	if err := s.repo.Update(ctx, rule); err != nil {
 		return nil, err
 	}
 	return rule.ToProto(), nil
@@ -107,14 +116,14 @@ func (s service) Update(ctx context.Context, req *auth.UpdateRuleRequest) (*auth
 
 // Delete deletes the rule with the specified UUID.
 func (s service) Delete(ctx context.Context, UUID string) (*auth.Rule, error) {
-	rule, err := s.Get(ctx, UUID)
+	rule, err := s.repo.Get(ctx, UUID)
 	if err != nil {
 		return nil, err
 	}
-	if err = s.repo.Delete(ctx, UUID); err != nil {
+	if err = s.repo.Delete(ctx, rule); err != nil {
 		return nil, err
 	}
-	return rule, nil
+	return rule.ToProto(), nil
 }
 
 // Count returns the number of rules.

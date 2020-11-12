@@ -4,7 +4,12 @@ import (
 	"context"
 	"time"
 
+	"github.com/golang/protobuf/ptypes"
+
+	"github.com/golang-tire/auth/internal/rules"
+
 	validation "github.com/go-ozzo/ozzo-validation/v4"
+	"github.com/go-ozzo/ozzo-validation/v4/is"
 	"github.com/golang-tire/auth/internal/entity"
 	auth "github.com/golang-tire/auth/internal/proto/v1"
 )
@@ -14,17 +19,24 @@ type Service interface {
 	Get(ctx context.Context, uuid string) (*auth.User, error)
 	Query(ctx context.Context, offset, limit int64) (*auth.ListUsersResponse, error)
 	Count(ctx context.Context) (int64, error)
-	Create(ctx context.Context, input *auth.CreateUserRequest) (*auth.User, error)
-	Update(ctx context.Context, input *auth.UpdateUserRequest) (*auth.User, error)
+	Create(ctx context.Context, req *auth.CreateUserRequest) (*auth.User, error)
+	Update(ctx context.Context, req *auth.UpdateUserRequest) (*auth.User, error)
 	Delete(ctx context.Context, uuid string) (*auth.User, error)
+
+	AddRule(ctx context.Context, req *auth.AddUserRuleRequest) (*auth.UserRule, error)
+	UpdateRule(ctx context.Context, req *auth.UpdateUserRuleRequest) (*auth.UserRule, error)
+	DeleteRule(ctx context.Context, req *auth.DeleteUserRuleRequest) (*auth.User, error)
+	AddDomainRole(ctx context.Context, req *auth.AddDomainRoleRequest) (*auth.AddDomainRoleResponse, error)
+	UpdateDomainRole(ctx context.Context, req *auth.UpdateDomainRoleRequest) (*auth.User, error)
+	DeleteDomainRole(ctx context.Context, req *auth.DeleteDomainRoleRequest) (*auth.User, error)
 }
 
 // ValidateCreateRequest validates the CreateUserRequest fields.
 func ValidateCreateRequest(c *auth.CreateUserRequest) error {
 	return validation.ValidateStruct(c,
-		validation.Field(&c.Username, validation.Required, validation.Length(0, 128)),
-		validation.Field(&c.Password, validation.Required, validation.Length(0, 128)),
-		validation.Field(&c.Email, validation.Required, validation.Length(0, 128)),
+		validation.Field(&c.Username, validation.Required, validation.Length(6, 128)),
+		validation.Field(&c.Password, validation.Required, validation.Length(8, 128)),
+		validation.Field(&c.Email, validation.Required, validation.Length(4, 128), is.Email),
 	)
 }
 
@@ -35,13 +47,31 @@ func ValidateUpdateRequest(u *auth.UpdateUserRequest) error {
 	)
 }
 
+// ValidateAddUserRuleRequest validates the AddUserRuleRequest fields.
+func ValidateAddUserRuleRequest(c *auth.AddUserRuleRequest) error {
+	return validation.ValidateStruct(c,
+		validation.Field(&c.UserUuid, validation.Required, validation.Length(36, 36), is.UUIDv4),
+		validation.Field(&c.RuleUuid, validation.Required, validation.Length(36, 36), is.UUIDv4),
+	)
+}
+
+// ValidateUpdateUserRuleRequest validates the UpdateUserRequest fields.
+func ValidateUpdateUserRuleRequest(u *auth.UpdateUserRuleRequest) error {
+	return validation.ValidateStruct(u,
+		validation.Field(&u.UserUuid, validation.Required, validation.Length(36, 36), is.UUIDv4),
+		validation.Field(&u.RuleUuid, validation.Required, validation.Length(36, 36), is.UUIDv4),
+		validation.Field(&u.UserRuleUuid, validation.Required, validation.Length(36, 36), is.UUIDv4),
+	)
+}
+
 type service struct {
-	repo Repository
+	repo     Repository
+	ruleRepo rules.Repository
 }
 
 // NewService creates a new user service.
-func NewService(repo Repository) Service {
-	return service{repo}
+func NewService(repo Repository, ruleRepo rules.Repository) Service {
+	return service{repo, ruleRepo}
 }
 
 // Get returns the user with the specified the user UUID.
@@ -122,14 +152,14 @@ func (s service) Update(ctx context.Context, req *auth.UpdateUserRequest) (*auth
 
 // Delete deletes the user with the specified UUID.
 func (s service) Delete(ctx context.Context, UUID string) (*auth.User, error) {
-	user, err := s.Get(ctx, UUID)
+	user, err := s.repo.Get(ctx, UUID)
 	if err != nil {
 		return nil, err
 	}
-	if err = s.repo.Delete(ctx, UUID); err != nil {
+	if err = s.repo.Delete(ctx, user); err != nil {
 		return nil, err
 	}
-	return user, nil
+	return user.ToProto(), nil
 }
 
 // Count returns the number of users.
@@ -149,4 +179,90 @@ func (s service) Query(ctx context.Context, offset, limit int64) (*auth.ListUser
 		Offset:     offset,
 		Limit:      limit,
 	}, nil
+}
+
+// AddRule add a rule item to user
+func (s service) AddRule(ctx context.Context, req *auth.AddUserRuleRequest) (*auth.UserRule, error) {
+	if err := ValidateAddUserRuleRequest(req); err != nil {
+		return nil, err
+	}
+	user, err := s.repo.Get(ctx, req.UserUuid)
+	if err != nil {
+		return nil, err
+	}
+
+	rule, err := s.ruleRepo.Get(ctx, req.RuleUuid)
+	if err != nil {
+		return nil, err
+	}
+
+	userRule, err := s.repo.AddRule(ctx, user, rule)
+	if err != nil {
+		return nil, err
+	}
+
+	return &auth.UserRule{
+		Uuid:     userRule.UUID,
+		UserUuid: user.UUID,
+		Rule:     rule.ToProto(),
+	}, nil
+}
+
+// UpdateRule update rule item to user
+func (s service) UpdateRule(ctx context.Context, req *auth.UpdateUserRuleRequest) (*auth.UserRule, error) {
+	if err := ValidateUpdateUserRuleRequest(req); err != nil {
+		return nil, err
+	}
+	user, err := s.repo.Get(ctx, req.UserUuid)
+	if err != nil {
+		return nil, err
+	}
+
+	rule, err := s.ruleRepo.Get(ctx, req.RuleUuid)
+	if err != nil {
+		return nil, err
+	}
+
+	oldUserRule, err := s.repo.GetRule(ctx, req.UserRuleUuid)
+	if err != nil {
+		return nil, err
+	}
+
+	userRule, err := s.repo.UpdateRule(ctx, oldUserRule.UUID, user, rule)
+	if err != nil {
+		return nil, err
+	}
+
+	c, _ := ptypes.TimestampProto(userRule.CreatedAt)
+	u, _ := ptypes.TimestampProto(userRule.UpdatedAt)
+	return &auth.UserRule{
+		Uuid:      userRule.UUID,
+		UserUuid:  user.UUID,
+		Rule:      rule.ToProto(),
+		CreatedAt: c,
+		UpdatedAt: u,
+	}, nil
+}
+
+func (s service) DeleteRule(ctx context.Context, req *auth.DeleteUserRuleRequest) (*auth.User, error) {
+	user, err := s.repo.Get(ctx, req.UserRuleUuid)
+	if err != nil {
+		return nil, err
+	}
+	if err = s.repo.Delete(ctx, user); err != nil {
+		return nil, err
+	}
+	return user.ToProto(), nil
+}
+
+func (s service) AddDomainRole(ctx context.Context, req *auth.AddDomainRoleRequest) (*auth.AddDomainRoleResponse, error) {
+	panic("implement me")
+}
+
+func (s service) UpdateDomainRole(ctx context.Context, req *auth.UpdateDomainRoleRequest) (*auth.User, error) {
+	panic("implement me")
+}
+
+func (s service) DeleteDomainRole(ctx context.Context, req *auth.DeleteDomainRoleRequest) (*auth.User, error) {
+	panic("implement me")
 }

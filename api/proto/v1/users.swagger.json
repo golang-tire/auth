@@ -208,7 +208,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/authV1AddUserRuleResponse"
+              "$ref": "#/definitions/authV1UserRule"
             }
           },
           "default": {
@@ -239,7 +239,7 @@
         ]
       }
     },
-    "/v1/users/{user_uuid}/rules/{rule_uuid}": {
+    "/v1/users/{user_uuid}/rules/{user_rule_uuid}": {
       "delete": {
         "summary": "DeleteRole remove user role",
         "operationId": "UserService_DeleteRule",
@@ -265,7 +265,7 @@
             "type": "string"
           },
           {
-            "name": "rule_uuid",
+            "name": "user_rule_uuid",
             "in": "path",
             "required": true,
             "type": "string"
@@ -282,7 +282,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/authV1User"
+              "$ref": "#/definitions/authV1UserRule"
             }
           },
           "default": {
@@ -300,7 +300,7 @@
             "type": "string"
           },
           {
-            "name": "rule_uuid",
+            "name": "user_rule_uuid",
             "in": "path",
             "required": true,
             "type": "string"
@@ -446,6 +446,9 @@
         },
         "enable": {
           "type": "boolean"
+        },
+        "domain_role_uuid": {
+          "type": "string"
         }
       }
     },
@@ -455,16 +458,8 @@
         "user_uuid": {
           "type": "string"
         },
-        "role_uuid": {
+        "rule_uuid": {
           "type": "string"
-        }
-      }
-    },
-    "authV1AddUserRuleResponse": {
-      "type": "object",
-      "properties": {
-        "rule": {
-          "$ref": "#/definitions/authV1Rule"
         }
       }
     },
@@ -680,6 +675,9 @@
         },
         "rule_uuid": {
           "type": "string"
+        },
+        "user_rule_uuid": {
+          "type": "string"
         }
       }
     },
@@ -727,6 +725,28 @@
           "items": {
             "$ref": "#/definitions/authV1Rule"
           }
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "authV1UserRule": {
+      "type": "object",
+      "properties": {
+        "uuid": {
+          "type": "string"
+        },
+        "user_uuid": {
+          "type": "string"
+        },
+        "rule": {
+          "$ref": "#/definitions/authV1Rule"
         },
         "created_at": {
           "type": "string",

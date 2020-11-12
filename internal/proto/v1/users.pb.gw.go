@@ -381,15 +381,15 @@ func request_UserService_UpdateRule_0(ctx context.Context, marshaler runtime.Mar
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "user_uuid", err)
 	}
 
-	val, ok = pathParams["rule_uuid"]
+	val, ok = pathParams["user_rule_uuid"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "rule_uuid")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "user_rule_uuid")
 	}
 
-	protoReq.RuleUuid, err = runtime.String(val)
+	protoReq.UserRuleUuid, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "rule_uuid", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "user_rule_uuid", err)
 	}
 
 	msg, err := client.UpdateRule(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -427,15 +427,15 @@ func local_request_UserService_UpdateRule_0(ctx context.Context, marshaler runti
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "user_uuid", err)
 	}
 
-	val, ok = pathParams["rule_uuid"]
+	val, ok = pathParams["user_rule_uuid"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "rule_uuid")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "user_rule_uuid")
 	}
 
-	protoReq.RuleUuid, err = runtime.String(val)
+	protoReq.UserRuleUuid, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "rule_uuid", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "user_rule_uuid", err)
 	}
 
 	msg, err := server.UpdateRule(ctx, &protoReq)
@@ -465,15 +465,15 @@ func request_UserService_DeleteRule_0(ctx context.Context, marshaler runtime.Mar
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "user_uuid", err)
 	}
 
-	val, ok = pathParams["rule_uuid"]
+	val, ok = pathParams["user_rule_uuid"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "rule_uuid")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "user_rule_uuid")
 	}
 
-	protoReq.RuleUuid, err = runtime.String(val)
+	protoReq.UserRuleUuid, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "rule_uuid", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "user_rule_uuid", err)
 	}
 
 	msg, err := client.DeleteRule(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -503,15 +503,15 @@ func local_request_UserService_DeleteRule_0(ctx context.Context, marshaler runti
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "user_uuid", err)
 	}
 
-	val, ok = pathParams["rule_uuid"]
+	val, ok = pathParams["user_rule_uuid"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "rule_uuid")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "user_rule_uuid")
 	}
 
-	protoReq.RuleUuid, err = runtime.String(val)
+	protoReq.UserRuleUuid, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "rule_uuid", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "user_rule_uuid", err)
 	}
 
 	msg, err := server.DeleteRule(ctx, &protoReq)
@@ -1293,9 +1293,9 @@ var (
 
 	pattern_UserService_AddRule_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"v1", "users", "user_uuid", "rules"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_UserService_UpdateRule_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"v1", "users", "user_uuid", "rules", "rule_uuid"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_UserService_UpdateRule_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"v1", "users", "user_uuid", "rules", "user_rule_uuid"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_UserService_DeleteRule_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"v1", "users", "user_uuid", "rules", "rule_uuid"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_UserService_DeleteRule_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"v1", "users", "user_uuid", "rules", "user_rule_uuid"}, "", runtime.AssumeColonVerbOpt(true)))
 
 	pattern_UserService_AddDomainRole_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"v1", "users", "user_uuid", "domain-roles"}, "", runtime.AssumeColonVerbOpt(true)))
 

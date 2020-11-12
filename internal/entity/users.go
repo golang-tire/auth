@@ -10,40 +10,45 @@ import (
 )
 
 type User struct {
-	tableName   struct{} `pg:"users,alias:u"` //nolint
+	tableName   struct{} `pg:"users,alias:user"` //nolint
 	ID          uint64   `pg:",pk"`
-	UUID        string   `pg:"default:gen_random_uuid()"`
+	UUID        string
 	Firstname   string
 	Lastname    string
-	Username    string
+	Username    string `pg:",unique"`
 	Password    string
 	Gender      string
 	AvatarURL   string
-	Email       string
-	Enable      bool
+	Email       string `pg:",unique"`
+	Enable      bool   `pg:"default:FALSE,notnull,use_zero"`
 	RawData     string
-	Rules       []*Rule       `pg:"many2many:user_rules"`
+	Rules       []Rule        `pg:"many2many:user_rules"`
 	DomainRoles []*DomainRole `pg:"rel:has-many"`
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 }
 
 type UserRule struct {
-	tableName struct{} `pg:"user_rules,alias:ur"` //nolint
-	RuleId    uint64
-	UserId    uint64
+	tableName struct{} `pg:"user_rules,alias:user_role"` //nolint
+	UUID      string
+	Rule      *Rule  `pg:"rel:has-one"`
+	RuleID    uint64 `pg:"unique:rule_id"`
+	User      *User  `pg:"rel:has-one"`
+	UserID    uint64 `pg:"unique:user_id"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 
 type DomainRole struct {
-	tableName struct{} `pg:"user_domain_roles,alias:dr"` //nolint
+	tableName struct{} `pg:"user_domain_roles,alias:domain_role"` //nolint
 	ID        uint64   `pg:",pk"`
-	UUID      string   `pg:"default:gen_random_uuid()"`
+	UUID      string
 	RoleId    uint64
 	Role      *Role `pg:"rel:has-one"`
 	UserID    uint64
 	DomainId  uint64
 	Domain    *Domain `pg:"rel:has-one"`
-	Enable    bool
+	Enable    bool    `pg:"default:TRUE,notnull,use_zero"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
@@ -91,7 +96,6 @@ func UserFromProto(user *auth.User) User {
 		Enable:      user.Enable,
 		RawData:     user.RawData,
 		DomainRoles: DomainRoleListFromProto(user.DomainRoles),
-		Rules:       RuleListFromProto(user.Rules),
 		CreatedAt:   c,
 		UpdatedAt:   u,
 	}

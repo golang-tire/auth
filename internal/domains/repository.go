@@ -15,6 +15,8 @@ import (
 type Repository interface {
 	// Get returns the domain with the specified domain UUID.
 	Get(ctx context.Context, uuid string) (entity.Domain, error)
+	// GetByName returns the domain with the specified domain name.
+	GetByName(ctx context.Context, name string) (entity.Domain, error)
 	// Count returns the number of domains.
 	Count(ctx context.Context) (int64, error)
 	// Query returns the list of domains with the given offset and limit.
@@ -24,7 +26,7 @@ type Repository interface {
 	// Update updates the domain with given UUID in the storage.
 	Update(ctx context.Context, domain entity.Domain) error
 	// Delete removes the domain with given UUID from the storage.
-	Delete(ctx context.Context, uuid string) error
+	Delete(ctx context.Context, domain entity.Domain) error
 }
 
 // repository persists domains in database
@@ -44,6 +46,13 @@ func (r repository) Get(ctx context.Context, uuid string) (entity.Domain, error)
 	return domain, err
 }
 
+// GetByName returns the domain with the specified domain name.
+func (r repository) GetByName(ctx context.Context, name string) (entity.Domain, error) {
+	var domain entity.Domain
+	err := r.db.With(ctx).Model(&domain).Where("name = ?", name).First()
+	return domain, err
+}
+
 // Create saves a new domain record in the database.
 // It returns the UUID of the newly inserted domain record.
 func (r repository) Create(ctx context.Context, domain entity.Domain) (string, error) {
@@ -57,17 +66,13 @@ func (r repository) Create(ctx context.Context, domain entity.Domain) (string, e
 
 // Update saves the changes to an domain in the database.
 func (r repository) Update(ctx context.Context, domain entity.Domain) error {
-	_, err := r.db.With(ctx).Model(&domain).WherePK().Update()
+	_, err := r.db.With(ctx).Model(&domain).WherePK().UpdateNotZero()
 	return err
 }
 
 // Delete deletes an domain with the specified ID from the database.
-func (r repository) Delete(ctx context.Context, uuid string) error {
-	domain, err := r.Get(ctx, uuid)
-	if err != nil {
-		return err
-	}
-	_, err = r.db.With(ctx).Model(&domain).WherePK().Delete()
+func (r repository) Delete(ctx context.Context, domain entity.Domain) error {
+	_, err := r.db.With(ctx).Model(&domain).WherePK().Delete()
 	return err
 }
 

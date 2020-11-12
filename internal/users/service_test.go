@@ -5,6 +5,8 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/golang-tire/auth/internal/rules"
+
 	"github.com/google/uuid"
 
 	"github.com/go-pg/pg/v10"
@@ -110,7 +112,7 @@ func TestUpdateUserRequest_Validate(t *testing.T) {
 }
 
 func Test_service_CRUD(t *testing.T) {
-	s := NewService(&mockRepository{})
+	s := NewService(&mockRepository{}, rules.NewMockRepository())
 	ctx := context.Background()
 
 	// initial count
@@ -271,6 +273,18 @@ type mockRepository struct {
 	items []entity.User
 }
 
+func (m mockRepository) AddRule(ctx context.Context, user entity.User, rule entity.Rule) (*entity.UserRule, error) {
+	panic("implement me")
+}
+
+func (m mockRepository) GetRule(ctx context.Context, uuid string) (entity.UserRule, error) {
+	panic("implement me")
+}
+
+func (m mockRepository) UpdateRule(ctx context.Context, uuid string, user entity.User, rule entity.Rule) (*entity.UserRule, error) {
+	panic("implement me")
+}
+
 func (m mockRepository) Get(ctx context.Context, id string) (entity.User, error) {
 	for _, item := range m.items {
 		if item.UUID == id {
@@ -310,9 +324,9 @@ func (m *mockRepository) Update(ctx context.Context, user entity.User) error {
 	return nil
 }
 
-func (m *mockRepository) Delete(ctx context.Context, id string) error {
+func (m *mockRepository) Delete(ctx context.Context, user entity.User) error {
 	for i, item := range m.items {
-		if item.UUID == id {
+		if item.UUID == user.UUID {
 			m.items[i] = m.items[len(m.items)-1]
 			m.items = m.items[:len(m.items)-1]
 			break

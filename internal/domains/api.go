@@ -69,7 +69,7 @@ func (a api) DeleteDomain(ctx context.Context, request *auth.DeleteDomainRequest
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
-	return nil, err
+	return &empty.Empty{}, err
 }
 
 func New(srv Service) API {

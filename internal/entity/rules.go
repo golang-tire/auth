@@ -8,11 +8,11 @@ import (
 )
 
 type Rule struct {
-	tableName struct{} `pg:"rules,alias:ru"` //nolint
+	tableName struct{} `pg:"rules,alias:rule"` //nolint
 	ID        uint64   `pg:",pk"`
-	UUID      string   `pg:"default:gen_random_uuid()"`
+	UUID      string
 	Subject   string
-	DomainId  uint64
+	DomainID  uint64
 	Domain    *Domain `pg:"rel:has-one"`
 	Object    string
 	Action    string
@@ -29,6 +29,7 @@ func (r Rule) ToProto() *auth.Rule {
 		Subject:   r.Subject,
 		Object:    r.Object,
 		Action:    r.Action,
+		Domain:    r.Domain.Name,
 		CreatedAt: c,
 		UpdatedAt: u,
 	}

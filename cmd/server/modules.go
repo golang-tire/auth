@@ -3,6 +3,8 @@ package main
 import (
 	"context"
 
+	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+
 	"github.com/golang-tire/auth/internal/domains"
 
 	"github.com/golang-tire/auth/internal/users"
@@ -68,17 +70,27 @@ func setupModules(ctx context.Context) error {
 	roles.New(rolesSrv)
 
 	rulesRepo := rules.NewRepository(dbInstance)
-	rulesSrv := rules.NewService(rulesRepo)
+	rulesSrv := rules.NewService(rulesRepo, domainsRepo)
 	rules.New(rulesSrv)
 
 	usersRepo := users.NewRepository(dbInstance)
-	usersSrv := users.NewService(usersRepo)
+	usersSrv := users.NewService(usersRepo, rulesRepo)
 	users.New(usersSrv)
+
+	jsonpb := &runtime.JSONPb{
+		EmitDefaults: true,
+		Indent:       "  ",
+		OrigName:     true,
+	}
 
 	err = grpcgw.Serve(ctx,
 		grpcgw.GrpcPort(grpcPort.Int()),
 		grpcgw.HttpPort(httpPort.Int()),
 		grpcgw.SwaggerBaseURL(swaggerBaseURL.String()),
+		grpcgw.ServeMuxOptions(
+			runtime.WithMarshalerOption(runtime.MIMEWildcard, jsonpb),
+			runtime.WithProtoErrorHandler(runtime.DefaultHTTPProtoErrorHandler),
+		),
 	)
 
 	return err

@@ -69,14 +69,14 @@ func (a api) DeleteUser(ctx context.Context, request *auth.DeleteUserRequest) (*
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
-	return nil, err
+	return &empty.Empty{}, err
 }
 
-func (a api) AddRule(ctx context.Context, request *auth.AddUserRuleRequest) (*auth.AddUserRuleResponse, error) {
+func (a api) AddRule(ctx context.Context, request *auth.AddUserRuleRequest) (*auth.UserRule, error) {
 	panic("implement me")
 }
 
-func (a api) UpdateRule(ctx context.Context, request *auth.UpdateUserRuleRequest) (*auth.User, error) {
+func (a api) UpdateRule(ctx context.Context, request *auth.UpdateUserRuleRequest) (*auth.UserRule, error) {
 	panic("implement me")
 }
 

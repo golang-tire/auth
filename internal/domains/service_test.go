@@ -168,9 +168,9 @@ func (m *mockRepository) Update(ctx context.Context, domain entity.Domain) error
 	return nil
 }
 
-func (m *mockRepository) Delete(ctx context.Context, id string) error {
+func (m *mockRepository) Delete(ctx context.Context, domain entity.Domain) error {
 	for i, item := range m.items {
-		if item.UUID == id {
+		if item.UUID == domain.UUID {
 			m.items[i] = m.items[len(m.items)-1]
 			m.items = m.items[:len(m.items)-1]
 			break

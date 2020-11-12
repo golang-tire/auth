@@ -24,7 +24,7 @@ type Repository interface {
 	// Update updates the role with given UUID in the storage.
 	Update(ctx context.Context, role entity.Role) error
 	// Delete removes the role with given UUID from the storage.
-	Delete(ctx context.Context, uuid string) error
+	Delete(ctx context.Context, role entity.Role) error
 }
 
 // repository persists roles in database
@@ -57,17 +57,13 @@ func (r repository) Create(ctx context.Context, role entity.Role) (string, error
 
 // Update saves the changes to an role in the database.
 func (r repository) Update(ctx context.Context, role entity.Role) error {
-	_, err := r.db.With(ctx).Model(&role).WherePK().Update()
+	_, err := r.db.With(ctx).Model(&role).WherePK().UpdateNotZero()
 	return err
 }
 
 // Delete deletes an role with the specified ID from the database.
-func (r repository) Delete(ctx context.Context, uuid string) error {
-	role, err := r.Get(ctx, uuid)
-	if err != nil {
-		return err
-	}
-	_, err = r.db.With(ctx).Model(&role).WherePK().Delete()
+func (r repository) Delete(ctx context.Context, role entity.Role) error {
+	_, err := r.db.With(ctx).Model(&role).WherePK().Delete()
 	return err
 }
 

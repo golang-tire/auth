@@ -61,12 +61,12 @@ func TestRepository(t *testing.T) {
 	assert.Equal(t, count2, int64(count3))
 
 	// delete
-	err = repo.Delete(ctx, testUuid)
+	err = repo.Delete(ctx, rule)
 	assert.Nil(t, err)
 	_, err = repo.Get(ctx, testUuid)
 	assert.NotNil(t, err)
 	assert.EqualError(t, pg.ErrNoRows, err.Error())
-	err = repo.Delete(ctx, testUuid)
+	err = repo.Delete(ctx, rule)
 	assert.NotNil(t, err)
 	assert.EqualError(t, pg.ErrNoRows, err.Error())
 }

@@ -78,18 +78,10 @@ func (s service) Update(ctx context.Context, req *auth.UpdateDomainRequest) (*au
 	}
 	now := time.Now()
 	domain.Name = req.Name
+	domain.Enable = req.Enable
 	domain.UpdatedAt = now
 
-	domainModel := entity.Domain{
-		ID:        domain.ID,
-		UUID:      domain.UUID,
-		Name:      req.Name,
-		Enable:    req.Enable,
-		CreatedAt: domain.CreatedAt,
-		UpdatedAt: now,
-	}
-
-	if err := s.repo.Update(ctx, domainModel); err != nil {
+	if err := s.repo.Update(ctx, domain); err != nil {
 		return nil, err
 	}
 	return domain.ToProto(), nil
@@ -97,14 +89,14 @@ func (s service) Update(ctx context.Context, req *auth.UpdateDomainRequest) (*au
 
 // Delete deletes the domain with the specified UUID.
 func (s service) Delete(ctx context.Context, UUID string) (*auth.Domain, error) {
-	domain, err := s.Get(ctx, UUID)
+	domain, err := s.repo.Get(ctx, UUID)
 	if err != nil {
 		return nil, err
 	}
-	if err = s.repo.Delete(ctx, UUID); err != nil {
+	if err = s.repo.Delete(ctx, domain); err != nil {
 		return nil, err
 	}
-	return domain, nil
+	return domain.ToProto(), nil
 }
 
 // Count returns the number of domains.

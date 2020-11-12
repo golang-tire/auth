@@ -69,7 +69,7 @@ func (a api) DeleteRule(ctx context.Context, request *auth.DeleteRuleRequest) (*
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
-	return nil, err
+	return &empty.Empty{}, err
 }
 
 func New(srv Service) API {
