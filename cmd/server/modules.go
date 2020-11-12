@@ -3,7 +3,9 @@ package main
 import (
 	"context"
 
-	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"google.golang.org/protobuf/encoding/protojson"
+
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 
 	"github.com/golang-tire/auth/internal/domains"
 
@@ -78,9 +80,13 @@ func setupModules(ctx context.Context) error {
 	users.New(usersSrv)
 
 	jsonpb := &runtime.JSONPb{
-		EmitDefaults: true,
-		Indent:       "  ",
-		OrigName:     true,
+		MarshalOptions: protojson.MarshalOptions{
+			UseProtoNames:   true,
+			EmitUnpopulated: true,
+		},
+		UnmarshalOptions: protojson.UnmarshalOptions{
+			DiscardUnknown: true,
+		},
 	}
 
 	err = grpcgw.Serve(ctx,
@@ -89,7 +95,6 @@ func setupModules(ctx context.Context) error {
 		grpcgw.SwaggerBaseURL(swaggerBaseURL.String()),
 		grpcgw.ServeMuxOptions(
 			runtime.WithMarshalerOption(runtime.MIMEWildcard, jsonpb),
-			runtime.WithProtoErrorHandler(runtime.DefaultHTTPProtoErrorHandler),
 		),
 	)
 

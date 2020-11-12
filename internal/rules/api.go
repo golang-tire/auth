@@ -7,7 +7,7 @@ import (
 	auth "github.com/golang-tire/auth/internal/proto/v1"
 	"github.com/golang-tire/pkg/grpcgw"
 	"github.com/golang/protobuf/ptypes/empty"
-	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -15,11 +15,11 @@ import (
 
 type API interface {
 	grpcgw.Controller
-	auth.RuleServiceServer
 }
 
 type api struct {
 	service Service
+	auth.RuleServiceServer
 }
 
 func (a api) InitRest(ctx context.Context, conn *grpc.ClientConn, mux *runtime.ServeMux) {

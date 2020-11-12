@@ -10,9 +10,11 @@ generate:
   go_options:
     import_path: github.com/golang-tire/auth
   plugins:
+    - name: go-grpc
+      type: go
+      output: .
     - name: go
       type: go
-      flags: plugins=grpc
       output: .
     - name: grpc-gateway
       type: go
