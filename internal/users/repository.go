@@ -63,7 +63,7 @@ func (r repository) Create(ctx context.Context, user entity.User) (string, error
 
 // Update saves the changes to an user in the database.
 func (r repository) Update(ctx context.Context, user entity.User) error {
-	_, err := r.db.With(ctx).Model(&user).WherePK().Update()
+	_, err := r.db.With(ctx).Model(&user).WherePK().UpdateNotZero()
 	return err
 }
 

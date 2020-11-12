@@ -128,23 +128,7 @@ func (s service) Update(ctx context.Context, req *auth.UpdateUserRequest) (*auth
 	user.Email = req.Email
 	user.UpdatedAt = now
 
-	userModel := entity.User{
-		ID:        user.ID,
-		UUID:      user.UUID,
-		Firstname: req.Firstname,
-		Lastname:  req.Lastname,
-		Username:  req.Username,
-		Password:  req.Password,
-		Gender:    req.Gender,
-		AvatarURL: req.AvatarUrl,
-		Email:     req.Email,
-		Enable:    req.Enable,
-		RawData:   req.RawData,
-		CreatedAt: user.CreatedAt,
-		UpdatedAt: now,
-	}
-
-	if err := s.repo.Update(ctx, userModel); err != nil {
+	if err := s.repo.Update(ctx, user); err != nil {
 		return nil, err
 	}
 	return user.ToProto(), nil
