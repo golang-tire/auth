@@ -25,7 +25,7 @@ type Repository interface {
 	Update(ctx context.Context, user entity.User) error
 	// Delete removes the user from the storage.
 	Delete(ctx context.Context, user entity.User) error
-
+	// AddRule add a new rule to user
 	AddRule(ctx context.Context, user entity.User, rule entity.Rule) (*entity.UserRule, error)
 	// GetRule returns the user rule with the specified user UUID.
 	GetRule(ctx context.Context, uuid string) (entity.UserRule, error)

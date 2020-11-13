@@ -76,27 +76,51 @@ func (a api) DeleteUser(ctx context.Context, request *auth.DeleteUserRequest) (*
 }
 
 func (a api) AddRule(ctx context.Context, request *auth.AddUserRuleRequest) (*auth.UserRule, error) {
-	panic("implement me")
+	userRule, err := a.service.AddRule(ctx, request)
+	if err != nil {
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+	return userRule, nil
 }
 
 func (a api) UpdateRule(ctx context.Context, request *auth.UpdateUserRuleRequest) (*auth.UserRule, error) {
-	panic("implement me")
+	userRule, err := a.service.UpdateRule(ctx, request)
+	if err != nil {
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+	return userRule, nil
 }
 
 func (a api) DeleteRule(ctx context.Context, request *auth.DeleteUserRuleRequest) (*empty.Empty, error) {
-	panic("implement me")
+	_, err := a.service.DeleteRule(ctx, request)
+	if err != nil {
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+	return &empty.Empty{}, nil
 }
 
 func (a api) AddDomainRole(ctx context.Context, request *auth.AddDomainRoleRequest) (*auth.AddDomainRoleResponse, error) {
-	panic("implement me")
+	domainRole, err := a.service.AddDomainRole(ctx, request)
+	if err != nil {
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+	return domainRole, nil
 }
 
 func (a api) UpdateDomainRole(ctx context.Context, request *auth.UpdateDomainRoleRequest) (*auth.User, error) {
-	panic("implement me")
+	user, err := a.service.UpdateDomainRole(ctx, request)
+	if err != nil {
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+	return user, nil
 }
 
 func (a api) DeleteDomainRole(ctx context.Context, request *auth.DeleteDomainRoleRequest) (*empty.Empty, error) {
-	panic("implement me")
+	_, err := a.service.DeleteDomainRole(ctx, request)
+	if err != nil {
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+	return &empty.Empty{}, nil
 }
 
 func New(srv Service) API {
