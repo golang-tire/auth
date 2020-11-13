@@ -4,9 +4,9 @@ import (
 	"context"
 	"time"
 
-	"github.com/golang/protobuf/ptypes"
+	"github.com/golang-tire/auth/internal/domains"
 
-	"github.com/golang-tire/auth/internal/rules"
+	"github.com/golang-tire/auth/internal/roles"
 
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/go-ozzo/ozzo-validation/v4/is"
@@ -23,12 +23,9 @@ type Service interface {
 	Update(ctx context.Context, req *auth.UpdateUserRequest) (*auth.User, error)
 	Delete(ctx context.Context, uuid string) (*auth.User, error)
 
-	AddRule(ctx context.Context, req *auth.AddUserRuleRequest) (*auth.UserRule, error)
-	UpdateRule(ctx context.Context, req *auth.UpdateUserRuleRequest) (*auth.UserRule, error)
-	DeleteRule(ctx context.Context, req *auth.DeleteUserRuleRequest) (*auth.User, error)
-	AddDomainRole(ctx context.Context, req *auth.AddDomainRoleRequest) (*auth.AddDomainRoleResponse, error)
-	UpdateDomainRole(ctx context.Context, req *auth.UpdateDomainRoleRequest) (*auth.User, error)
-	DeleteDomainRole(ctx context.Context, req *auth.DeleteDomainRoleRequest) (*auth.User, error)
+	AddUserRole(ctx context.Context, req *auth.AddUserRoleRequest) (*auth.User, error)
+	UpdateUserRole(ctx context.Context, req *auth.UpdateUserRoleRequest) (*auth.User, error)
+	DeleteUserRole(ctx context.Context, req *auth.DeleteUserRoleRequest) (*auth.User, error)
 }
 
 // ValidateCreateRequest validates the CreateUserRequest fields.
@@ -47,31 +44,33 @@ func ValidateUpdateRequest(u *auth.UpdateUserRequest) error {
 	)
 }
 
-// ValidateAddUserRuleRequest validates the AddUserRuleRequest fields.
-func ValidateAddUserRuleRequest(c *auth.AddUserRuleRequest) error {
+// ValidateAddUserRoleRequest validates the AddUserRoleRequest fields.
+func ValidateAddUserRoleRequest(c *auth.AddUserRoleRequest) error {
 	return validation.ValidateStruct(c,
-		validation.Field(&c.UserUuid, validation.Required, validation.Length(36, 36), is.UUIDv4),
-		validation.Field(&c.RuleUuid, validation.Required, validation.Length(36, 36), is.UUIDv4),
+		validation.Field(&c.Uuid, validation.Required, is.UUID),
+		validation.Field(&c.RoleUuid, validation.Required, is.UUID),
+		validation.Field(&c.DomainUuid, validation.Required, is.UUID),
 	)
 }
 
-// ValidateUpdateUserRuleRequest validates the UpdateUserRequest fields.
-func ValidateUpdateUserRuleRequest(u *auth.UpdateUserRuleRequest) error {
-	return validation.ValidateStruct(u,
-		validation.Field(&u.UserUuid, validation.Required, validation.Length(36, 36), is.UUIDv4),
-		validation.Field(&u.RuleUuid, validation.Required, validation.Length(36, 36), is.UUIDv4),
-		validation.Field(&u.UserRuleUuid, validation.Required, validation.Length(36, 36), is.UUIDv4),
+// ValidateUpdateUserRoleRequest validates the AddUserRoleRequest fields.
+func ValidateUpdateUserRoleRequest(c *auth.UpdateUserRoleRequest) error {
+	return validation.ValidateStruct(c,
+		validation.Field(&c.Uuid, validation.Required, is.UUID),
+		validation.Field(&c.RoleUuid, validation.Required, is.UUID),
+		validation.Field(&c.DomainUuid, validation.Required, is.UUID),
 	)
 }
 
 type service struct {
-	repo     Repository
-	ruleRepo rules.Repository
+	repo        Repository
+	domainsRepo domains.Repository
+	rolesRepo   roles.Repository
 }
 
 // NewService creates a new user service.
-func NewService(repo Repository, ruleRepo rules.Repository) Service {
-	return service{repo, ruleRepo}
+func NewService(repo Repository, domainsRepo domains.Repository, rolesRepo roles.Repository) Service {
+	return service{repo, domainsRepo, rolesRepo}
 }
 
 // Get returns the user with the specified the user UUID.
@@ -89,17 +88,15 @@ func (s service) Create(ctx context.Context, req *auth.CreateUserRequest) (*auth
 		return nil, err
 	}
 	id, err := s.repo.Create(ctx, entity.User{
-		Firstname:   req.Firstname,
-		Lastname:    req.Lastname,
-		Username:    req.Username,
-		Password:    req.Password,
-		Gender:      req.Gender,
-		AvatarURL:   req.AvatarUrl,
-		Email:       req.Email,
-		Enable:      req.Enable,
-		RawData:     req.RawData,
-		Rules:       nil,
-		DomainRoles: nil,
+		Firstname: req.Firstname,
+		Lastname:  req.Lastname,
+		Username:  req.Username,
+		Password:  req.Password,
+		Gender:    req.Gender,
+		AvatarURL: req.AvatarUrl,
+		Email:     req.Email,
+		Enable:    req.Enable,
+		RawData:   req.RawData,
 	})
 	if err != nil {
 		return nil, err
@@ -165,88 +162,86 @@ func (s service) Query(ctx context.Context, offset, limit int64) (*auth.ListUser
 	}, nil
 }
 
-// AddRule add a rule item to user
-func (s service) AddRule(ctx context.Context, req *auth.AddUserRuleRequest) (*auth.UserRule, error) {
-	if err := ValidateAddUserRuleRequest(req); err != nil {
+func (s service) AddUserRole(ctx context.Context, req *auth.AddUserRoleRequest) (*auth.User, error) {
+	if err := ValidateAddUserRoleRequest(req); err != nil {
 		return nil, err
 	}
-	user, err := s.repo.Get(ctx, req.UserUuid)
+	user, err := s.repo.Get(ctx, req.Uuid)
 	if err != nil {
 		return nil, err
 	}
 
-	rule, err := s.ruleRepo.Get(ctx, req.RuleUuid)
+	domain, err := s.domainsRepo.Get(ctx, req.DomainUuid)
 	if err != nil {
 		return nil, err
 	}
 
-	userRule, err := s.repo.AddRule(ctx, user, rule)
+	role, err := s.rolesRepo.Get(ctx, req.RoleUuid)
 	if err != nil {
 		return nil, err
 	}
 
-	return &auth.UserRule{
-		Uuid:     userRule.UUID,
-		UserUuid: user.UUID,
-		Rule:     rule.ToProto(),
-	}, nil
+	_, err = s.repo.AddUserRole(ctx, entity.UserRole{
+		RoleId:   role.ID,
+		Role:     &role,
+		UserID:   user.ID,
+		DomainId: domain.ID,
+		Domain:   &domain,
+		Enable:   req.Enable,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	// get updated user with its latest roles
+	return s.Get(ctx, user.UUID)
 }
 
-// UpdateRule update rule item to user
-func (s service) UpdateRule(ctx context.Context, req *auth.UpdateUserRuleRequest) (*auth.UserRule, error) {
-	if err := ValidateUpdateUserRuleRequest(req); err != nil {
+func (s service) UpdateUserRole(ctx context.Context, req *auth.UpdateUserRoleRequest) (*auth.User, error) {
+
+	if err := ValidateUpdateUserRoleRequest(req); err != nil {
 		return nil, err
 	}
-	user, err := s.repo.Get(ctx, req.UserUuid)
+
+	user, err := s.repo.Get(ctx, req.Uuid)
 	if err != nil {
 		return nil, err
 	}
 
-	rule, err := s.ruleRepo.Get(ctx, req.RuleUuid)
+	domain, err := s.domainsRepo.Get(ctx, req.DomainUuid)
 	if err != nil {
 		return nil, err
 	}
 
-	oldUserRule, err := s.repo.GetRule(ctx, req.UserRuleUuid)
+	role, err := s.rolesRepo.Get(ctx, req.RoleUuid)
 	if err != nil {
 		return nil, err
 	}
 
-	userRule, err := s.repo.UpdateRule(ctx, oldUserRule.UUID, user, rule)
+	err = s.repo.UpdateUserRole(ctx, entity.UserRole{
+		RoleId:   role.ID,
+		Role:     &role,
+		UserID:   user.ID,
+		DomainId: domain.ID,
+		Domain:   &domain,
+		Enable:   req.Enable,
+	})
 	if err != nil {
 		return nil, err
 	}
 
-	c, _ := ptypes.TimestampProto(userRule.CreatedAt)
-	u, _ := ptypes.TimestampProto(userRule.UpdatedAt)
-	return &auth.UserRule{
-		Uuid:      userRule.UUID,
-		UserUuid:  user.UUID,
-		Rule:      rule.ToProto(),
-		CreatedAt: c,
-		UpdatedAt: u,
-	}, nil
+	// get updated user with its latest roles
+	return s.Get(ctx, user.UUID)
 }
 
-func (s service) DeleteRule(ctx context.Context, req *auth.DeleteUserRuleRequest) (*auth.User, error) {
-	user, err := s.repo.Get(ctx, req.UserRuleUuid)
+func (s service) DeleteUserRole(ctx context.Context, req *auth.DeleteUserRoleRequest) (*auth.User, error) {
+	userRole, err := s.repo.GetUserRole(ctx, req.RoleUuid)
 	if err != nil {
 		return nil, err
 	}
-	if err = s.repo.Delete(ctx, user); err != nil {
+	if err = s.repo.DeleteUserRole(ctx, userRole); err != nil {
 		return nil, err
 	}
-	return user.ToProto(), nil
-}
-
-func (s service) AddDomainRole(ctx context.Context, req *auth.AddDomainRoleRequest) (*auth.AddDomainRoleResponse, error) {
-	panic("implement me")
-}
-
-func (s service) UpdateDomainRole(ctx context.Context, req *auth.UpdateDomainRoleRequest) (*auth.User, error) {
-	panic("implement me")
-}
-
-func (s service) DeleteDomainRole(ctx context.Context, req *auth.DeleteDomainRoleRequest) (*auth.User, error) {
-	panic("implement me")
+	// get updated user with its latest roles
+	return s.Get(ctx, req.Uuid)
 }

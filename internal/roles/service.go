@@ -76,6 +76,7 @@ func (s service) Update(ctx context.Context, req *auth.UpdateRoleRequest) (*auth
 	if err != nil {
 		return nil, err
 	}
+
 	now := time.Now()
 	role.Title = req.Title
 	role.Enable = req.Enable

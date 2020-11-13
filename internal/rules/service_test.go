@@ -15,22 +15,22 @@ func TestCreateRuleRequest_Validate(t *testing.T) {
 		wantError bool
 	}{
 		{"success", auth.CreateRuleRequest{
-			Subject: "test",
-			Domain:  "test",
-			Object:  "test",
-			Action:  "test",
+			Role:   "test",
+			Domain: "test",
+			Object: "test",
+			Action: "test",
 		}, false},
 		{"required", auth.CreateRuleRequest{
-			Subject: "",
-			Domain:  "test",
-			Object:  "test",
-			Action:  "test",
+			Role:   "",
+			Domain: "test",
+			Object: "test",
+			Action: "test",
 		}, true},
 		{"too long", auth.CreateRuleRequest{
-			Subject: "test",
-			Domain:  "test",
-			Object:  "test",
-			Action:  "1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890"}, true},
+			Role:   "test",
+			Domain: "test",
+			Object: "test",
+			Action: "1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890"}, true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -47,22 +47,22 @@ func TestUpdateRuleRequest_Validate(t *testing.T) {
 		wantError bool
 	}{
 		{"success", auth.UpdateRuleRequest{
-			Subject: "test",
-			Domain:  "test",
-			Object:  "test",
-			Action:  "test",
+			Role:   "test",
+			Domain: "test",
+			Object: "test",
+			Action: "test",
 		}, false},
 		{"required", auth.UpdateRuleRequest{
-			Subject: "",
-			Domain:  "test",
-			Object:  "test",
-			Action:  "test",
+			Role:   "",
+			Domain: "test",
+			Object: "test",
+			Action: "test",
 		}, true},
 		{"too long", auth.UpdateRuleRequest{
-			Subject: "test",
-			Domain:  "test",
-			Object:  "test",
-			Action:  "1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890"}, true},
+			Role:   "test",
+			Domain: "test",
+			Object: "test",
+			Action: "1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890"}, true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -82,15 +82,15 @@ func Test_service_CRUD(t *testing.T) {
 
 	// successful creation
 	rule, err := s.Create(ctx, &auth.CreateRuleRequest{
-		Subject: "test",
-		Domain:  "test",
-		Object:  "test",
-		Action:  "test",
+		Role:   "test",
+		Domain: "test",
+		Object: "test",
+		Action: "test",
 	})
 	assert.Nil(t, err)
 	assert.NotEmpty(t, rule.Uuid)
 	id := rule.Uuid
-	assert.Equal(t, "test", rule.Subject)
+	assert.Equal(t, "test", rule.Role)
 	assert.NotEmpty(t, rule.CreatedAt)
 	assert.NotEmpty(t, rule.UpdatedAt)
 	count, _ = s.Count(ctx)
@@ -98,10 +98,10 @@ func Test_service_CRUD(t *testing.T) {
 
 	// validation error in creation
 	_, err = s.Create(ctx, &auth.CreateRuleRequest{
-		Subject: "",
-		Domain:  "test",
-		Object:  "test",
-		Action:  "test",
+		Role:   "",
+		Domain: "test",
+		Object: "test",
+		Action: "test",
 	})
 	assert.NotNil(t, err)
 	count, _ = s.Count(ctx)
@@ -109,48 +109,48 @@ func Test_service_CRUD(t *testing.T) {
 
 	// unexpected error in creation
 	_, err = s.Create(ctx, &auth.CreateRuleRequest{
-		Subject: "error",
-		Domain:  "test",
-		Object:  "test",
-		Action:  "test",
+		Role:   "error",
+		Domain: "test",
+		Object: "test",
+		Action: "test",
 	})
 	assert.Equal(t, errCRUD, err)
 	count, _ = s.Count(ctx)
 	assert.Equal(t, int64(1), count)
 
 	_, _ = s.Create(ctx, &auth.CreateRuleRequest{
-		Subject: "test2",
-		Domain:  "test",
-		Object:  "test",
-		Action:  "test",
+		Role:   "test2",
+		Domain: "test",
+		Object: "test",
+		Action: "test",
 	})
 
 	// update
 	rule, err = s.Update(ctx, &auth.UpdateRuleRequest{
-		Subject: "test updated",
-		Domain:  "test",
-		Object:  "test",
-		Action:  "test",
-		Uuid:    id,
+		Role:   "test updated",
+		Domain: "test",
+		Object: "test",
+		Action: "test",
+		Uuid:   id,
 	})
 	assert.Nil(t, err)
-	assert.Equal(t, "test updated", rule.Subject)
+	assert.Equal(t, "test updated", rule.Role)
 	_, err = s.Update(ctx, &auth.UpdateRuleRequest{
-		Subject: "test updated",
-		Domain:  "test",
-		Object:  "test",
-		Action:  "test",
-		Uuid:    "none",
+		Role:   "test updated",
+		Domain: "test",
+		Object: "test",
+		Action: "test",
+		Uuid:   "none",
 	})
 	assert.NotNil(t, err)
 
 	// validation error in update
 	_, err = s.Update(ctx, &auth.UpdateRuleRequest{
-		Subject: "",
-		Domain:  "test",
-		Object:  "test",
-		Action:  "test",
-		Uuid:    id,
+		Role:   "",
+		Domain: "test",
+		Object: "test",
+		Action: "test",
+		Uuid:   id,
 	})
 	assert.NotNil(t, err)
 	count, _ = s.Count(ctx)
@@ -158,11 +158,11 @@ func Test_service_CRUD(t *testing.T) {
 
 	// unexpected error in update
 	_, err = s.Update(ctx, &auth.UpdateRuleRequest{
-		Subject: "error",
-		Domain:  "test",
-		Object:  "test",
-		Action:  "test",
-		Uuid:    id,
+		Role:   "error",
+		Domain: "test",
+		Object: "test",
+		Action: "test",
+		Uuid:   id,
 	})
 	assert.Equal(t, errCRUD, err)
 	count, _ = s.Count(ctx)
@@ -173,7 +173,7 @@ func Test_service_CRUD(t *testing.T) {
 	assert.NotNil(t, err)
 	rule, err = s.Get(ctx, id)
 	assert.Nil(t, err)
-	assert.Equal(t, "test updated", rule.Subject)
+	assert.Equal(t, "test updated", rule.Role)
 	assert.Equal(t, id, rule.Uuid)
 
 	// query

@@ -183,7 +183,7 @@
     "authV1CreateRuleRequest": {
       "type": "object",
       "properties": {
-        "subject": {
+        "role": {
           "type": "string"
         },
         "domain": {
@@ -226,7 +226,7 @@
         "uuid": {
           "type": "string"
         },
-        "subject": {
+        "role": {
           "type": "string"
         },
         "domain": {
@@ -254,7 +254,7 @@
         "uuid": {
           "type": "string"
         },
-        "subject": {
+        "role": {
           "type": "string"
         },
         "domain": {

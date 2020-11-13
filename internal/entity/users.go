@@ -3,49 +3,36 @@ package entity
 import (
 	"time"
 
-	"github.com/go-pg/pg/v10/orm"
-
 	auth "github.com/golang-tire/auth/internal/proto/v1"
 	"github.com/golang/protobuf/ptypes"
 )
 
 type User struct {
-	tableName   struct{} `pg:"users,alias:user"` //nolint
-	ID          uint64   `pg:",pk"`
-	UUID        string
-	Firstname   string
-	Lastname    string
-	Username    string `pg:",unique"`
-	Password    string
-	Gender      string
-	AvatarURL   string
-	Email       string `pg:",unique"`
-	Enable      bool   `pg:"default:FALSE,notnull,use_zero"`
-	RawData     string
-	Rules       []Rule        `pg:"many2many:user_rules"`
-	DomainRoles []*DomainRole `pg:"rel:has-many"`
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
-}
-
-type UserRule struct {
-	tableName struct{} `pg:"user_rules,alias:user_role"` //nolint
-	UUID      string
-	Rule      *Rule  `pg:"rel:has-one"`
-	RuleID    uint64 `pg:"unique:rule_id"`
-	User      *User  `pg:"rel:has-one"`
-	UserID    uint64 `pg:"unique:user_id"`
+	tableName struct{} `pg:"users,alias:user"` //nolint
+	ID        uint64   `pg:",pk"`
+	UUID      string   `pg:",unique"`
+	Firstname string
+	Lastname  string
+	Username  string `pg:",unique"`
+	Password  string
+	Gender    string
+	AvatarURL string
+	Email     string `pg:",unique"`
+	Enable    bool   `pg:"default:FALSE,notnull,use_zero"`
+	RawData   string
+	UserRoles []*UserRole `pg:"rel:has-many"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
 
-type DomainRole struct {
-	tableName struct{} `pg:"user_domain_roles,alias:domain_role"` //nolint
+type UserRole struct {
+	tableName struct{} `pg:"user_roles,alias:user_roles"` //nolint
 	ID        uint64   `pg:",pk"`
-	UUID      string
+	UUID      string   `pg:",unique"`
 	RoleId    uint64
 	Role      *Role `pg:"rel:has-one"`
 	UserID    uint64
+	User      *User `pg:"rel:has-one"`
 	DomainId  uint64
 	Domain    *Domain `pg:"rel:has-one"`
 	Enable    bool    `pg:"default:TRUE,notnull,use_zero"`
@@ -67,6 +54,7 @@ func (r User) ToProto() *auth.User {
 		Email:     r.Email,
 		Enable:    r.Enable,
 		RawData:   r.RawData,
+		Roles:     UserRoleToProtoList(r.UserRoles),
 		CreatedAt: c,
 		UpdatedAt: u,
 	}
@@ -86,25 +74,25 @@ func UserFromProto(user *auth.User) User {
 	u, _ := ptypes.Timestamp(user.UpdatedAt)
 
 	return User{
-		UUID:        user.Uuid,
-		Firstname:   user.Firstname,
-		Lastname:    user.Lastname,
-		Gender:      user.Gender,
-		AvatarURL:   user.AvatarUrl,
-		Username:    user.Username,
-		Email:       user.Email,
-		Enable:      user.Enable,
-		RawData:     user.RawData,
-		DomainRoles: DomainRoleListFromProto(user.DomainRoles),
-		CreatedAt:   c,
-		UpdatedAt:   u,
+		UUID:      user.Uuid,
+		Firstname: user.Firstname,
+		Lastname:  user.Lastname,
+		Gender:    user.Gender,
+		AvatarURL: user.AvatarUrl,
+		Username:  user.Username,
+		Email:     user.Email,
+		Enable:    user.Enable,
+		RawData:   user.RawData,
+		UserRoles: UserRoleListFromProto(user.Roles),
+		CreatedAt: c,
+		UpdatedAt: u,
 	}
 }
 
-func (dr DomainRole) ToProto() *auth.DomainRole {
+func (dr UserRole) ToProto() *auth.UserRole {
 	c, _ := ptypes.TimestampProto(dr.CreatedAt)
 	u, _ := ptypes.TimestampProto(dr.UpdatedAt)
-	domainRole := &auth.DomainRole{
+	domainRole := &auth.UserRole{
 		Uuid:      dr.UUID,
 		Role:      dr.Role.ToProto(),
 		Enable:    dr.Enable,
@@ -114,19 +102,19 @@ func (dr DomainRole) ToProto() *auth.DomainRole {
 	return domainRole
 }
 
-func DomainRoleToProtoList(rml []*DomainRole) []*auth.DomainRole {
-	var r []*auth.DomainRole
+func UserRoleToProtoList(rml []*UserRole) []*auth.UserRole {
+	var r []*auth.UserRole
 	for _, i := range rml {
 		r = append(r, i.ToProto())
 	}
 	return r
 }
 
-func DomainRoleFromProto(domainRole *auth.DomainRole) DomainRole {
+func UserRoleFromProto(domainRole *auth.UserRole) UserRole {
 	c, _ := ptypes.Timestamp(domainRole.CreatedAt)
 	u, _ := ptypes.Timestamp(domainRole.UpdatedAt)
 
-	return DomainRole{
+	return UserRole{
 		UUID:      domainRole.Uuid,
 		Enable:    domainRole.Enable,
 		CreatedAt: c,
@@ -134,17 +122,11 @@ func DomainRoleFromProto(domainRole *auth.DomainRole) DomainRole {
 	}
 }
 
-func DomainRoleListFromProto(domainRoles []*auth.DomainRole) []*DomainRole {
-	var d []*DomainRole
+func UserRoleListFromProto(domainRoles []*auth.UserRole) []*UserRole {
+	var d []*UserRole
 	for _, i := range domainRoles {
-		dr := DomainRoleFromProto(i)
+		dr := UserRoleFromProto(i)
 		d = append(d, &dr)
 	}
 	return d
-}
-
-func init() {
-	// Register many to many model so ORM can better recognize m2m relation.
-	// This should be done before dependant models are used.
-	orm.RegisterTable((*UserRule)(nil))
 }

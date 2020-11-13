@@ -11,7 +11,8 @@ type Rule struct {
 	tableName struct{} `pg:"rules,alias:rule"` //nolint
 	ID        uint64   `pg:",pk"`
 	UUID      string
-	Subject   string
+	RoleID    uint64
+	Role      string
 	DomainID  uint64
 	Domain    *Domain `pg:"rel:has-one"`
 	Object    string
@@ -26,7 +27,7 @@ func (r Rule) ToProto() *auth.Rule {
 
 	rule := &auth.Rule{
 		Uuid:      r.UUID,
-		Subject:   r.Subject,
+		Role:      r.Role,
 		Object:    r.Object,
 		Action:    r.Action,
 		Domain:    r.Domain.Name,
@@ -50,7 +51,7 @@ func RuleFromProto(rule *auth.Rule) Rule {
 
 	return Rule{
 		UUID:      rule.Uuid,
-		Subject:   rule.Subject,
+		Role:      rule.Role,
 		Object:    rule.Object,
 		Action:    rule.Action,
 		CreatedAt: c,

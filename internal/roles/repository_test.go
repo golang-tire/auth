@@ -40,6 +40,14 @@ func TestRepository(t *testing.T) {
 	assert.NotNil(t, err)
 	assert.EqualError(t, pg.ErrNoRows, err.Error())
 
+	// get by title
+	role, err = repo.GetByTitle(ctx, "admin")
+	assert.Nil(t, err)
+	assert.Equal(t, "admin", role.Title)
+	_, err = repo.GetByTitle(ctx, "test0")
+	assert.NotNil(t, err)
+	assert.EqualError(t, pg.ErrNoRows, err.Error())
+
 	// update
 	err = repo.Update(ctx, entity.Role{
 		ID:        role.ID,

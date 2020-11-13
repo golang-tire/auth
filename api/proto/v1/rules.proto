@@ -10,7 +10,7 @@ import "google/protobuf/timestamp.proto";
 
 message Rule {
     string uuid = 1;
-    string subject = 2;
+    string role = 2;
     string domain = 3;
     string object = 4;
     string action = 5;
@@ -35,7 +35,7 @@ message GetRuleRequest {
 }
 
 message CreateRuleRequest {
-    string subject = 1;
+    string role = 1;
     string domain = 2;
     string object = 3;
     string action = 4;
@@ -43,7 +43,7 @@ message CreateRuleRequest {
 
 message UpdateRuleRequest {
     string uuid = 1;
-    string subject = 2;
+    string role = 2;
     string domain = 3;
     string object = 4;
     string action = 5;

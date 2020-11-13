@@ -75,48 +75,24 @@ func (a api) DeleteUser(ctx context.Context, request *auth.DeleteUserRequest) (*
 	return &empty.Empty{}, err
 }
 
-func (a api) AddRule(ctx context.Context, request *auth.AddUserRuleRequest) (*auth.UserRule, error) {
-	userRule, err := a.service.AddRule(ctx, request)
-	if err != nil {
-		return nil, status.Error(codes.InvalidArgument, err.Error())
-	}
-	return userRule, nil
-}
-
-func (a api) UpdateRule(ctx context.Context, request *auth.UpdateUserRuleRequest) (*auth.UserRule, error) {
-	userRule, err := a.service.UpdateRule(ctx, request)
-	if err != nil {
-		return nil, status.Error(codes.InvalidArgument, err.Error())
-	}
-	return userRule, nil
-}
-
-func (a api) DeleteRule(ctx context.Context, request *auth.DeleteUserRuleRequest) (*empty.Empty, error) {
-	_, err := a.service.DeleteRule(ctx, request)
-	if err != nil {
-		return nil, status.Error(codes.InvalidArgument, err.Error())
-	}
-	return &empty.Empty{}, nil
-}
-
-func (a api) AddDomainRole(ctx context.Context, request *auth.AddDomainRoleRequest) (*auth.AddDomainRoleResponse, error) {
-	domainRole, err := a.service.AddDomainRole(ctx, request)
+func (a api) AddUserRole(ctx context.Context, request *auth.AddUserRoleRequest) (*auth.User, error) {
+	domainRole, err := a.service.AddUserRole(ctx, request)
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 	return domainRole, nil
 }
 
-func (a api) UpdateDomainRole(ctx context.Context, request *auth.UpdateDomainRoleRequest) (*auth.User, error) {
-	user, err := a.service.UpdateDomainRole(ctx, request)
+func (a api) UpdateUserRole(ctx context.Context, request *auth.UpdateUserRoleRequest) (*auth.User, error) {
+	user, err := a.service.UpdateUserRole(ctx, request)
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 	return user, nil
 }
 
-func (a api) DeleteDomainRole(ctx context.Context, request *auth.DeleteDomainRoleRequest) (*empty.Empty, error) {
-	_, err := a.service.DeleteDomainRole(ctx, request)
+func (a api) DeleteUserRole(ctx context.Context, request *auth.DeleteUserRoleRequest) (*empty.Empty, error) {
+	_, err := a.service.DeleteUserRole(ctx, request)
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}

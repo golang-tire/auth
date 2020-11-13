@@ -38,7 +38,7 @@ func (m mockRepository) Query(ctx context.Context, offset, limit int64) ([]entit
 
 func (m *mockRepository) Create(ctx context.Context, rule entity.Rule) (string, error) {
 	Uuid := uuid.New().String()
-	if rule.Subject == "error" {
+	if rule.Object == "error" {
 		return Uuid, errCRUD
 	}
 	m.items = append(m.items, rule)
@@ -46,7 +46,7 @@ func (m *mockRepository) Create(ctx context.Context, rule entity.Rule) (string, 
 }
 
 func (m *mockRepository) Update(ctx context.Context, rule entity.Rule) error {
-	if rule.Subject == "error" {
+	if rule.Object == "error" {
 		return errCRUD
 	}
 	for i, item := range m.items {

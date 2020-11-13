@@ -4,6 +4,8 @@ import (
 	"context"
 	"time"
 
+	"github.com/golang-tire/auth/internal/roles"
+
 	"github.com/golang-tire/auth/internal/domains"
 
 	validation "github.com/go-ozzo/ozzo-validation/v4"
@@ -24,7 +26,7 @@ type Service interface {
 // ValidateCreateRequest validates the CreateRuleRequest fields.
 func ValidateCreateRequest(c *auth.CreateRuleRequest) error {
 	return validation.ValidateStruct(c,
-		validation.Field(&c.Subject, validation.Required, validation.Length(0, 128)),
+		validation.Field(&c.Role, validation.Required, validation.Length(0, 128)),
 		validation.Field(&c.Object, validation.Required, validation.Length(0, 128)),
 		validation.Field(&c.Domain, validation.Required, validation.Length(0, 128)),
 		validation.Field(&c.Action, validation.Required, validation.Length(0, 128)),
@@ -34,7 +36,7 @@ func ValidateCreateRequest(c *auth.CreateRuleRequest) error {
 // Validate validates the UpdateRuleRequest fields.
 func ValidateUpdateRequest(u *auth.UpdateRuleRequest) error {
 	return validation.ValidateStruct(u,
-		validation.Field(&u.Subject, validation.Required, validation.Length(0, 128)),
+		validation.Field(&u.Role, validation.Required, validation.Length(0, 128)),
 		validation.Field(&u.Object, validation.Required, validation.Length(0, 128)),
 		validation.Field(&u.Domain, validation.Required, validation.Length(0, 128)),
 		validation.Field(&u.Action, validation.Required, validation.Length(0, 128)),
@@ -44,11 +46,12 @@ func ValidateUpdateRequest(u *auth.UpdateRuleRequest) error {
 type service struct {
 	repo        Repository
 	domainsRepo domains.Repository
+	rolesRepo   roles.Repository
 }
 
 // NewService creates a new rule service.
-func NewService(repo Repository, domainsRepo domains.Repository) Service {
-	return service{repo, domainsRepo}
+func NewService(repo Repository, domainsRepo domains.Repository, rolesRepo roles.Repository) Service {
+	return service{repo, domainsRepo, rolesRepo}
 }
 
 // Get returns the rule with the specified the rule UUID.
@@ -71,8 +74,14 @@ func (s service) Create(ctx context.Context, req *auth.CreateRuleRequest) (*auth
 		return nil, err
 	}
 
+	role, err := s.rolesRepo.GetByTitle(ctx, req.Role)
+	if err != nil {
+		return nil, err
+	}
+
 	id, err := s.repo.Create(ctx, entity.Rule{
-		Subject:  req.Subject,
+		RoleID:   role.ID,
+		Role:     role.Title,
 		DomainID: domain.ID,
 		Domain:   &domain,
 		Object:   req.Object,
@@ -100,8 +109,14 @@ func (s service) Update(ctx context.Context, req *auth.UpdateRuleRequest) (*auth
 		return nil, err
 	}
 
+	role, err := s.rolesRepo.GetByTitle(ctx, req.Role)
+	if err != nil {
+		return nil, err
+	}
+
 	now := time.Now()
-	rule.Subject = req.Subject
+	rule.Role = role.Title
+	rule.RoleID = role.ID
 	rule.Domain = &domain
 	rule.DomainID = domain.ID
 	rule.Object = req.Object

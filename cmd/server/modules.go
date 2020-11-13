@@ -54,8 +54,7 @@ func setupModules(ctx context.Context) error {
 		&entity.Role{},
 		&entity.Rule{},
 		&entity.User{},
-		&entity.DomainRole{},
-		&entity.UserRule{},
+		&entity.UserRole{},
 	}
 
 	err = db.CreateSchema(dbInstance.DB(), models)
@@ -72,11 +71,11 @@ func setupModules(ctx context.Context) error {
 	roles.New(rolesSrv)
 
 	rulesRepo := rules.NewRepository(dbInstance)
-	rulesSrv := rules.NewService(rulesRepo, domainsRepo)
+	rulesSrv := rules.NewService(rulesRepo, domainsRepo, rolesRepo)
 	rules.New(rulesSrv)
 
 	usersRepo := users.NewRepository(dbInstance)
-	usersSrv := users.NewService(usersRepo, rulesRepo)
+	usersSrv := users.NewService(usersRepo, domainsRepo, rolesRepo)
 	users.New(usersSrv)
 
 	jsonpb := &runtime.JSONPb{

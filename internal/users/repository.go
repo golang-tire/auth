@@ -25,12 +25,14 @@ type Repository interface {
 	Update(ctx context.Context, user entity.User) error
 	// Delete removes the user from the storage.
 	Delete(ctx context.Context, user entity.User) error
-	// AddRule add a new rule to user
-	AddRule(ctx context.Context, user entity.User, rule entity.Rule) (*entity.UserRule, error)
-	// GetRule returns the user rule with the specified user UUID.
-	GetRule(ctx context.Context, uuid string) (entity.UserRule, error)
-	// UpdateRule updates the user rule with given UUID in the storage.
-	UpdateRule(ctx context.Context, uuid string, user entity.User, rule entity.Rule) (*entity.UserRule, error)
+	// AddUserRole add a role to user
+	AddUserRole(ctx context.Context, userRole entity.UserRole) (string, error)
+	// GetUserRole reads the user role with the specified ID from the database.
+	GetUserRole(ctx context.Context, uuid string) (entity.UserRole, error)
+	// UpdateUserRole updates the user role
+	UpdateUserRole(ctx context.Context, userRole entity.UserRole) error
+	// DeleteUserRole delete the user role
+	DeleteUserRole(ctx context.Context, userRole entity.UserRole) error
 }
 
 // repository persists users in database
@@ -46,7 +48,9 @@ func NewRepository(db *db.DB) Repository {
 // Get reads the user with the specified ID from the database.
 func (r repository) Get(ctx context.Context, uuid string) (entity.User, error) {
 	var user entity.User
-	err := r.db.With(ctx).Model(&user).Where("uuid = ?", uuid).First()
+	err := r.db.With(ctx).Model(&user).
+		Relation("UserRole").
+		Where("user.uuid = ?", uuid).First()
 	return user, err
 }
 
@@ -84,51 +88,78 @@ func (r repository) Count(ctx context.Context) (int64, error) {
 func (r repository) Query(ctx context.Context, offset, limit int64) ([]entity.User, int, error) {
 	var _users []entity.User
 	count, err := r.db.With(ctx).Model(&_users).
-		Order("id ASC").Limit(int(limit)).
+		Relation("UserRole").
+		Order("user.id ASC").Limit(int(limit)).
 		Offset(int(offset)).SelectAndCount()
 	return _users, count, err
 }
 
-// AddRule saves a new user rule record in the database.
-func (r repository) AddRule(ctx context.Context, user entity.User, rule entity.Rule) (*entity.UserRule, error) {
-	userRule := entity.UserRule{
-		UUID:   uuid.New().String(),
-		RuleID: rule.ID,
-		UserID: user.ID,
-	}
-	_, err := r.db.With(ctx).Model(&userRule).Insert()
-	if err != nil {
-		return nil, err
-	}
-	return &userRule, nil
+func (r repository) AddUserRole(ctx context.Context, userRole entity.UserRole) (string, error) {
+	now := time.Now()
+	userRole.UUID = uuid.New().String()
+	userRole.CreatedAt = now
+	userRole.UpdatedAt = now
+	_, err := r.db.With(ctx).Model(&userRole).Insert()
+	return userRole.UUID, err
 }
 
-// GetRule returns the user rule with the specified user UUID.
-func (r repository) GetRule(ctx context.Context, uuid string) (entity.UserRule, error) {
-	var userRule entity.UserRule
-	err := r.db.With(ctx).Model(&userRule).Where("uuid = ?", uuid).First()
-	return userRule, err
+// GetUserRole reads the user role with the specified ID from the database.
+func (r repository) GetUserRole(ctx context.Context, uuid string) (entity.UserRole, error) {
+	var userRole entity.UserRole
+	err := r.db.With(ctx).Model(&userRole).Where("uuid = ?", uuid).First()
+	return userRole, err
 }
 
-// UpdateRule updates the user rule with given UUID in the storage.
-func (r repository) UpdateRule(ctx context.Context, uuid string, user entity.User, rule entity.Rule) (*entity.UserRule, error) {
-	userRule, err := r.GetRule(ctx, uuid)
-	if err != nil {
-		return nil, err
-	}
-
-	userRule.UserID = user.ID
-	userRule.RuleID = rule.ID
-	_, err = r.db.With(ctx).Model(&userRule).WherePK().Delete()
-	return &userRule, err
-}
-
-// DeleteRule deletes an user rule with the specified UUID from the database.
-func (r repository) DeleteRule(ctx context.Context, uuid string) error {
-	userRule, err := r.GetRule(ctx, uuid)
-	if err != nil {
-		return err
-	}
-	_, err = r.db.With(ctx).Model(&userRule).WherePK().Delete()
+func (r repository) UpdateUserRole(ctx context.Context, userRole entity.UserRole) error {
+	_, err := r.db.With(ctx).Model(&userRole).WherePK().UpdateNotZero()
 	return err
 }
+
+func (r repository) DeleteUserRole(ctx context.Context, userRole entity.UserRole) error {
+	_, err := r.db.With(ctx).Model(&userRole).WherePK().Delete()
+	return err
+}
+
+//// AddRule saves a new user rule record in the database.
+//func (r repository) AddRule(ctx context.Context, user entity.User, rule entity.Rule) (*entity.UserRule, error) {
+//	userRule := entity.UserRule{
+//		UUID:   uuid.New().String(),
+//		RuleID: rule.ID,
+//		UserID: user.ID,
+//	}
+//	_, err := r.db.With(ctx).Model(&userRule).Insert()
+//	if err != nil {
+//		return nil, err
+//	}
+//	return &userRule, nil
+//}
+//
+//// GetRule returns the user rule with the specified user UUID.
+//func (r repository) GetRule(ctx context.Context, uuid string) (entity.UserRule, error) {
+//	var userRule entity.UserRule
+//	err := r.db.With(ctx).Model(&userRule).Where("uuid = ?", uuid).First()
+//	return userRule, err
+//}
+//
+//// UpdateRule updates the user rule with given UUID in the storage.
+//func (r repository) UpdateRule(ctx context.Context, uuid string, user entity.User, rule entity.Rule) (*entity.UserRule, error) {
+//	userRule, err := r.GetRule(ctx, uuid)
+//	if err != nil {
+//		return nil, err
+//	}
+//
+//	userRule.UserID = user.ID
+//	userRule.RuleID = rule.ID
+//	_, err = r.db.With(ctx).Model(&userRule).WherePK().Delete()
+//	return &userRule, err
+//}
+
+//// DeleteRule deletes an user rule with the specified UUID from the database.
+//func (r repository) DeleteRule(ctx context.Context, uuid string) error {
+//	userRule, err := r.GetRule(ctx, uuid)
+//	if err != nil {
+//		return err
+//	}
+//	_, err = r.db.With(ctx).Model(&userRule).WherePK().Delete()
+//	return err
+//}

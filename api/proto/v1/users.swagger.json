@@ -81,244 +81,6 @@
         ]
       }
     },
-    "/v1/users/{user_uuid}/domain-roles": {
-      "post": {
-        "summary": "AddDomainRole assign a domain_role to a user",
-        "operationId": "UserService_AddDomainRole",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/authV1AddDomainRoleResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/runtimeError"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "user_uuid",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/authV1AddDomainRoleRequest"
-            }
-          }
-        ],
-        "tags": [
-          "UserService"
-        ]
-      }
-    },
-    "/v1/users/{user_uuid}/domain-roles/{domain_role_uuid}": {
-      "delete": {
-        "summary": "DeleteDomainRole remove user domain_role role",
-        "operationId": "UserService_DeleteDomainRole",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "properties": {}
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/runtimeError"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "user_uuid",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "domain_role_uuid",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "UserService"
-        ]
-      },
-      "put": {
-        "summary": "UpdateDomainRole update user domain_rule",
-        "operationId": "UserService_UpdateDomainRole",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/authV1User"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/runtimeError"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "user_uuid",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "domain_role_uuid",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/authV1UpdateDomainRoleRequest"
-            }
-          }
-        ],
-        "tags": [
-          "UserService"
-        ]
-      }
-    },
-    "/v1/users/{user_uuid}/rules": {
-      "post": {
-        "summary": "AddRule assign a role to a user",
-        "operationId": "UserService_AddRule",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/authV1UserRule"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/runtimeError"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "user_uuid",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/authV1AddUserRuleRequest"
-            }
-          }
-        ],
-        "tags": [
-          "UserService"
-        ]
-      }
-    },
-    "/v1/users/{user_uuid}/rules/{user_rule_uuid}": {
-      "delete": {
-        "summary": "DeleteRole remove user role",
-        "operationId": "UserService_DeleteRule",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "properties": {}
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/runtimeError"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "user_uuid",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "user_rule_uuid",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "UserService"
-        ]
-      },
-      "put": {
-        "summary": "UpdateRule User rule object request",
-        "operationId": "UserService_UpdateRule",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/authV1UserRule"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/runtimeError"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "user_uuid",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "user_rule_uuid",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/authV1UpdateUserRuleRequest"
-            }
-          }
-        ],
-        "tags": [
-          "UserService"
-        ]
-      }
-    },
     "/v1/users/{uuid}": {
       "get": {
         "summary": "Get User",
@@ -415,13 +177,132 @@
           "UserService"
         ]
       }
+    },
+    "/v1/users/{uuid}/roles": {
+      "post": {
+        "summary": "AddUserRole assign a role to a user",
+        "operationId": "UserService_AddUserRole",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/authV1User"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "uuid",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/authV1AddUserRoleRequest"
+            }
+          }
+        ],
+        "tags": [
+          "UserService"
+        ]
+      }
+    },
+    "/v1/users/{uuid}/roles/{role_uuid}": {
+      "delete": {
+        "summary": "DeleteUserRole remove a user role",
+        "operationId": "UserService_DeleteUserRole",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "uuid",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "role_uuid",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "UserService"
+        ]
+      },
+      "put": {
+        "summary": "UpdateUserRole update a user role",
+        "operationId": "UserService_UpdateUserRole",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/authV1User"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "uuid",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "role_uuid",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/authV1UpdateUserRoleRequest"
+            }
+          }
+        ],
+        "tags": [
+          "UserService"
+        ]
+      }
     }
   },
   "definitions": {
-    "authV1AddDomainRoleRequest": {
+    "authV1AddUserRoleRequest": {
       "type": "object",
       "properties": {
-        "user_uuid": {
+        "uuid": {
           "type": "string"
         },
         "role_uuid": {
@@ -432,34 +313,6 @@
         },
         "enable": {
           "type": "boolean"
-        }
-      }
-    },
-    "authV1AddDomainRoleResponse": {
-      "type": "object",
-      "properties": {
-        "role": {
-          "$ref": "#/definitions/authV1Role"
-        },
-        "domain_uuid": {
-          "type": "string"
-        },
-        "enable": {
-          "type": "boolean"
-        },
-        "domain_role_uuid": {
-          "type": "string"
-        }
-      }
-    },
-    "authV1AddUserRuleRequest": {
-      "type": "object",
-      "properties": {
-        "user_uuid": {
-          "type": "string"
-        },
-        "rule_uuid": {
-          "type": "string"
         }
       }
     },
@@ -503,31 +356,6 @@
         },
         "name": {
           "type": "string"
-        },
-        "enable": {
-          "type": "boolean"
-        },
-        "created_at": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "updated_at": {
-          "type": "string",
-          "format": "date-time"
-        }
-      }
-    },
-    "authV1DomainRole": {
-      "type": "object",
-      "properties": {
-        "uuid": {
-          "type": "string"
-        },
-        "role": {
-          "$ref": "#/definitions/authV1Role"
-        },
-        "domain": {
-          "$ref": "#/definitions/authV1Domain"
         },
         "enable": {
           "type": "boolean"
@@ -587,51 +415,6 @@
         }
       }
     },
-    "authV1Rule": {
-      "type": "object",
-      "properties": {
-        "uuid": {
-          "type": "string"
-        },
-        "subject": {
-          "type": "string"
-        },
-        "domain": {
-          "type": "string"
-        },
-        "object": {
-          "type": "string"
-        },
-        "action": {
-          "type": "string"
-        },
-        "created_at": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "updated_at": {
-          "type": "string",
-          "format": "date-time"
-        }
-      }
-    },
-    "authV1UpdateDomainRoleRequest": {
-      "type": "object",
-      "properties": {
-        "user_uuid": {
-          "type": "string"
-        },
-        "domain_role_uuid": {
-          "type": "string"
-        },
-        "domain_uuid": {
-          "type": "string"
-        },
-        "enable": {
-          "type": "boolean"
-        }
-      }
-    },
     "authV1UpdateUserRequest": {
       "type": "object",
       "properties": {
@@ -667,17 +450,20 @@
         }
       }
     },
-    "authV1UpdateUserRuleRequest": {
+    "authV1UpdateUserRoleRequest": {
       "type": "object",
       "properties": {
-        "user_uuid": {
+        "uuid": {
           "type": "string"
         },
-        "rule_uuid": {
+        "role_uuid": {
           "type": "string"
         },
-        "user_rule_uuid": {
+        "domain_uuid": {
           "type": "string"
+        },
+        "enable": {
+          "type": "boolean"
         }
       }
     },
@@ -714,16 +500,10 @@
         "raw_data": {
           "type": "string"
         },
-        "domain_roles": {
+        "roles": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/authV1DomainRole"
-          }
-        },
-        "rules": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/authV1Rule"
+            "$ref": "#/definitions/authV1UserRole"
           }
         },
         "created_at": {
@@ -736,17 +516,20 @@
         }
       }
     },
-    "authV1UserRule": {
+    "authV1UserRole": {
       "type": "object",
       "properties": {
         "uuid": {
           "type": "string"
         },
-        "user_uuid": {
-          "type": "string"
+        "role": {
+          "$ref": "#/definitions/authV1Role"
         },
-        "rule": {
-          "$ref": "#/definitions/authV1Rule"
+        "domain": {
+          "$ref": "#/definitions/authV1Domain"
+        },
+        "enable": {
+          "type": "boolean"
         },
         "created_at": {
           "type": "string",

@@ -138,6 +138,15 @@ func (m mockRepository) Get(ctx context.Context, id string) (entity.Role, error)
 	return entity.Role{}, pg.ErrNoRows
 }
 
+func (m mockRepository) GetByTitle(ctx context.Context, title string) (entity.Role, error) {
+	for _, item := range m.items {
+		if item.Title == title {
+			return item, nil
+		}
+	}
+	return entity.Role{}, pg.ErrNoRows
+}
+
 func (m mockRepository) Count(ctx context.Context) (int64, error) {
 	return int64(len(m.items)), nil
 }

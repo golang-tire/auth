@@ -15,6 +15,8 @@ import (
 type Repository interface {
 	// Get returns the role with the specified role UUID.
 	Get(ctx context.Context, uuid string) (entity.Role, error)
+	// GetByTitle returns the role with the specified role title.
+	GetByTitle(ctx context.Context, title string) (entity.Role, error)
 	// Count returns the number of roles.
 	Count(ctx context.Context) (int64, error)
 	// Query returns the list of roles with the given offset and limit.
@@ -41,6 +43,13 @@ func NewRepository(db *db.DB) Repository {
 func (r repository) Get(ctx context.Context, uuid string) (entity.Role, error) {
 	var role entity.Role
 	err := r.db.With(ctx).Model(&role).Where("uuid = ?", uuid).First()
+	return role, err
+}
+
+// GetByTitle returns the role with the specified role title.
+func (r repository) GetByTitle(ctx context.Context, title string) (entity.Role, error) {
+	var role entity.Role
+	err := r.db.With(ctx).Model(&role).Where("title = ?", title).First()
 	return role, err
 }
 

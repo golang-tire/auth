@@ -28,18 +28,12 @@ type UserServiceClient interface {
 	UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*User, error)
 	// Delete User object request
 	DeleteUser(ctx context.Context, in *DeleteUserRequest, opts ...grpc.CallOption) (*empty.Empty, error)
-	// AddRule assign a role to a user
-	AddRule(ctx context.Context, in *AddUserRuleRequest, opts ...grpc.CallOption) (*UserRule, error)
-	// UpdateRule User rule object request
-	UpdateRule(ctx context.Context, in *UpdateUserRuleRequest, opts ...grpc.CallOption) (*UserRule, error)
-	// DeleteRole remove user role
-	DeleteRule(ctx context.Context, in *DeleteUserRuleRequest, opts ...grpc.CallOption) (*empty.Empty, error)
-	// AddDomainRole assign a domain_role to a user
-	AddDomainRole(ctx context.Context, in *AddDomainRoleRequest, opts ...grpc.CallOption) (*AddDomainRoleResponse, error)
-	// UpdateDomainRole update user domain_rule
-	UpdateDomainRole(ctx context.Context, in *UpdateDomainRoleRequest, opts ...grpc.CallOption) (*User, error)
-	// DeleteDomainRole remove user domain_role role
-	DeleteDomainRole(ctx context.Context, in *DeleteDomainRoleRequest, opts ...grpc.CallOption) (*empty.Empty, error)
+	// AddUserRole assign a role to a user
+	AddUserRole(ctx context.Context, in *AddUserRoleRequest, opts ...grpc.CallOption) (*User, error)
+	// UpdateUserRole update a user role
+	UpdateUserRole(ctx context.Context, in *UpdateUserRoleRequest, opts ...grpc.CallOption) (*User, error)
+	// DeleteUserRole remove a user role
+	DeleteUserRole(ctx context.Context, in *DeleteUserRoleRequest, opts ...grpc.CallOption) (*empty.Empty, error)
 }
 
 type userServiceClient struct {
@@ -95,54 +89,27 @@ func (c *userServiceClient) DeleteUser(ctx context.Context, in *DeleteUserReques
 	return out, nil
 }
 
-func (c *userServiceClient) AddRule(ctx context.Context, in *AddUserRuleRequest, opts ...grpc.CallOption) (*UserRule, error) {
-	out := new(UserRule)
-	err := c.cc.Invoke(ctx, "/authV1.UserService/AddRule", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *userServiceClient) UpdateRule(ctx context.Context, in *UpdateUserRuleRequest, opts ...grpc.CallOption) (*UserRule, error) {
-	out := new(UserRule)
-	err := c.cc.Invoke(ctx, "/authV1.UserService/UpdateRule", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *userServiceClient) DeleteRule(ctx context.Context, in *DeleteUserRuleRequest, opts ...grpc.CallOption) (*empty.Empty, error) {
-	out := new(empty.Empty)
-	err := c.cc.Invoke(ctx, "/authV1.UserService/DeleteRule", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *userServiceClient) AddDomainRole(ctx context.Context, in *AddDomainRoleRequest, opts ...grpc.CallOption) (*AddDomainRoleResponse, error) {
-	out := new(AddDomainRoleResponse)
-	err := c.cc.Invoke(ctx, "/authV1.UserService/AddDomainRole", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *userServiceClient) UpdateDomainRole(ctx context.Context, in *UpdateDomainRoleRequest, opts ...grpc.CallOption) (*User, error) {
+func (c *userServiceClient) AddUserRole(ctx context.Context, in *AddUserRoleRequest, opts ...grpc.CallOption) (*User, error) {
 	out := new(User)
-	err := c.cc.Invoke(ctx, "/authV1.UserService/UpdateDomainRole", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/authV1.UserService/AddUserRole", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *userServiceClient) DeleteDomainRole(ctx context.Context, in *DeleteDomainRoleRequest, opts ...grpc.CallOption) (*empty.Empty, error) {
+func (c *userServiceClient) UpdateUserRole(ctx context.Context, in *UpdateUserRoleRequest, opts ...grpc.CallOption) (*User, error) {
+	out := new(User)
+	err := c.cc.Invoke(ctx, "/authV1.UserService/UpdateUserRole", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) DeleteUserRole(ctx context.Context, in *DeleteUserRoleRequest, opts ...grpc.CallOption) (*empty.Empty, error) {
 	out := new(empty.Empty)
-	err := c.cc.Invoke(ctx, "/authV1.UserService/DeleteDomainRole", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/authV1.UserService/DeleteUserRole", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -163,18 +130,12 @@ type UserServiceServer interface {
 	UpdateUser(context.Context, *UpdateUserRequest) (*User, error)
 	// Delete User object request
 	DeleteUser(context.Context, *DeleteUserRequest) (*empty.Empty, error)
-	// AddRule assign a role to a user
-	AddRule(context.Context, *AddUserRuleRequest) (*UserRule, error)
-	// UpdateRule User rule object request
-	UpdateRule(context.Context, *UpdateUserRuleRequest) (*UserRule, error)
-	// DeleteRole remove user role
-	DeleteRule(context.Context, *DeleteUserRuleRequest) (*empty.Empty, error)
-	// AddDomainRole assign a domain_role to a user
-	AddDomainRole(context.Context, *AddDomainRoleRequest) (*AddDomainRoleResponse, error)
-	// UpdateDomainRole update user domain_rule
-	UpdateDomainRole(context.Context, *UpdateDomainRoleRequest) (*User, error)
-	// DeleteDomainRole remove user domain_role role
-	DeleteDomainRole(context.Context, *DeleteDomainRoleRequest) (*empty.Empty, error)
+	// AddUserRole assign a role to a user
+	AddUserRole(context.Context, *AddUserRoleRequest) (*User, error)
+	// UpdateUserRole update a user role
+	UpdateUserRole(context.Context, *UpdateUserRoleRequest) (*User, error)
+	// DeleteUserRole remove a user role
+	DeleteUserRole(context.Context, *DeleteUserRoleRequest) (*empty.Empty, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -197,23 +158,14 @@ func (UnimplementedUserServiceServer) UpdateUser(context.Context, *UpdateUserReq
 func (UnimplementedUserServiceServer) DeleteUser(context.Context, *DeleteUserRequest) (*empty.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteUser not implemented")
 }
-func (UnimplementedUserServiceServer) AddRule(context.Context, *AddUserRuleRequest) (*UserRule, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method AddRule not implemented")
+func (UnimplementedUserServiceServer) AddUserRole(context.Context, *AddUserRoleRequest) (*User, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddUserRole not implemented")
 }
-func (UnimplementedUserServiceServer) UpdateRule(context.Context, *UpdateUserRuleRequest) (*UserRule, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpdateRule not implemented")
+func (UnimplementedUserServiceServer) UpdateUserRole(context.Context, *UpdateUserRoleRequest) (*User, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateUserRole not implemented")
 }
-func (UnimplementedUserServiceServer) DeleteRule(context.Context, *DeleteUserRuleRequest) (*empty.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method DeleteRule not implemented")
-}
-func (UnimplementedUserServiceServer) AddDomainRole(context.Context, *AddDomainRoleRequest) (*AddDomainRoleResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method AddDomainRole not implemented")
-}
-func (UnimplementedUserServiceServer) UpdateDomainRole(context.Context, *UpdateDomainRoleRequest) (*User, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpdateDomainRole not implemented")
-}
-func (UnimplementedUserServiceServer) DeleteDomainRole(context.Context, *DeleteDomainRoleRequest) (*empty.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method DeleteDomainRole not implemented")
+func (UnimplementedUserServiceServer) DeleteUserRole(context.Context, *DeleteUserRoleRequest) (*empty.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteUserRole not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}
 
@@ -318,110 +270,56 @@ func _UserService_DeleteUser_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
-func _UserService_AddRule_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(AddUserRuleRequest)
+func _UserService_AddUserRole_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddUserRoleRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServiceServer).AddRule(ctx, in)
+		return srv.(UserServiceServer).AddUserRole(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/authV1.UserService/AddRule",
+		FullMethod: "/authV1.UserService/AddUserRole",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).AddRule(ctx, req.(*AddUserRuleRequest))
+		return srv.(UserServiceServer).AddUserRole(ctx, req.(*AddUserRoleRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _UserService_UpdateRule_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpdateUserRuleRequest)
+func _UserService_UpdateUserRole_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateUserRoleRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServiceServer).UpdateRule(ctx, in)
+		return srv.(UserServiceServer).UpdateUserRole(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/authV1.UserService/UpdateRule",
+		FullMethod: "/authV1.UserService/UpdateUserRole",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).UpdateRule(ctx, req.(*UpdateUserRuleRequest))
+		return srv.(UserServiceServer).UpdateUserRole(ctx, req.(*UpdateUserRoleRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _UserService_DeleteRule_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DeleteUserRuleRequest)
+func _UserService_DeleteUserRole_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteUserRoleRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServiceServer).DeleteRule(ctx, in)
+		return srv.(UserServiceServer).DeleteUserRole(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/authV1.UserService/DeleteRule",
+		FullMethod: "/authV1.UserService/DeleteUserRole",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).DeleteRule(ctx, req.(*DeleteUserRuleRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _UserService_AddDomainRole_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(AddDomainRoleRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(UserServiceServer).AddDomainRole(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/authV1.UserService/AddDomainRole",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).AddDomainRole(ctx, req.(*AddDomainRoleRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _UserService_UpdateDomainRole_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpdateDomainRoleRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(UserServiceServer).UpdateDomainRole(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/authV1.UserService/UpdateDomainRole",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).UpdateDomainRole(ctx, req.(*UpdateDomainRoleRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _UserService_DeleteDomainRole_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DeleteDomainRoleRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(UserServiceServer).DeleteDomainRole(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/authV1.UserService/DeleteDomainRole",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).DeleteDomainRole(ctx, req.(*DeleteDomainRoleRequest))
+		return srv.(UserServiceServer).DeleteUserRole(ctx, req.(*DeleteUserRoleRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -451,28 +349,16 @@ var _UserService_serviceDesc = grpc.ServiceDesc{
 			Handler:    _UserService_DeleteUser_Handler,
 		},
 		{
-			MethodName: "AddRule",
-			Handler:    _UserService_AddRule_Handler,
+			MethodName: "AddUserRole",
+			Handler:    _UserService_AddUserRole_Handler,
 		},
 		{
-			MethodName: "UpdateRule",
-			Handler:    _UserService_UpdateRule_Handler,
+			MethodName: "UpdateUserRole",
+			Handler:    _UserService_UpdateUserRole_Handler,
 		},
 		{
-			MethodName: "DeleteRule",
-			Handler:    _UserService_DeleteRule_Handler,
-		},
-		{
-			MethodName: "AddDomainRole",
-			Handler:    _UserService_AddDomainRole_Handler,
-		},
-		{
-			MethodName: "UpdateDomainRole",
-			Handler:    _UserService_UpdateDomainRole_Handler,
-		},
-		{
-			MethodName: "DeleteDomainRole",
-			Handler:    _UserService_DeleteDomainRole_Handler,
+			MethodName: "DeleteUserRole",
+			Handler:    _UserService_DeleteUserRole_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

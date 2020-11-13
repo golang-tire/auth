@@ -40,7 +40,9 @@ func NewRepository(db *db.DB) Repository {
 // Get reads the rule with the specified ID from the database.
 func (r repository) Get(ctx context.Context, uuid string) (entity.Rule, error) {
 	var rule entity.Rule
-	err := r.db.With(ctx).Model(&rule).Relation("Domain").Where("rule.uuid = ?", uuid).First()
+	err := r.db.With(ctx).Model(&rule).
+		Relation("Domain").
+		Where("rule.uuid = ?", uuid).First()
 	return rule, err
 }
 
