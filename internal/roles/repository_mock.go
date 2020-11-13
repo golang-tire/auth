@@ -4,7 +4,8 @@ import (
 	"context"
 	"errors"
 
-	"github.com/go-pg/pg"
+	"gorm.io/gorm"
+
 	"github.com/golang-tire/auth/internal/entity"
 	"github.com/google/uuid"
 )
@@ -25,7 +26,7 @@ func (m mockRepository) GetByTitle(ctx context.Context, title string) (entity.Ro
 			return item, nil
 		}
 	}
-	return entity.Role{}, pg.ErrNoRows
+	return entity.Role{}, gorm.ErrRecordNotFound
 }
 
 func (m mockRepository) Get(ctx context.Context, id string) (entity.Role, error) {
@@ -34,7 +35,7 @@ func (m mockRepository) Get(ctx context.Context, id string) (entity.Role, error)
 			return item, nil
 		}
 	}
-	return entity.Role{}, pg.ErrNoRows
+	return entity.Role{}, gorm.ErrRecordNotFound
 }
 
 func (m mockRepository) Count(ctx context.Context) (int64, error) {

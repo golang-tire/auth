@@ -3,18 +3,19 @@ package domains
 import (
 	"context"
 	"testing"
-	"time"
+
+	"gorm.io/gorm"
 
 	"github.com/golang-tire/auth/internal/db"
 
-	"github.com/go-pg/pg"
 	"github.com/golang-tire/auth/internal/entity"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestRepository(t *testing.T) {
 	database := db.NewForTest(t, []interface{}{(*entity.Domain)(nil)})
-	db.ResetTables(t, database, "domains")
+	err := db.ResetTables(t, database, "domains")
+	assert.Nil(t, err)
 	repo := NewRepository(database)
 
 	ctx := context.Background()
@@ -23,7 +24,6 @@ func TestRepository(t *testing.T) {
 	assert.Nil(t, err)
 
 	// create
-	now := time.Now()
 	testUuid, err := repo.Create(ctx, entity.Domain{
 		Name:   "foo.bar",
 		Enable: true,
@@ -38,16 +38,13 @@ func TestRepository(t *testing.T) {
 	assert.Equal(t, "foo.bar", domain.Name)
 	_, err = repo.Get(ctx, "test0")
 	assert.NotNil(t, err)
-	assert.EqualError(t, pg.ErrNoRows, err.Error())
+	assert.EqualError(t, gorm.ErrRecordNotFound, err.Error())
 
 	// update
 	err = repo.Update(ctx, entity.Domain{
-		ID:        domain.ID,
-		UUID:      testUuid,
-		Name:      "bar.foo",
-		Enable:    true,
-		CreatedAt: now,
-		UpdatedAt: now,
+		UUID:   testUuid,
+		Name:   "bar.foo",
+		Enable: true,
 	})
 	assert.Nil(t, err)
 	domain, _ = repo.Get(ctx, testUuid)
@@ -63,8 +60,8 @@ func TestRepository(t *testing.T) {
 	assert.Nil(t, err)
 	_, err = repo.Get(ctx, testUuid)
 	assert.NotNil(t, err)
-	assert.EqualError(t, pg.ErrNoRows, err.Error())
+	assert.EqualError(t, gorm.ErrRecordNotFound, err.Error())
 	err = repo.Delete(ctx, domain)
 	assert.NotNil(t, err)
-	assert.EqualError(t, pg.ErrNoRows, err.Error())
+	assert.EqualError(t, gorm.ErrRecordNotFound, err.Error())
 }

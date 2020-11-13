@@ -5,13 +5,14 @@ import (
 	"errors"
 	"testing"
 
+	"gorm.io/gorm"
+
 	"github.com/golang-tire/auth/internal/roles"
 
 	"github.com/golang-tire/auth/internal/domains"
 
 	"github.com/google/uuid"
 
-	"github.com/go-pg/pg/v10"
 	"github.com/golang-tire/auth/internal/entity"
 	auth "github.com/golang-tire/auth/internal/proto/v1"
 	"github.com/stretchr/testify/assert"
@@ -297,7 +298,7 @@ func (m mockRepository) Get(ctx context.Context, id string) (entity.User, error)
 			return item, nil
 		}
 	}
-	return entity.User{}, pg.ErrNoRows
+	return entity.User{}, gorm.ErrRecordNotFound
 }
 
 func (m mockRepository) Count(ctx context.Context) (int64, error) {

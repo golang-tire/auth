@@ -3,18 +3,19 @@ package rules
 import (
 	"context"
 	"testing"
-	"time"
+
+	"gorm.io/gorm"
 
 	"github.com/golang-tire/auth/internal/db"
 
-	"github.com/go-pg/pg"
 	"github.com/golang-tire/auth/internal/entity"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestRepository(t *testing.T) {
 	database := db.NewForTest(t, []interface{}{(*entity.Rule)(nil)})
-	db.ResetTables(t, database, "rules")
+	err := db.ResetTables(t, database, "rules")
+	assert.Nil(t, err)
 	repo := NewRepository(database)
 
 	ctx := context.Background()
@@ -23,7 +24,6 @@ func TestRepository(t *testing.T) {
 	assert.Nil(t, err)
 
 	// create
-	now := time.Now()
 	testUuid, err := repo.Create(ctx, entity.Rule{
 		Object: "rules",
 		Action: "get",
@@ -38,16 +38,13 @@ func TestRepository(t *testing.T) {
 	assert.Equal(t, "rules", rule.Object)
 	_, err = repo.Get(ctx, "test0")
 	assert.NotNil(t, err)
-	assert.EqualError(t, pg.ErrNoRows, err.Error())
+	assert.EqualError(t, gorm.ErrRecordNotFound, err.Error())
 
 	// update
 	err = repo.Update(ctx, entity.Rule{
-		ID:        rule.ID,
-		UUID:      testUuid,
-		Object:    "products",
-		Action:    "get",
-		CreatedAt: now,
-		UpdatedAt: now,
+		UUID:   testUuid,
+		Object: "products",
+		Action: "get",
 	})
 	assert.Nil(t, err)
 	rule, _ = repo.Get(ctx, testUuid)
@@ -63,8 +60,8 @@ func TestRepository(t *testing.T) {
 	assert.Nil(t, err)
 	_, err = repo.Get(ctx, testUuid)
 	assert.NotNil(t, err)
-	assert.EqualError(t, pg.ErrNoRows, err.Error())
+	assert.EqualError(t, gorm.ErrRecordNotFound, err.Error())
 	err = repo.Delete(ctx, rule)
 	assert.NotNil(t, err)
-	assert.EqualError(t, pg.ErrNoRows, err.Error())
+	assert.EqualError(t, gorm.ErrRecordNotFound, err.Error())
 }
