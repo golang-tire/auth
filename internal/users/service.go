@@ -23,6 +23,9 @@ type Service interface {
 	Update(ctx context.Context, req *auth.UpdateUserRequest) (*auth.User, error)
 	Delete(ctx context.Context, uuid string) (*auth.User, error)
 
+	// GetByUsername returns the users if username found
+	GetByUsername(ctx context.Context, username string) (*auth.User, error)
+
 	AddUserRole(ctx context.Context, req *auth.AddUserRoleRequest) (*auth.User, error)
 	UpdateUserRole(ctx context.Context, req *auth.UpdateUserRoleRequest) (*auth.User, error)
 	DeleteUserRole(ctx context.Context, req *auth.DeleteUserRoleRequest) (*auth.User, error)
@@ -80,7 +83,7 @@ func (s service) Get(ctx context.Context, UUID string) (*auth.User, error) {
 	if err != nil {
 		return nil, err
 	}
-	return user.ToProto(), nil
+	return user.ToProto(true), nil
 }
 
 // Create creates a new user.
@@ -129,7 +132,7 @@ func (s service) Update(ctx context.Context, req *auth.UpdateUserRequest) (*auth
 	if err := s.repo.Update(ctx, user); err != nil {
 		return nil, err
 	}
-	return user.ToProto(), nil
+	return user.ToProto(true), nil
 }
 
 // Delete deletes the user with the specified UUID.
@@ -141,7 +144,7 @@ func (s service) Delete(ctx context.Context, UUID string) (*auth.User, error) {
 	if err = s.repo.Delete(ctx, user); err != nil {
 		return nil, err
 	}
-	return user.ToProto(), nil
+	return user.ToProto(true), nil
 }
 
 // Count returns the number of users.
@@ -161,6 +164,15 @@ func (s service) Query(ctx context.Context, offset, limit int64) (*auth.ListUser
 		Offset:     offset,
 		Limit:      limit,
 	}, nil
+}
+
+// GetByUsername returns the users if username found
+func (s service) GetByUsername(ctx context.Context, username string) (*auth.User, error) {
+	user, err := s.repo.FindOne(ctx, "users.username = ?", username)
+	if err != nil {
+		return nil, err
+	}
+	return user.ToProto(false), nil
 }
 
 func (s service) AddUserRole(ctx context.Context, req *auth.AddUserRoleRequest) (*auth.User, error) {

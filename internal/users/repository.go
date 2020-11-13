@@ -33,6 +33,8 @@ type Repository interface {
 	UpdateUserRole(ctx context.Context, userRole entity.UserRole) error
 	// DeleteUserRole delete the user role
 	DeleteUserRole(ctx context.Context, userRole entity.UserRole) error
+	// FindOne returns the one of users with the given condition
+	FindOne(ctx context.Context, condition string, params ...interface{}) (entity.User, error)
 }
 
 // repository persists users in database
@@ -101,6 +103,16 @@ func (r repository) Query(ctx context.Context, offset, limit int64) ([]entity.Us
 		return nil, 0, err
 	}
 	return _users, int(count), res.Error
+}
+
+// FindOne returns the one of users with the given condition
+func (r repository) FindOne(ctx context.Context, condition string, params ...interface{}) (entity.User, error) {
+	var user entity.User
+	res := r.db.With(ctx).
+		Preload("UserRoles.Domain").
+		Preload("UserRoles.Role").
+		Where(condition, params...).First(&user)
+	return user, res.Error
 }
 
 func (r repository) AddUserRole(ctx context.Context, userRole entity.UserRole) (string, error) {

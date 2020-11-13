@@ -33,7 +33,7 @@ type UserRole struct {
 	Enable   bool
 }
 
-func (r User) ToProto() *auth.User {
+func (r User) ToProto(secure bool) *auth.User {
 	c, _ := ptypes.TimestampProto(r.CreatedAt)
 	u, _ := ptypes.TimestampProto(r.UpdatedAt)
 
@@ -52,13 +52,18 @@ func (r User) ToProto() *auth.User {
 		CreatedAt: c,
 		UpdatedAt: u,
 	}
+
+	if !secure {
+		user.Password = r.Password
+	}
+
 	return user
 }
 
 func UserToProtoList(rml []User) []*auth.User {
 	var r []*auth.User
 	for _, i := range rml {
-		r = append(r, i.ToProto())
+		r = append(r, i.ToProto(true))
 	}
 	return r
 }

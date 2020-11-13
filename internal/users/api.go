@@ -3,8 +3,6 @@ package users
 import (
 	"context"
 
-	"golang.org/x/crypto/bcrypt"
-
 	"github.com/golang-tire/auth/internal/helpers"
 	auth "github.com/golang-tire/auth/internal/proto/v1"
 	"github.com/golang-tire/pkg/grpcgw"
@@ -51,7 +49,7 @@ func (a api) GetUser(ctx context.Context, request *auth.GetUserRequest) (*auth.U
 }
 
 func (a api) CreateUser(ctx context.Context, request *auth.CreateUserRequest) (*auth.User, error) {
-	request.Password, _ = HashPassword(request.Password)
+	request.Password, _ = helpers.HashPassword(request.Password)
 	res, err := a.service.Create(ctx, request)
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
@@ -103,16 +101,4 @@ func New(srv Service) API {
 	s := api{service: srv}
 	grpcgw.RegisterController(s)
 	return s
-}
-
-// HashPassword return hashed password
-func HashPassword(password string) (string, error) {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 10)
-	return string(bytes), err
-}
-
-// CheckPasswordHash will check hashed password against password
-func CheckPasswordHash(password, hash string) bool {
-	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
-	return err == nil
 }

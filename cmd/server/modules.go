@@ -3,6 +3,10 @@ package main
 import (
 	"context"
 
+	"github.com/golang-tire/pkg/kv"
+
+	"github.com/golang-tire/auth/internal/auth"
+
 	"google.golang.org/protobuf/encoding/protojson"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
@@ -34,6 +38,11 @@ var (
 	httpPort       = config.RegisterInt("server.httpPort", defaultHttpPort)
 	grpcPort       = config.RegisterInt("server.grpcPort", defaultGrpcPort)
 	swaggerBaseURL = config.RegisterString("server.swaggerBaseURL", defaultSwaggerBaseURL)
+
+	kvHost     = config.RegisterString("redis.host", "localhost")
+	kvPort     = config.RegisterInt("redis.port", 6379)
+	kvDb       = config.RegisterInt64("redis.db", 1)
+	kvPassword = config.RegisterString("redis.password", "")
 )
 
 func setupModules(ctx context.Context) error {
@@ -43,6 +52,13 @@ func setupModules(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
+
+	_, err = kv.Init(ctx, &kv.Config{
+		Host:     kvHost.String(),
+		Port:     kvPort.Int(),
+		Password: kvPassword.String(),
+		DB:       kvDb.Int(),
+	})
 
 	dbInstance, err := db.Init(ctx)
 	if err != nil {
@@ -77,6 +93,8 @@ func setupModules(ctx context.Context) error {
 	usersRepo := users.NewRepository(dbInstance)
 	usersSrv := users.NewService(usersRepo, domainsRepo, rolesRepo)
 	users.New(usersSrv)
+
+	auth.New(usersSrv)
 
 	jsonpb := &runtime.JSONPb{
 		MarshalOptions: protojson.MarshalOptions{
