@@ -1,10 +1,12 @@
 package db
 
 import (
-	"fmt"
 	"testing"
 
-	"github.com/go-pg/pg/v10"
+	"github.com/golang-tire/pkg/log"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
+
 	"github.com/golang-tire/pkg/config"
 )
 
@@ -21,12 +23,12 @@ func NewForTest(t *testing.T, models []interface{}) *DB {
 	}
 
 	testDSN = config.RegisterString("db.testDSN", "postgres://postgres:postgres@localhost:5432/auth_test?sslmode=disable")
-	opt, err := pg.ParseURL(testDSN.String())
+
+	dbc, err := gorm.Open(postgres.Open(testDSN.String()), &gorm.Config{})
 	if err != nil {
-		t.Error(err)
-		t.FailNow()
+		log.Error("open database failed", log.Err(err))
+		return nil
 	}
-	dbc := pg.Connect(opt)
 
 	err = CreateSchema(dbc, models)
 	if err != nil {
@@ -37,12 +39,6 @@ func NewForTest(t *testing.T, models []interface{}) *DB {
 }
 
 // ResetTables truncates all data in the specified tables.
-func ResetTables(t *testing.T, db *DB, tables ...string) {
-	for _, table := range tables {
-		_, err := db.DB().Exec(fmt.Sprintf("TRUNCATE %s", table))
-		if err != nil {
-			t.Error(err)
-			t.FailNow()
-		}
-	}
+func ResetTables(t *testing.T, db *DB, tables ...string) error {
+	return db.DB().Migrator().DropTable(tables)
 }

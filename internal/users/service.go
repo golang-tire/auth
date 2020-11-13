@@ -57,6 +57,7 @@ func ValidateAddUserRoleRequest(c *auth.AddUserRoleRequest) error {
 func ValidateUpdateUserRoleRequest(c *auth.UpdateUserRoleRequest) error {
 	return validation.ValidateStruct(c,
 		validation.Field(&c.Uuid, validation.Required, is.UUID),
+		validation.Field(&c.UserRoleUuid, validation.Required, is.UUID),
 		validation.Field(&c.RoleUuid, validation.Required, is.UUID),
 		validation.Field(&c.DomainUuid, validation.Required, is.UUID),
 	)
@@ -182,12 +183,10 @@ func (s service) AddUserRole(ctx context.Context, req *auth.AddUserRoleRequest) 
 	}
 
 	_, err = s.repo.AddUserRole(ctx, entity.UserRole{
-		RoleId:   role.ID,
-		Role:     &role,
-		UserID:   user.ID,
-		DomainId: domain.ID,
-		Domain:   &domain,
-		Enable:   req.Enable,
+		Role:   role,
+		User:   user,
+		Domain: domain,
+		Enable: req.Enable,
 	})
 	if err != nil {
 		return nil, err
@@ -208,6 +207,11 @@ func (s service) UpdateUserRole(ctx context.Context, req *auth.UpdateUserRoleReq
 		return nil, err
 	}
 
+	userRole, err := s.repo.GetUserRole(ctx, req.UserRoleUuid)
+	if err != nil {
+		return nil, err
+	}
+
 	domain, err := s.domainsRepo.Get(ctx, req.DomainUuid)
 	if err != nil {
 		return nil, err
@@ -218,14 +222,11 @@ func (s service) UpdateUserRole(ctx context.Context, req *auth.UpdateUserRoleReq
 		return nil, err
 	}
 
-	err = s.repo.UpdateUserRole(ctx, entity.UserRole{
-		RoleId:   role.ID,
-		Role:     &role,
-		UserID:   user.ID,
-		DomainId: domain.ID,
-		Domain:   &domain,
-		Enable:   req.Enable,
-	})
+	userRole.Domain = domain
+	userRole.Role = role
+	userRole.Enable = req.Enable
+
+	err = s.repo.UpdateUserRole(ctx, userRole)
 	if err != nil {
 		return nil, err
 	}
@@ -235,7 +236,7 @@ func (s service) UpdateUserRole(ctx context.Context, req *auth.UpdateUserRoleReq
 }
 
 func (s service) DeleteUserRole(ctx context.Context, req *auth.DeleteUserRoleRequest) (*auth.User, error) {
-	userRole, err := s.repo.GetUserRole(ctx, req.RoleUuid)
+	userRole, err := s.repo.GetUserRole(ctx, req.UserRoleUuid)
 	if err != nil {
 		return nil, err
 	}

@@ -4,6 +4,9 @@ import (
 	"context"
 	"testing"
 
+	"github.com/golang-tire/auth/internal/domains"
+	"github.com/golang-tire/auth/internal/roles"
+
 	auth "github.com/golang-tire/auth/internal/proto/v1"
 	"github.com/stretchr/testify/assert"
 )
@@ -73,7 +76,7 @@ func TestUpdateRuleRequest_Validate(t *testing.T) {
 }
 
 func Test_service_CRUD(t *testing.T) {
-	s := NewService(&mockRepository{})
+	s := NewService(&mockRepository{}, domains.NewMockRepository(), roles.NewMockRepository())
 	ctx := context.Background()
 
 	// initial count

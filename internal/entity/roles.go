@@ -1,20 +1,17 @@
 package entity
 
 import (
-	"time"
+	"gorm.io/gorm"
 
 	auth "github.com/golang-tire/auth/internal/proto/v1"
 	"github.com/golang/protobuf/ptypes"
 )
 
 type Role struct {
-	tableName struct{} `pg:"roles,alias:role"` //nolint
-	ID        uint64   `pg:",pk"`
-	UUID      string
-	Title     string `pg:",unique"`
-	Enable    bool   `pg:"default:FALSE,notnull,use_zero"`
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	gorm.Model
+	UUID   string `gorm:"index"`
+	Title  string `gorm:"index"`
+	Enable bool
 }
 
 func (rm Role) ToProto() *auth.Role {
@@ -37,16 +34,4 @@ func RoleToProtoList(rml []Role) []*auth.Role {
 		r = append(r, i.ToProto())
 	}
 	return r
-}
-
-func RoleFromProto(role *auth.Role) Role {
-	c, _ := ptypes.Timestamp(role.CreatedAt)
-	u, _ := ptypes.Timestamp(role.UpdatedAt)
-
-	return Role{
-		UUID:      role.Uuid,
-		Title:     role.Title,
-		CreatedAt: c,
-		UpdatedAt: u,
-	}
 }

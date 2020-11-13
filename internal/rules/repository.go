@@ -40,10 +40,8 @@ func NewRepository(db *db.DB) Repository {
 // Get reads the rule with the specified ID from the database.
 func (r repository) Get(ctx context.Context, uuid string) (entity.Rule, error) {
 	var rule entity.Rule
-	err := r.db.With(ctx).Model(&rule).
-		Relation("Domain").
-		Where("rule.uuid = ?", uuid).First()
-	return rule, err
+	res := r.db.With(ctx).Where("uuid = ?", uuid).First(&rule)
+	return rule, res.Error
 }
 
 // Create saves a new rule record in the database.
@@ -53,35 +51,41 @@ func (r repository) Create(ctx context.Context, rule entity.Rule) (string, error
 	rule.UUID = uuid.New().String()
 	rule.CreatedAt = now
 	rule.UpdatedAt = now
-	_, err := r.db.With(ctx).Model(&rule).Insert()
-	return rule.UUID, err
+	res := r.db.With(ctx).Create(&rule)
+	return rule.UUID, res.Error
 }
 
 // Update saves the changes to an rule in the database.
 func (r repository) Update(ctx context.Context, rule entity.Rule) error {
-	_, err := r.db.With(ctx).Model(&rule).WherePK().UpdateNotZero()
-	return err
+	res := r.db.With(ctx).Save(&rule)
+	return res.Error
 }
 
 // Delete deletes an rule with the specified ID from the database.
 func (r repository) Delete(ctx context.Context, rule entity.Rule) error {
-	_, err := r.db.With(ctx).Model(&rule).WherePK().Delete()
-	return err
+	res := r.db.With(ctx).Delete(&rule)
+	return res.Error
 }
 
 // Count returns the number of the rule records in the database.
 func (r repository) Count(ctx context.Context) (int64, error) {
-	var count int
-	count, err := r.db.With(ctx).Model((*entity.Rule)(nil)).Count()
-	return int64(count), err
+	var count int64
+	res := r.db.With(ctx).Model(&entity.Rule{}).Count(&count)
+	return count, res.Error
 }
 
 // Query retrieves the rule records with the specified offset and limit from the database.
 func (r repository) Query(ctx context.Context, offset, limit int64) ([]entity.Rule, int, error) {
-	var _rules []entity.Rule
-	count, err := r.db.With(ctx).Model(&_rules).
-		Relation("Domain").
-		Order("id ASC").Limit(int(limit)).
-		Offset(int(offset)).SelectAndCount()
-	return _rules, count, err
+	var _rule []entity.Rule
+	res := r.db.With(ctx).
+		Limit(int(limit)).
+		Offset(int(offset)).
+		Order("id asc").
+		Find(&_rule)
+
+	count, err := r.Count(ctx)
+	if err != nil {
+		return nil, 0, err
+	}
+	return _rule, int(count), res.Error
 }

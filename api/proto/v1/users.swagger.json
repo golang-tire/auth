@@ -217,7 +217,7 @@
         ]
       }
     },
-    "/v1/users/{uuid}/roles/{role_uuid}": {
+    "/v1/users/{uuid}/roles/{user_role_uuid}": {
       "delete": {
         "summary": "DeleteUserRole remove a user role",
         "operationId": "UserService_DeleteUserRole",
@@ -243,7 +243,7 @@
             "type": "string"
           },
           {
-            "name": "role_uuid",
+            "name": "user_role_uuid",
             "in": "path",
             "required": true,
             "type": "string"
@@ -278,7 +278,7 @@
             "type": "string"
           },
           {
-            "name": "role_uuid",
+            "name": "user_role_uuid",
             "in": "path",
             "required": true,
             "type": "string"
@@ -348,28 +348,6 @@
         }
       }
     },
-    "authV1Domain": {
-      "type": "object",
-      "properties": {
-        "uuid": {
-          "type": "string"
-        },
-        "name": {
-          "type": "string"
-        },
-        "enable": {
-          "type": "boolean"
-        },
-        "created_at": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "updated_at": {
-          "type": "string",
-          "format": "date-time"
-        }
-      }
-    },
     "authV1ListUsersResponse": {
       "type": "object",
       "properties": {
@@ -390,28 +368,6 @@
         "offset": {
           "type": "string",
           "format": "int64"
-        }
-      }
-    },
-    "authV1Role": {
-      "type": "object",
-      "properties": {
-        "uuid": {
-          "type": "string"
-        },
-        "title": {
-          "type": "string"
-        },
-        "enable": {
-          "type": "boolean"
-        },
-        "created_at": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "updated_at": {
-          "type": "string",
-          "format": "date-time"
         }
       }
     },
@@ -454,6 +410,9 @@
       "type": "object",
       "properties": {
         "uuid": {
+          "type": "string"
+        },
+        "user_role_uuid": {
           "type": "string"
         },
         "role_uuid": {
@@ -523,10 +482,10 @@
           "type": "string"
         },
         "role": {
-          "$ref": "#/definitions/authV1Role"
+          "type": "string"
         },
         "domain": {
-          "$ref": "#/definitions/authV1Domain"
+          "type": "string"
         },
         "enable": {
           "type": "boolean"

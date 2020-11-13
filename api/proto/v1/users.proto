@@ -7,13 +7,11 @@ option go_package = "internal/proto/v1;auth";
 import "google/protobuf/timestamp.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
-import "api/proto/v1/roles.proto";
-import "api/proto/v1/domains.proto";
 
 message UserRole {
     string uuid = 1;
-    Role role = 2;
-    Domain domain = 3;
+    string role = 2;
+    string domain = 3;
     bool enable = 4;
     google.protobuf.Timestamp created_at = 5;
     google.protobuf.Timestamp updated_at = 6;
@@ -89,14 +87,15 @@ message AddUserRoleRequest {
 
 message UpdateUserRoleRequest {
     string uuid = 1;
-    string role_uuid = 2;
-    string domain_uuid = 3;
-    bool enable = 4;
+    string user_role_uuid = 2;
+    string role_uuid = 3;
+    string domain_uuid = 4;
+    bool enable = 5;
 }
 
 message DeleteUserRoleRequest {
     string uuid = 1;
-    string role_uuid = 2;
+    string user_role_uuid = 2;
 }
 
 service UserService {
@@ -148,7 +147,7 @@ service UserService {
     // UpdateUserRole update a user role
     rpc UpdateUserRole (UpdateUserRoleRequest) returns (User) {
         option (google.api.http) = {
-            put: "/v1/users/{uuid}/roles/{role_uuid}"
+            put: "/v1/users/{uuid}/roles/{user_role_uuid}"
             body: "*"
         };
     }
@@ -156,7 +155,7 @@ service UserService {
     // DeleteUserRole remove a user role
     rpc DeleteUserRole (DeleteUserRoleRequest) returns (google.protobuf.Empty) {
         option (google.api.http) = {
-            delete: "/v1/users/{uuid}/roles/{role_uuid}"
+            delete: "/v1/users/{uuid}/roles/{user_role_uuid}"
         };
     }
 }

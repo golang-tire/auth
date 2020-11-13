@@ -1,24 +1,20 @@
 package entity
 
 import (
-	"time"
-
 	auth "github.com/golang-tire/auth/internal/proto/v1"
 	"github.com/golang/protobuf/ptypes"
+	"gorm.io/gorm"
 )
 
 type Rule struct {
-	tableName struct{} `pg:"rules,alias:rule"` //nolint
-	ID        uint64   `pg:",pk"`
-	UUID      string
-	RoleID    uint64
-	Role      string
-	DomainID  uint64
-	Domain    *Domain `pg:"rel:has-one"`
-	Object    string
-	Action    string
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	gorm.Model
+	UUID     string `gorm:"index"`
+	RoleID   uint
+	Role     Role `gorm:"foreignKey:RoleID"`
+	DomainID uint
+	Domain   Domain `gorm:"foreignKey:DomainID"`
+	Object   string
+	Action   string
 }
 
 func (r Rule) ToProto() *auth.Rule {
@@ -27,7 +23,7 @@ func (r Rule) ToProto() *auth.Rule {
 
 	rule := &auth.Rule{
 		Uuid:      r.UUID,
-		Role:      r.Role,
+		Role:      r.Role.Title,
 		Object:    r.Object,
 		Action:    r.Action,
 		Domain:    r.Domain.Name,
@@ -43,27 +39,4 @@ func RuleToProtoList(rml []Rule) []*auth.Rule {
 		r = append(r, i.ToProto())
 	}
 	return r
-}
-
-func RuleFromProto(rule *auth.Rule) Rule {
-	c, _ := ptypes.Timestamp(rule.CreatedAt)
-	u, _ := ptypes.Timestamp(rule.UpdatedAt)
-
-	return Rule{
-		UUID:      rule.Uuid,
-		Role:      rule.Role,
-		Object:    rule.Object,
-		Action:    rule.Action,
-		CreatedAt: c,
-		UpdatedAt: u,
-	}
-}
-
-func RuleListFromProto(rules []*auth.Rule) []*Rule {
-	var d []*Rule
-	for _, i := range rules {
-		dr := RuleFromProto(i)
-		d = append(d, &dr)
-	}
-	return d
 }

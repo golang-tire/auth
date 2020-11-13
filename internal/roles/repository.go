@@ -42,15 +42,15 @@ func NewRepository(db *db.DB) Repository {
 // Get reads the role with the specified ID from the database.
 func (r repository) Get(ctx context.Context, uuid string) (entity.Role, error) {
 	var role entity.Role
-	err := r.db.With(ctx).Model(&role).Where("uuid = ?", uuid).First()
-	return role, err
+	res := r.db.With(ctx).Where("uuid = ?", uuid).First(&role)
+	return role, res.Error
 }
 
 // GetByTitle returns the role with the specified role title.
 func (r repository) GetByTitle(ctx context.Context, title string) (entity.Role, error) {
 	var role entity.Role
-	err := r.db.With(ctx).Model(&role).Where("title = ?", title).First()
-	return role, err
+	res := r.db.With(ctx).Where("title = ?", title).First(&role)
+	return role, res.Error
 }
 
 // Create saves a new role record in the database.
@@ -60,34 +60,41 @@ func (r repository) Create(ctx context.Context, role entity.Role) (string, error
 	role.UUID = uuid.New().String()
 	role.CreatedAt = now
 	role.UpdatedAt = now
-	_, err := r.db.With(ctx).Model(&role).Insert()
-	return role.UUID, err
+	res := r.db.With(ctx).Create(&role)
+	return role.UUID, res.Error
 }
 
 // Update saves the changes to an role in the database.
 func (r repository) Update(ctx context.Context, role entity.Role) error {
-	_, err := r.db.With(ctx).Model(&role).WherePK().UpdateNotZero()
-	return err
+	res := r.db.With(ctx).Save(&role)
+	return res.Error
 }
 
 // Delete deletes an role with the specified ID from the database.
 func (r repository) Delete(ctx context.Context, role entity.Role) error {
-	_, err := r.db.With(ctx).Model(&role).WherePK().Delete()
-	return err
+	res := r.db.With(ctx).Delete(&role)
+	return res.Error
 }
 
 // Count returns the number of the role records in the database.
 func (r repository) Count(ctx context.Context) (int64, error) {
-	var count int
-	count, err := r.db.With(ctx).Model((*entity.Role)(nil)).Count()
-	return int64(count), err
+	var count int64
+	res := r.db.With(ctx).Model(&entity.Role{}).Count(&count)
+	return count, res.Error
 }
 
 // Query retrieves the role records with the specified offset and limit from the database.
 func (r repository) Query(ctx context.Context, offset, limit int64) ([]entity.Role, int, error) {
 	var _roles []entity.Role
-	count, err := r.db.With(ctx).Model(&_roles).
-		Order("id ASC").Limit(int(limit)).
-		Offset(int(offset)).SelectAndCount()
-	return _roles, count, err
+	res := r.db.With(ctx).
+		Limit(int(limit)).
+		Offset(int(offset)).
+		Order("id asc").
+		Find(&_roles)
+
+	count, err := r.Count(ctx)
+	if err != nil {
+		return nil, 0, err
+	}
+	return _roles, int(count), res.Error
 }

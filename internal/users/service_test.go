@@ -5,7 +5,9 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/golang-tire/auth/internal/rules"
+	"github.com/golang-tire/auth/internal/roles"
+
+	"github.com/golang-tire/auth/internal/domains"
 
 	"github.com/google/uuid"
 
@@ -112,7 +114,7 @@ func TestUpdateUserRequest_Validate(t *testing.T) {
 }
 
 func Test_service_CRUD(t *testing.T) {
-	s := NewService(&mockRepository{}, rules.NewMockRepository())
+	s := NewService(&mockRepository{}, domains.NewMockRepository(), roles.NewMockRepository())
 	ctx := context.Background()
 
 	// initial count
@@ -273,15 +275,19 @@ type mockRepository struct {
 	items []entity.User
 }
 
-func (m mockRepository) AddRule(ctx context.Context, user entity.User, rule entity.Rule) (*entity.UserRule, error) {
+func (m mockRepository) AddUserRole(ctx context.Context, userRole entity.UserRole) (string, error) {
 	panic("implement me")
 }
 
-func (m mockRepository) GetRule(ctx context.Context, uuid string) (entity.UserRule, error) {
+func (m mockRepository) GetUserRole(ctx context.Context, uuid string) (entity.UserRole, error) {
 	panic("implement me")
 }
 
-func (m mockRepository) UpdateRule(ctx context.Context, uuid string, user entity.User, rule entity.Rule) (*entity.UserRule, error) {
+func (m mockRepository) UpdateUserRole(ctx context.Context, userRole entity.UserRole) error {
+	panic("implement me")
+}
+
+func (m mockRepository) DeleteUserRole(ctx context.Context, userRole entity.UserRole) error {
 	panic("implement me")
 }
 

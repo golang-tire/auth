@@ -4,17 +4,16 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/go-pg/pg/v10/orm"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 
 	"github.com/golang-tire/pkg/config"
 	"github.com/golang-tire/pkg/log"
-
-	"github.com/go-pg/pg/v10"
 )
 
 // DB represents a DB connection that can be used to run SQL queries.
 type DB struct {
-	db *pg.DB
+	db *gorm.DB
 }
 
 type contextKey int
@@ -32,15 +31,15 @@ var (
 )
 
 // DB returns the dbx.DB wrapped by this object.
-func (db *DB) DB() *pg.DB {
+func (db *DB) DB() *gorm.DB {
 	return db.db
 }
 
 // With returns a Builder that can be used to build and execute SQL queries.
 // With will return the transaction if it is found in the given context.
 // Otherwise it will return a DB connection associated with the context.
-func (db *DB) With(ctx context.Context) *pg.DB {
-	if tx, ok := ctx.Value(txKey).(*pg.DB); ok {
+func (db *DB) With(ctx context.Context) *gorm.DB {
+	if tx, ok := ctx.Value(txKey).(*gorm.DB); ok {
 		return tx
 	}
 	return db.db.WithContext(ctx)
@@ -59,16 +58,23 @@ func Init(ctx context.Context) (*DB, error) {
 		return nil, err
 	}
 
-	database := pg.Connect(&pg.Options{
-		Addr:     fmt.Sprintf("%s:%d", host.String(), port.Int()),
-		User:     user.String(),
-		Password: password.String(),
-		Database: db.String(),
-	})
+	dsn := fmt.Sprintf(
+		"user=%s password=%s dbname=%s host=%s port=%d sslmode=disable TimeZone=Europe/Stockholm",
+		user.String(), password.String(), db.String(), host.String(), port.Int(),
+	)
+	database, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	if err != nil {
+		log.Error("open database failed", log.Err(err))
+		return nil, err
+	}
 
 	go func() {
 		<-ctx.Done()
-		if err := database.Close(); err != nil {
+		pgDB, err := database.DB()
+		if err != nil {
+			log.Error("error in close database", log.Err(err))
+		}
+		if err := pgDB.Close(); err != nil {
 			log.Error("error in close database", log.Err(err))
 		}
 	}()
@@ -77,12 +83,6 @@ func Init(ctx context.Context) (*DB, error) {
 }
 
 // CreateSchema creates database schema for test
-func CreateSchema(db *pg.DB, models []interface{}) error {
-	for _, model := range models {
-		err := db.Model(model).CreateTable(&orm.CreateTableOptions{IfNotExists: true})
-		if err != nil {
-			return err
-		}
-	}
-	return nil
+func CreateSchema(db *gorm.DB, models []interface{}) error {
+	return db.AutoMigrate(models...)
 }

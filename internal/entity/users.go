@@ -1,43 +1,36 @@
 package entity
 
 import (
-	"time"
-
 	auth "github.com/golang-tire/auth/internal/proto/v1"
 	"github.com/golang/protobuf/ptypes"
+	"gorm.io/gorm"
 )
 
 type User struct {
-	tableName struct{} `pg:"users,alias:user"` //nolint
-	ID        uint64   `pg:",pk"`
-	UUID      string   `pg:",unique"`
+	gorm.Model
+	UUID      string `gorm:"index"`
 	Firstname string
 	Lastname  string
-	Username  string `pg:",unique"`
+	Username  string `gorm:"index"`
 	Password  string
 	Gender    string
 	AvatarURL string
-	Email     string `pg:",unique"`
-	Enable    bool   `pg:"default:FALSE,notnull,use_zero"`
+	Email     string `gorm:"unique"`
+	Enable    bool
 	RawData   string
-	UserRoles []*UserRole `pg:"rel:has-many"`
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	UserRoles []UserRole
 }
 
 type UserRole struct {
-	tableName struct{} `pg:"user_roles,alias:user_roles"` //nolint
-	ID        uint64   `pg:",pk"`
-	UUID      string   `pg:",unique"`
-	RoleId    uint64
-	Role      *Role `pg:"rel:has-one"`
-	UserID    uint64
-	User      *User `pg:"rel:has-one"`
-	DomainId  uint64
-	Domain    *Domain `pg:"rel:has-one"`
-	Enable    bool    `pg:"default:TRUE,notnull,use_zero"`
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	gorm.Model
+	UUID     string `gorm:"index"`
+	RoleID   uint
+	Role     Role
+	User     User
+	UserID   uint
+	DomainID uint
+	Domain   Domain
+	Enable   bool
 }
 
 func (r User) ToProto() *auth.User {
@@ -51,6 +44,7 @@ func (r User) ToProto() *auth.User {
 		Gender:    r.Gender,
 		AvatarUrl: r.AvatarURL,
 		Username:  r.Username,
+		Password:  "",
 		Email:     r.Email,
 		Enable:    r.Enable,
 		RawData:   r.RawData,
@@ -69,32 +63,13 @@ func UserToProtoList(rml []User) []*auth.User {
 	return r
 }
 
-func UserFromProto(user *auth.User) User {
-	c, _ := ptypes.Timestamp(user.CreatedAt)
-	u, _ := ptypes.Timestamp(user.UpdatedAt)
-
-	return User{
-		UUID:      user.Uuid,
-		Firstname: user.Firstname,
-		Lastname:  user.Lastname,
-		Gender:    user.Gender,
-		AvatarURL: user.AvatarUrl,
-		Username:  user.Username,
-		Email:     user.Email,
-		Enable:    user.Enable,
-		RawData:   user.RawData,
-		UserRoles: UserRoleListFromProto(user.Roles),
-		CreatedAt: c,
-		UpdatedAt: u,
-	}
-}
-
 func (dr UserRole) ToProto() *auth.UserRole {
 	c, _ := ptypes.TimestampProto(dr.CreatedAt)
 	u, _ := ptypes.TimestampProto(dr.UpdatedAt)
 	domainRole := &auth.UserRole{
 		Uuid:      dr.UUID,
-		Role:      dr.Role.ToProto(),
+		Role:      dr.Role.Title,
+		Domain:    dr.Domain.Name,
 		Enable:    dr.Enable,
 		CreatedAt: c,
 		UpdatedAt: u,
@@ -102,31 +77,10 @@ func (dr UserRole) ToProto() *auth.UserRole {
 	return domainRole
 }
 
-func UserRoleToProtoList(rml []*UserRole) []*auth.UserRole {
+func UserRoleToProtoList(rml []UserRole) []*auth.UserRole {
 	var r []*auth.UserRole
 	for _, i := range rml {
 		r = append(r, i.ToProto())
 	}
 	return r
-}
-
-func UserRoleFromProto(domainRole *auth.UserRole) UserRole {
-	c, _ := ptypes.Timestamp(domainRole.CreatedAt)
-	u, _ := ptypes.Timestamp(domainRole.UpdatedAt)
-
-	return UserRole{
-		UUID:      domainRole.Uuid,
-		Enable:    domainRole.Enable,
-		CreatedAt: c,
-		UpdatedAt: u,
-	}
-}
-
-func UserRoleListFromProto(domainRoles []*auth.UserRole) []*UserRole {
-	var d []*UserRole
-	for _, i := range domainRoles {
-		dr := UserRoleFromProto(i)
-		d = append(d, &dr)
-	}
-	return d
 }

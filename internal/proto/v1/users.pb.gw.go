@@ -370,14 +370,14 @@ func request_UserService_UpdateUserRole_0(ctx context.Context, marshaler runtime
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "uuid", err)
 	}
 
-	val, ok = pathParams["role_uuid"]
+	val, ok = pathParams["user_role_uuid"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "role_uuid")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "user_role_uuid")
 	}
 
-	protoReq.RoleUuid, err = runtime.String(val)
+	protoReq.UserRoleUuid, err = runtime.String(val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "role_uuid", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "user_role_uuid", err)
 	}
 
 	msg, err := client.UpdateUserRole(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -414,14 +414,14 @@ func local_request_UserService_UpdateUserRole_0(ctx context.Context, marshaler r
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "uuid", err)
 	}
 
-	val, ok = pathParams["role_uuid"]
+	val, ok = pathParams["user_role_uuid"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "role_uuid")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "user_role_uuid")
 	}
 
-	protoReq.RoleUuid, err = runtime.String(val)
+	protoReq.UserRoleUuid, err = runtime.String(val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "role_uuid", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "user_role_uuid", err)
 	}
 
 	msg, err := server.UpdateUserRole(ctx, &protoReq)
@@ -450,14 +450,14 @@ func request_UserService_DeleteUserRole_0(ctx context.Context, marshaler runtime
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "uuid", err)
 	}
 
-	val, ok = pathParams["role_uuid"]
+	val, ok = pathParams["user_role_uuid"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "role_uuid")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "user_role_uuid")
 	}
 
-	protoReq.RoleUuid, err = runtime.String(val)
+	protoReq.UserRoleUuid, err = runtime.String(val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "role_uuid", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "user_role_uuid", err)
 	}
 
 	msg, err := client.DeleteUserRole(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -486,14 +486,14 @@ func local_request_UserService_DeleteUserRole_0(ctx context.Context, marshaler r
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "uuid", err)
 	}
 
-	val, ok = pathParams["role_uuid"]
+	val, ok = pathParams["user_role_uuid"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "role_uuid")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "user_role_uuid")
 	}
 
-	protoReq.RoleUuid, err = runtime.String(val)
+	protoReq.UserRoleUuid, err = runtime.String(val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "role_uuid", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "user_role_uuid", err)
 	}
 
 	msg, err := server.DeleteUserRole(ctx, &protoReq)
@@ -908,9 +908,9 @@ var (
 
 	pattern_UserService_AddUserRole_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"v1", "users", "uuid", "roles"}, ""))
 
-	pattern_UserService_UpdateUserRole_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"v1", "users", "uuid", "roles", "role_uuid"}, ""))
+	pattern_UserService_UpdateUserRole_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"v1", "users", "uuid", "roles", "user_role_uuid"}, ""))
 
-	pattern_UserService_DeleteUserRole_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"v1", "users", "uuid", "roles", "role_uuid"}, ""))
+	pattern_UserService_DeleteUserRole_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"v1", "users", "uuid", "roles", "user_role_uuid"}, ""))
 )
 
 var (

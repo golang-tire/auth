@@ -1,20 +1,17 @@
 package entity
 
 import (
-	"time"
+	"gorm.io/gorm"
 
 	auth "github.com/golang-tire/auth/internal/proto/v1"
 	"github.com/golang/protobuf/ptypes"
 )
 
 type Domain struct {
-	tableName struct{} `pg:"domains,alias:domain"` //nolint
-	ID        uint64   `pg:",pk"`
-	UUID      string
-	Name      string `pg:",unique"`
-	Enable    bool   `pg:"default:FALSE,notnull,use_zero"`
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	gorm.Model
+	UUID   string `gorm:"index"`
+	Name   string `gorm:"index"`
+	Enable bool
 }
 
 func (dm Domain) ToProto() *auth.Domain {
@@ -37,17 +34,4 @@ func DomainToProtoList(dml []Domain) []*auth.Domain {
 		r = append(r, i.ToProto())
 	}
 	return r
-}
-
-func DomainFromProto(domain *auth.Domain) Domain {
-	c, _ := ptypes.Timestamp(domain.CreatedAt)
-	u, _ := ptypes.Timestamp(domain.UpdatedAt)
-
-	return Domain{
-		UUID:      domain.Uuid,
-		Name:      domain.Name,
-		Enable:    domain.Enable,
-		CreatedAt: c,
-		UpdatedAt: u,
-	}
 }

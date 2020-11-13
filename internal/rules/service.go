@@ -80,12 +80,10 @@ func (s service) Create(ctx context.Context, req *auth.CreateRuleRequest) (*auth
 	}
 
 	id, err := s.repo.Create(ctx, entity.Rule{
-		RoleID:   role.ID,
-		Role:     role.Title,
-		DomainID: domain.ID,
-		Domain:   &domain,
-		Object:   req.Object,
-		Action:   req.Action,
+		Role:   role,
+		Domain: domain,
+		Object: req.Object,
+		Action: req.Action,
 	})
 	if err != nil {
 		return nil, err
@@ -115,10 +113,8 @@ func (s service) Update(ctx context.Context, req *auth.UpdateRuleRequest) (*auth
 	}
 
 	now := time.Now()
-	rule.Role = role.Title
-	rule.RoleID = role.ID
-	rule.Domain = &domain
-	rule.DomainID = domain.ID
+	rule.Role = role
+	rule.Domain = domain
 	rule.Object = req.Object
 	rule.Action = req.Action
 	rule.UpdatedAt = now

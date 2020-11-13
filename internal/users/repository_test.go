@@ -3,7 +3,6 @@ package users
 import (
 	"context"
 	"testing"
-	"time"
 
 	"github.com/golang-tire/auth/internal/db"
 
@@ -14,7 +13,8 @@ import (
 
 func TestRepository(t *testing.T) {
 	database := db.NewForTest(t, []interface{}{(*entity.User)(nil)})
-	db.ResetTables(t, database, "users")
+	err := db.ResetTables(t, database, "users")
+	assert.Nil(t, err)
 	repo := NewRepository(database)
 
 	ctx := context.Background()
@@ -23,7 +23,6 @@ func TestRepository(t *testing.T) {
 	assert.Nil(t, err)
 
 	// create
-	now := time.Now()
 	testUuid, err := repo.Create(ctx, entity.User{
 		Firstname: "foo",
 		Lastname:  "bar",
@@ -49,7 +48,6 @@ func TestRepository(t *testing.T) {
 
 	// update
 	err = repo.Update(ctx, entity.User{
-		ID:        user.ID,
 		UUID:      testUuid,
 		Firstname: "bar",
 		Lastname:  "foo",
@@ -60,8 +58,6 @@ func TestRepository(t *testing.T) {
 		Email:     "foo@bar.com",
 		Enable:    true,
 		RawData:   "",
-		CreatedAt: now,
-		UpdatedAt: now,
 	})
 	assert.Nil(t, err)
 	user, _ = repo.Get(ctx, testUuid)

@@ -48,10 +48,11 @@ func NewRepository(db *db.DB) Repository {
 // Get reads the user with the specified ID from the database.
 func (r repository) Get(ctx context.Context, uuid string) (entity.User, error) {
 	var user entity.User
-	err := r.db.With(ctx).Model(&user).
-		Relation("UserRole").
-		Where("user.uuid = ?", uuid).First()
-	return user, err
+	res := r.db.With(ctx).
+		Preload("UserRoles.Domain").
+		Preload("UserRoles.Role").
+		Where("users.uuid = ?", uuid).First(&user)
+	return user, res.Error
 }
 
 // Create saves a new user record in the database.
@@ -61,37 +62,45 @@ func (r repository) Create(ctx context.Context, user entity.User) (string, error
 	user.UUID = uuid.New().String()
 	user.CreatedAt = now
 	user.UpdatedAt = now
-	_, err := r.db.With(ctx).Model(&user).Insert()
-	return user.UUID, err
+	res := r.db.With(ctx).Create(&user)
+	return user.UUID, res.Error
 }
 
 // Update saves the changes to an user in the database.
 func (r repository) Update(ctx context.Context, user entity.User) error {
-	_, err := r.db.With(ctx).Model(&user).WherePK().UpdateNotZero()
-	return err
+	res := r.db.With(ctx).Save(&user)
+	return res.Error
 }
 
 // Delete deletes an user from the database.
 func (r repository) Delete(ctx context.Context, user entity.User) error {
-	_, err := r.db.With(ctx).Model(&user).WherePK().Delete()
-	return err
+	res := r.db.With(ctx).Delete(&user)
+	return res.Error
 }
 
 // Count returns the number of the user records in the database.
 func (r repository) Count(ctx context.Context) (int64, error) {
-	var count int
-	count, err := r.db.With(ctx).Model((*entity.User)(nil)).Count()
-	return int64(count), err
+	var count int64
+	res := r.db.With(ctx).Model(&entity.User{}).Count(&count)
+	return count, res.Error
 }
 
 // Query retrieves the user records with the specified offset and limit from the database.
 func (r repository) Query(ctx context.Context, offset, limit int64) ([]entity.User, int, error) {
 	var _users []entity.User
-	count, err := r.db.With(ctx).Model(&_users).
-		Relation("UserRole").
-		Order("user.id ASC").Limit(int(limit)).
-		Offset(int(offset)).SelectAndCount()
-	return _users, count, err
+	res := r.db.With(ctx).
+		Limit(int(limit)).
+		Offset(int(offset)).
+		Order("users.id asc").
+		Preload("UserRoles.Domain").
+		Preload("UserRoles.Role").
+		Find(&_users)
+
+	count, err := r.Count(ctx)
+	if err != nil {
+		return nil, 0, err
+	}
+	return _users, int(count), res.Error
 }
 
 func (r repository) AddUserRole(ctx context.Context, userRole entity.UserRole) (string, error) {
@@ -99,67 +108,23 @@ func (r repository) AddUserRole(ctx context.Context, userRole entity.UserRole) (
 	userRole.UUID = uuid.New().String()
 	userRole.CreatedAt = now
 	userRole.UpdatedAt = now
-	_, err := r.db.With(ctx).Model(&userRole).Insert()
-	return userRole.UUID, err
+	res := r.db.With(ctx).Create(&userRole)
+	return userRole.UUID, res.Error
 }
 
 // GetUserRole reads the user role with the specified ID from the database.
 func (r repository) GetUserRole(ctx context.Context, uuid string) (entity.UserRole, error) {
 	var userRole entity.UserRole
-	err := r.db.With(ctx).Model(&userRole).Where("uuid = ?", uuid).First()
-	return userRole, err
+	res := r.db.With(ctx).Where("uuid = ?", uuid).First(&userRole)
+	return userRole, res.Error
 }
 
 func (r repository) UpdateUserRole(ctx context.Context, userRole entity.UserRole) error {
-	_, err := r.db.With(ctx).Model(&userRole).WherePK().UpdateNotZero()
-	return err
+	res := r.db.With(ctx).Save(&userRole)
+	return res.Error
 }
 
 func (r repository) DeleteUserRole(ctx context.Context, userRole entity.UserRole) error {
-	_, err := r.db.With(ctx).Model(&userRole).WherePK().Delete()
-	return err
+	res := r.db.With(ctx).Delete(&userRole)
+	return res.Error
 }
-
-//// AddRule saves a new user rule record in the database.
-//func (r repository) AddRule(ctx context.Context, user entity.User, rule entity.Rule) (*entity.UserRule, error) {
-//	userRule := entity.UserRule{
-//		UUID:   uuid.New().String(),
-//		RuleID: rule.ID,
-//		UserID: user.ID,
-//	}
-//	_, err := r.db.With(ctx).Model(&userRule).Insert()
-//	if err != nil {
-//		return nil, err
-//	}
-//	return &userRule, nil
-//}
-//
-//// GetRule returns the user rule with the specified user UUID.
-//func (r repository) GetRule(ctx context.Context, uuid string) (entity.UserRule, error) {
-//	var userRule entity.UserRule
-//	err := r.db.With(ctx).Model(&userRule).Where("uuid = ?", uuid).First()
-//	return userRule, err
-//}
-//
-//// UpdateRule updates the user rule with given UUID in the storage.
-//func (r repository) UpdateRule(ctx context.Context, uuid string, user entity.User, rule entity.Rule) (*entity.UserRule, error) {
-//	userRule, err := r.GetRule(ctx, uuid)
-//	if err != nil {
-//		return nil, err
-//	}
-//
-//	userRule.UserID = user.ID
-//	userRule.RuleID = rule.ID
-//	_, err = r.db.With(ctx).Model(&userRule).WherePK().Delete()
-//	return &userRule, err
-//}
-
-//// DeleteRule deletes an user rule with the specified UUID from the database.
-//func (r repository) DeleteRule(ctx context.Context, uuid string) error {
-//	userRule, err := r.GetRule(ctx, uuid)
-//	if err != nil {
-//		return err
-//	}
-//	_, err = r.db.With(ctx).Model(&userRule).WherePK().Delete()
-//	return err
-//}
