@@ -8,14 +8,21 @@ import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
 import "google/protobuf/timestamp.proto";
 
+enum Effect {
+    DENY = 0;
+    ALLOW = 1;
+}
+
 message Rule {
     string uuid = 1;
     string role = 2;
     string domain = 3;
     string object = 4;
     string action = 5;
-    google.protobuf.Timestamp created_at = 6;
-    google.protobuf.Timestamp updated_at = 7;
+    string resource = 6;
+    Effect effect = 7;
+    google.protobuf.Timestamp created_at = 8;
+    google.protobuf.Timestamp updated_at = 9;
 }
 
 message ListRulesRequest {
@@ -39,6 +46,8 @@ message CreateRuleRequest {
     string domain = 2;
     string object = 3;
     string action = 4;
+    string resource = 5;
+    Effect effect = 6;
 }
 
 message UpdateRuleRequest {
@@ -47,6 +56,8 @@ message UpdateRuleRequest {
     string domain = 3;
     string object = 4;
     string action = 5;
+    string resource = 6;
+    Effect effect = 7;
 }
 
 message DeleteRuleRequest {

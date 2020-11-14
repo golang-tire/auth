@@ -13,13 +13,20 @@ type Rule struct {
 	Role     Role `gorm:"foreignKey:RoleID"`
 	DomainID uint
 	Domain   Domain `gorm:"foreignKey:DomainID"`
+	Resource string
 	Object   string
 	Action   string
+	Effect   string
 }
 
 func (r Rule) ToProto() *auth.Rule {
 	c, _ := ptypes.TimestampProto(r.CreatedAt)
 	u, _ := ptypes.TimestampProto(r.UpdatedAt)
+
+	var effect auth.Effect = auth.Effect_DENY
+	if r.Effect == "ALLOW" {
+		effect = auth.Effect_ALLOW
+	}
 
 	rule := &auth.Rule{
 		Uuid:      r.UUID,
@@ -27,6 +34,8 @@ func (r Rule) ToProto() *auth.Rule {
 		Object:    r.Object,
 		Action:    r.Action,
 		Domain:    r.Domain.Name,
+		Resource:  r.Resource,
+		Effect:    effect,
 		CreatedAt: c,
 		UpdatedAt: u,
 	}

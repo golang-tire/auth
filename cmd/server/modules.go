@@ -95,7 +95,10 @@ func setupModules(ctx context.Context) error {
 	users.New(usersSrv)
 
 	authService := auth.NewService(usersSrv)
-	auth.New(authService, usersSrv)
+	_, err = auth.New(ctx, authService, rulesSrv, usersSrv)
+	if err != nil {
+		return err
+	}
 
 	jsonpb := &runtime.JSONPb{
 		MarshalOptions: protojson.MarshalOptions{

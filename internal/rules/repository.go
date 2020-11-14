@@ -25,6 +25,8 @@ type Repository interface {
 	Update(ctx context.Context, rule entity.Rule) error
 	// Delete removes the rule with given UUID from the storage.
 	Delete(ctx context.Context, rule entity.Rule) error
+	// All retrieves all rules records from the database.
+	All(ctx context.Context) ([]entity.Rule, error)
 }
 
 // repository persists rules in database
@@ -40,7 +42,10 @@ func NewRepository(db *db.DB) Repository {
 // Get reads the rule with the specified ID from the database.
 func (r repository) Get(ctx context.Context, uuid string) (entity.Rule, error) {
 	var rule entity.Rule
-	res := r.db.With(ctx).Where("uuid = ?", uuid).First(&rule)
+	res := r.db.With(ctx).
+		Preload("Domain").
+		Preload("Role").
+		Where("rules.uuid = ?", uuid).First(&rule)
 	return rule, res.Error
 }
 
@@ -80,7 +85,9 @@ func (r repository) Query(ctx context.Context, offset, limit int64) ([]entity.Ru
 	res := r.db.With(ctx).
 		Limit(int(limit)).
 		Offset(int(offset)).
-		Order("id asc").
+		Order("rules.id asc").
+		Preload("Domain").
+		Preload("Role").
 		Find(&_rule)
 
 	count, err := r.Count(ctx)
@@ -88,4 +95,16 @@ func (r repository) Query(ctx context.Context, offset, limit int64) ([]entity.Ru
 		return nil, 0, err
 	}
 	return _rule, int(count), res.Error
+}
+
+// All retrieves all rules records from the database.
+func (r repository) All(ctx context.Context) ([]entity.Rule, error) {
+	var _rule []entity.Rule
+	res := r.db.With(ctx).
+		Order("rules.id asc").
+		Preload("Domain").
+		Preload("Role").
+		Find(&_rule)
+
+	return _rule, res.Error
 }

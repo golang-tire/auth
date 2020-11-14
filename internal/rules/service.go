@@ -21,6 +21,7 @@ type Service interface {
 	Create(ctx context.Context, input *auth.CreateRuleRequest) (*auth.Rule, error)
 	Update(ctx context.Context, input *auth.UpdateRuleRequest) (*auth.Rule, error)
 	Delete(ctx context.Context, uuid string) (*auth.Rule, error)
+	All(ctx context.Context) ([]entity.Rule, error)
 }
 
 // ValidateCreateRequest validates the CreateRuleRequest fields.
@@ -30,6 +31,7 @@ func ValidateCreateRequest(c *auth.CreateRuleRequest) error {
 		validation.Field(&c.Object, validation.Required, validation.Length(0, 128)),
 		validation.Field(&c.Domain, validation.Required, validation.Length(0, 128)),
 		validation.Field(&c.Action, validation.Required, validation.Length(0, 128)),
+		validation.Field(&c.Effect, validation.Required),
 	)
 }
 
@@ -40,6 +42,7 @@ func ValidateUpdateRequest(u *auth.UpdateRuleRequest) error {
 		validation.Field(&u.Object, validation.Required, validation.Length(0, 128)),
 		validation.Field(&u.Domain, validation.Required, validation.Length(0, 128)),
 		validation.Field(&u.Action, validation.Required, validation.Length(0, 128)),
+		validation.Field(&u.Effect, validation.Required),
 	)
 }
 
@@ -80,10 +83,12 @@ func (s service) Create(ctx context.Context, req *auth.CreateRuleRequest) (*auth
 	}
 
 	id, err := s.repo.Create(ctx, entity.Rule{
-		Role:   role,
-		Domain: domain,
-		Object: req.Object,
-		Action: req.Action,
+		Role:     role,
+		Domain:   domain,
+		Object:   req.Object,
+		Action:   req.Action,
+		Resource: req.Resource,
+		Effect:   req.Effect.String(),
 	})
 	if err != nil {
 		return nil, err
@@ -117,6 +122,8 @@ func (s service) Update(ctx context.Context, req *auth.UpdateRuleRequest) (*auth
 	rule.Domain = domain
 	rule.Object = req.Object
 	rule.Action = req.Action
+	rule.Resource = req.Resource
+	rule.Effect = req.Effect.String()
 	rule.UpdatedAt = now
 
 	if err := s.repo.Update(ctx, rule); err != nil {
@@ -154,4 +161,13 @@ func (s service) Query(ctx context.Context, offset, limit int64) (*auth.ListRule
 		Offset:     offset,
 		Limit:      limit,
 	}, nil
+}
+
+// All returns all rules.
+func (s service) All(ctx context.Context) ([]entity.Rule, error) {
+	items, err := s.repo.All(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return items, nil
 }

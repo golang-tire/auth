@@ -3,6 +3,10 @@ package auth
 import (
 	"context"
 
+	"github.com/golang-tire/pkg/log"
+
+	"github.com/golang-tire/auth/internal/rules"
+
 	"github.com/golang-tire/pkg/kv"
 
 	"github.com/golang-tire/auth/internal/users"
@@ -71,14 +75,23 @@ func (a api) RefreshToken(ctx context.Context, req *auth.RefreshTokenRequest) (*
 	return res, nil
 }
 
-func New(srv Service, userService users.Service) API {
+func New(ctx context.Context, srv Service, rulesService rules.Service, userService users.Service) (API, error) {
 	s := api{service: srv}
 	grpcgw.RegisterController(s)
-	InitMiddleware(userService)
+
+	enforcer, err := InitRbac(ctx, rulesService, userService)
+	if err != nil {
+		return nil, err
+	}
+	log.Info("load rbac polices...")
+	err = enforcer.LoadPolicy()
+	if err != nil {
+		return nil, err
+	}
+	InitMiddleware(userService, enforcer)
 	kv.Memory().SetString("/authV1.AuthService/Login", "open")
 	kv.Memory().SetString("/authV1.AuthService/Register", "open")
 	kv.Memory().SetString("/authV1.AuthService/VerifyToken", "open")
 	kv.Memory().SetString("/authV1.AuthService/RefreshToken", "open")
-
-	return s
+	return s, nil
 }

@@ -194,8 +194,22 @@
         },
         "action": {
           "type": "string"
+        },
+        "resource": {
+          "type": "string"
+        },
+        "effect": {
+          "$ref": "#/definitions/authV1Effect"
         }
       }
+    },
+    "authV1Effect": {
+      "type": "string",
+      "enum": [
+        "DENY",
+        "ALLOW"
+      ],
+      "default": "DENY"
     },
     "authV1ListRulesResponse": {
       "type": "object",
@@ -238,6 +252,12 @@
         "action": {
           "type": "string"
         },
+        "resource": {
+          "type": "string"
+        },
+        "effect": {
+          "$ref": "#/definitions/authV1Effect"
+        },
         "created_at": {
           "type": "string",
           "format": "date-time"
@@ -265,6 +285,12 @@
         },
         "action": {
           "type": "string"
+        },
+        "resource": {
+          "type": "string"
+        },
+        "effect": {
+          "$ref": "#/definitions/authV1Effect"
         }
       }
     },

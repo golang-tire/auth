@@ -33,6 +33,8 @@ type Repository interface {
 	UpdateUserRole(ctx context.Context, userRole entity.UserRole) error
 	// DeleteUserRole delete the user role
 	DeleteUserRole(ctx context.Context, userRole entity.UserRole) error
+	// GetUserRole reads the user role with the specified ID from the database.
+	AllUserRole(ctx context.Context) ([]entity.UserRole, error)
 	// FindOne returns the one of users with the given condition
 	FindOne(ctx context.Context, condition string, params ...interface{}) (entity.User, error)
 }
@@ -139,4 +141,15 @@ func (r repository) UpdateUserRole(ctx context.Context, userRole entity.UserRole
 func (r repository) DeleteUserRole(ctx context.Context, userRole entity.UserRole) error {
 	res := r.db.With(ctx).Delete(&userRole)
 	return res.Error
+}
+
+func (r repository) AllUserRole(ctx context.Context) ([]entity.UserRole, error) {
+	var _userRoles []entity.UserRole
+	res := r.db.With(ctx).
+		Order("user_roles.id asc").
+		Preload("Domain").
+		Preload("Role").
+		Preload("User").
+		Find(&_userRoles)
+	return _userRoles, res.Error
 }

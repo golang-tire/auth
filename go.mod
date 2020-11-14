@@ -3,6 +3,8 @@ module github.com/golang-tire/auth
 go 1.15
 
 require (
+	github.com/casbin/casbin/v2 v2.17.0
+	github.com/casbin/zap-logger v0.0.0-20201111160603-1487fd4c6e45
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
 	github.com/gogo/protobuf v1.3.1 // indirect
@@ -15,6 +17,7 @@ require (
 	github.com/lib/pq v1.8.0 // indirect
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	github.com/pkg/errors v0.9.1 // indirect
+	github.com/qiangmzsx/string-adapter v1.0.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/stretchr/testify v1.6.1
 	golang.org/x/crypto v0.0.0-20201112155050-0c6587e931a9

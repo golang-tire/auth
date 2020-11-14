@@ -29,6 +29,7 @@ type Service interface {
 	AddUserRole(ctx context.Context, req *auth.AddUserRoleRequest) (*auth.User, error)
 	UpdateUserRole(ctx context.Context, req *auth.UpdateUserRoleRequest) (*auth.User, error)
 	DeleteUserRole(ctx context.Context, req *auth.DeleteUserRoleRequest) (*auth.User, error)
+	ListUserRoles(ctx context.Context) ([]entity.UserRole, error)
 }
 
 // ValidateCreateRequest validates the CreateUserRequest fields.
@@ -257,4 +258,12 @@ func (s service) DeleteUserRole(ctx context.Context, req *auth.DeleteUserRoleReq
 	}
 	// get updated user with its latest roles
 	return s.Get(ctx, req.Uuid)
+}
+
+func (s service) ListUserRoles(ctx context.Context) ([]entity.UserRole, error) {
+	items, err := s.repo.AllUserRole(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return items, nil
 }
