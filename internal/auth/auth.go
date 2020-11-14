@@ -110,7 +110,6 @@ func VerifyToken(req string) (string, error) {
 		}
 		return []byte(jwtSecret.String()), nil
 	})
-	fmt.Println(err)
 	if err != nil {
 		return "", err
 	}

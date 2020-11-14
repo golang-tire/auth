@@ -94,7 +94,8 @@ func setupModules(ctx context.Context) error {
 	usersSrv := users.NewService(usersRepo, domainsRepo, rolesRepo)
 	users.New(usersSrv)
 
-	auth.New(usersSrv)
+	authService := auth.NewService(usersSrv)
+	auth.New(authService, usersSrv)
 
 	jsonpb := &runtime.JSONPb{
 		MarshalOptions: protojson.MarshalOptions{

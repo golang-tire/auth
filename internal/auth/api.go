@@ -3,13 +3,6 @@ package auth
 import (
 	"context"
 
-	"github.com/golang-tire/auth/internal/helpers"
-
-	"github.com/golang-tire/pkg/log"
-
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-
 	"github.com/golang-tire/pkg/kv"
 
 	"github.com/golang-tire/auth/internal/users"
@@ -25,7 +18,7 @@ type API interface {
 }
 
 type api struct {
-	userService users.Service
+	service Service
 	auth.AuthServiceServer
 }
 
@@ -39,131 +32,49 @@ func (a api) InitGrpc(ctx context.Context, server *grpc.Server) {
 }
 
 func (a api) Login(ctx context.Context, req *auth.LoginRequest) (*auth.LoginResponse, error) {
-	hostname, err := ExtractHostName(ctx)
+	res, err := a.service.Login(ctx, req)
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "hostname not found")
+		return nil, err
 	}
-
-	log.Info("hostname", log.String("hostname", hostname))
-
-	user, err := a.userService.GetByUsername(ctx, req.Username)
-	if err != nil {
-		return nil, status.Errorf(codes.NotFound, "username %s not found", req.Username)
-	}
-
-	if !helpers.CheckPasswordHash(req.Password, user.Password) {
-		return nil, status.Error(codes.Unauthenticated, "username or password is not valid")
-	}
-
-	tokens, err := CreateToken(user)
-	if err != nil {
-		log.Error("error on create user token", log.String("user", user.Username), log.Err(err))
-		return nil, status.Errorf(codes.Internal, "internal server error, create token")
-	}
-
-	err = SaveTokens(user, tokens)
-	if err != nil {
-		log.Error("error on set user session", log.String("user", user.Username), log.Err(err))
-		return nil, status.Errorf(codes.Internal, "internal server error, session")
-	}
-
-	log.Info("save token pass")
-	return tokens, nil
+	return res, nil
 }
 
 func (a api) Register(ctx context.Context, req *auth.RegisterRequest) (*auth.RegisterResponse, error) {
-
-	req.Password, _ = helpers.HashPassword(req.Password)
-	user, err := a.userService.Create(ctx, &auth.CreateUserRequest{
-		Firstname: req.Firstname,
-		Lastname:  req.Lastname,
-		Gender:    req.Gender,
-		AvatarUrl: req.AvatarUrl,
-		Username:  req.Username,
-		Password:  req.Password,
-		Email:     req.Email,
-		RawData:   req.RawData,
-		Enable:    true,
-	})
-
+	res, err := a.service.Register(ctx, req)
 	if err != nil {
-		return nil, status.Errorf(codes.OutOfRange, "registration failed with %s", err.Error())
+		return nil, err
 	}
-
-	return &auth.RegisterResponse{
-		Firstname: user.Firstname,
-		Lastname:  user.Lastname,
-		Gender:    user.Gender,
-		AvatarUrl: user.AvatarUrl,
-		Username:  user.Username,
-		Email:     user.Email,
-		RawData:   user.RawData,
-	}, nil
+	return res, nil
 }
 
 func (a api) Logout(ctx context.Context, req *auth.LogoutRequest) (*auth.LogoutResponse, error) {
-	token, err := ExtractToken(ctx)
+	res, err := a.service.Logout(ctx, req)
 	if err != nil {
-		return nil, status.Errorf(codes.Unauthenticated, "invalid token")
+		return nil, err
 	}
-	err = DeleteToken(token, true /* isAccessToken */)
-	if err != nil {
-		log.Error("failed to remove token", log.Err(err))
-		return nil, status.Errorf(codes.Internal, "logout failed")
-	}
-	return nil, nil
+	return res, nil
 }
 
 func (a api) VerifyToken(ctx context.Context, req *auth.VerifyTokenRequest) (*auth.VerifyTokenResponse, error) {
-	vTokens, err := VerifyToken(req.AccessToken)
+	res, err := a.service.VerifyToken(ctx, req)
 	if err != nil {
-		return nil, status.Errorf(codes.Unauthenticated, "invalid token")
+		return nil, err
 	}
-	return &auth.VerifyTokenResponse{AccessToken: vTokens}, nil
+	return res, nil
 }
 
 func (a api) RefreshToken(ctx context.Context, req *auth.RefreshTokenRequest) (*auth.RefreshTokenResponse, error) {
-	vToken, err := VerifyToken(req.RefreshToken)
+	res, err := a.service.RefreshToken(ctx, req)
 	if err != nil {
-		return nil, status.Errorf(codes.Unauthenticated, "invalid refresh token")
+		return nil, err
 	}
-
-	user, err := ExtractSessionUser(req.RefreshToken)
-	if err != nil {
-		return nil, status.Errorf(codes.Unauthenticated, "session expired")
-	}
-
-	dbUser, err := a.userService.GetByUsername(ctx, user.Username)
-	if err != nil {
-		return nil, status.Errorf(codes.Unauthenticated, "invalid user")
-	}
-
-	if !dbUser.Enable {
-		return nil, status.Errorf(codes.Unauthenticated, "user is not active")
-	}
-	err = DeleteToken(vToken, false /* isAccessToken */)
-	if err != nil {
-		log.Error("failed to remove token", log.Err(err))
-		return nil, status.Errorf(codes.Internal, "logout failed")
-	}
-
-	tokens, err := CreateToken(dbUser)
-	if err != nil {
-		log.Error("error on create user token", log.String("user", dbUser.Username), log.Err(err))
-		return nil, status.Errorf(codes.Internal, "internal server error, create token")
-	}
-
-	return &auth.RefreshTokenResponse{
-		AccessToken:  tokens.AccessToken,
-		RefreshToken: tokens.RefreshToken,
-	}, nil
+	return res, nil
 }
 
-func New(userService users.Service) API {
-	s := api{userService: userService}
+func New(srv Service, userService users.Service) API {
+	s := api{service: srv}
 	grpcgw.RegisterController(s)
 	InitMiddleware(userService)
-
 	kv.Memory().SetString("/authV1.AuthService/Login", "open")
 	kv.Memory().SetString("/authV1.AuthService/Register", "open")
 	kv.Memory().SetString("/authV1.AuthService/VerifyToken", "open")
