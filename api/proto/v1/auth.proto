@@ -18,7 +18,9 @@ message LoginResponse {
 
 message LogoutRequest {}
 
-message LogoutResponse {}
+message LogoutResponse {
+    string redirect_to = 1;
+}
 
 message RegisterRequest {
     string firstname = 1;

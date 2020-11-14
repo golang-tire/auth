@@ -4,8 +4,6 @@ import (
 	"context"
 	"errors"
 
-	"github.com/golang-tire/pkg/session"
-
 	"github.com/golang-tire/pkg/kv"
 
 	auth "github.com/golang-tire/auth/internal/proto/v1"
@@ -33,7 +31,7 @@ const (
 )
 
 type Middleware struct {
-	UserService users.Service
+	userService users.Service
 }
 
 func streamExtractor(srv interface{}, ss grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
@@ -72,13 +70,28 @@ func (m Middleware) authHandler(ctx context.Context) (context.Context, error) {
 	}
 	token, err := grpc_auth.AuthFromMD(ctx, "bearer")
 	if err != nil {
-		return ctx, status.Errorf(codes.InvalidArgument, "invalid token format")
+		return ctx, status.Errorf(codes.InvalidArgument, "token required")
 	}
-	var user *auth.User
-	err = session.Get(token, &user)
+
+	vToken, err := extractTokenData(token)
 	if err != nil {
-		return ctx, status.Errorf(codes.Unauthenticated, "invalid token")
+		return nil, status.Errorf(codes.Unauthenticated, "invalid token")
 	}
+
+	td, err := loadTokenDetails(*vToken.AccessUuid)
+	if err != nil {
+		return ctx, status.Errorf(codes.Unauthenticated, "session expired")
+	}
+
+	user, err := m.userService.Get(ctx, td.UserUuid)
+	if err != nil {
+		return ctx, status.Errorf(codes.Unauthenticated, "invalid credential")
+	}
+
+	if !user.Enable {
+		return ctx, status.Errorf(codes.Unauthenticated, "access denied")
+	}
+
 	return context.WithValue(context.WithValue(ctx, userKey, user), tokenKey, token), nil
 }
 
@@ -111,8 +124,7 @@ func ExtractHostName(ctx context.Context) (string, error) {
 
 func InitMiddleware(userService users.Service) {
 
-	middleware := Middleware{UserService: userService}
-
+	middleware := Middleware{userService: userService}
 	grpcgw.RegisterInterceptors(grpcgw.Interceptor{
 		Unary:  unaryExtractor,
 		Stream: streamExtractor,

@@ -3,6 +3,8 @@ package auth
 import (
 	"context"
 
+	"github.com/golang-tire/pkg/session"
+
 	"github.com/go-ozzo/ozzo-validation/v4/is"
 
 	validation "github.com/go-ozzo/ozzo-validation/v4"
@@ -68,20 +70,22 @@ func (s service) Login(ctx context.Context, req *auth.LoginRequest) (*auth.Login
 		return nil, status.Error(codes.Unauthenticated, "username or password is not valid")
 	}
 
-	tokens, err := CreateToken(user)
+	tokens, err := createToken(user)
 	if err != nil {
 		log.Error("error on create user token", log.String("user", user.Username), log.Err(err))
 		return nil, status.Errorf(codes.Internal, "internal server error, create token")
 	}
 
-	err = SaveTokens(user, tokens)
+	err = saveTokens(tokens)
 	if err != nil {
 		log.Error("error on set user session", log.String("user", user.Username), log.Err(err))
 		return nil, status.Errorf(codes.Internal, "internal server error, session")
 	}
 
-	log.Info("save token pass")
-	return tokens, nil
+	return &auth.LoginResponse{
+		AccessToken:  tokens.AccessToken,
+		RefreshToken: tokens.RefreshToken,
+	}, nil
 }
 
 func (s service) Register(ctx context.Context, req *auth.RegisterRequest) (*auth.RegisterResponse, error) {
@@ -121,36 +125,42 @@ func (s service) Register(ctx context.Context, req *auth.RegisterRequest) (*auth
 func (s service) Logout(ctx context.Context, req *auth.LogoutRequest) (*auth.LogoutResponse, error) {
 	token, err := ExtractToken(ctx)
 	if err != nil {
+		return nil, status.Errorf(codes.Unauthenticated, "token not found")
+	}
+
+	vToken, err := extractTokenData(token)
+	if err != nil {
 		return nil, status.Errorf(codes.Unauthenticated, "invalid token")
 	}
-	err = DeleteToken(token, true /* isAccessToken */)
+
+	err = session.Delete(*vToken.AccessUuid)
 	if err != nil {
 		log.Error("failed to remove token", log.Err(err))
-		return nil, status.Errorf(codes.Internal, "logout failed")
+		return nil, status.Errorf(codes.InvalidArgument, "session already expired")
 	}
-	return nil, nil
+	return &auth.LogoutResponse{RedirectTo: "/v1/auth/login"}, nil
 }
 
 func (s service) VerifyToken(ctx context.Context, req *auth.VerifyTokenRequest) (*auth.VerifyTokenResponse, error) {
-	vTokens, err := VerifyToken(req.AccessToken)
+	_, err := verifyToken(req.AccessToken)
 	if err != nil {
 		return nil, status.Errorf(codes.Unauthenticated, "invalid token")
 	}
-	return &auth.VerifyTokenResponse{AccessToken: vTokens}, nil
+	return &auth.VerifyTokenResponse{AccessToken: req.AccessToken}, nil
 }
 
 func (s service) RefreshToken(ctx context.Context, req *auth.RefreshTokenRequest) (*auth.RefreshTokenResponse, error) {
-	vToken, err := VerifyToken(req.RefreshToken)
+	vToken, err := extractTokenData(req.RefreshToken)
 	if err != nil {
 		return nil, status.Errorf(codes.Unauthenticated, "invalid refresh token")
 	}
 
-	user, err := ExtractSessionUser(req.RefreshToken)
+	td, err := loadTokenDetails(*vToken.RefreshUuid)
 	if err != nil {
 		return nil, status.Errorf(codes.Unauthenticated, "refresh token expired")
 	}
 
-	dbUser, err := s.userService.GetByUsername(ctx, user.Username)
+	dbUser, err := s.userService.GetByUsername(ctx, td.Username)
 	if err != nil {
 		return nil, status.Errorf(codes.Unauthenticated, "invalid user")
 	}
@@ -158,16 +168,23 @@ func (s service) RefreshToken(ctx context.Context, req *auth.RefreshTokenRequest
 	if !dbUser.Enable {
 		return nil, status.Errorf(codes.Unauthenticated, "user is not active")
 	}
-	err = DeleteToken(vToken, false /* isAccessToken */)
+
+	err = deleteToken(vToken)
 	if err != nil {
 		log.Error("failed to remove token", log.Err(err))
 		return nil, status.Errorf(codes.Internal, "logout failed")
 	}
 
-	tokens, err := CreateToken(dbUser)
+	tokens, err := createToken(dbUser)
 	if err != nil {
 		log.Error("error on create user token", log.String("user", dbUser.Username), log.Err(err))
 		return nil, status.Errorf(codes.Internal, "internal server error, create token")
+	}
+
+	err = saveTokens(tokens)
+	if err != nil {
+		log.Error("error on set user session", log.String("user", dbUser.Username), log.Err(err))
+		return nil, status.Errorf(codes.Internal, "internal server error, session")
 	}
 
 	return &auth.RefreshTokenResponse{

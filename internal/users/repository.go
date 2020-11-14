@@ -14,7 +14,7 @@ import (
 // Repository encapsulates the logic to access users from the data source.
 type Repository interface {
 	// Get returns the user with the specified user UUID.
-	Get(ctx context.Context, uuid string) (entity.User, error)
+	Get(ctx context.Context, Uuid string) (entity.User, error)
 	// Count returns the number of users.
 	Count(ctx context.Context) (int64, error)
 	// Query returns the list of users with the given offset and limit.
@@ -28,7 +28,7 @@ type Repository interface {
 	// AddUserRole add a role to user
 	AddUserRole(ctx context.Context, userRole entity.UserRole) (string, error)
 	// GetUserRole reads the user role with the specified ID from the database.
-	GetUserRole(ctx context.Context, uuid string) (entity.UserRole, error)
+	GetUserRole(ctx context.Context, Uuid string) (entity.UserRole, error)
 	// UpdateUserRole updates the user role
 	UpdateUserRole(ctx context.Context, userRole entity.UserRole) error
 	// DeleteUserRole delete the user role
@@ -47,13 +47,13 @@ func NewRepository(db *db.DB) Repository {
 	return repository{db}
 }
 
-// Get reads the user with the specified ID from the database.
-func (r repository) Get(ctx context.Context, uuid string) (entity.User, error) {
+// Get reads the user with the specified Uuid from the database.
+func (r repository) Get(ctx context.Context, Uuid string) (entity.User, error) {
 	var user entity.User
 	res := r.db.With(ctx).
 		Preload("UserRoles.Domain").
 		Preload("UserRoles.Role").
-		Where("users.uuid = ?", uuid).First(&user)
+		Where("users.uuid = ?", Uuid).First(&user)
 	return user, res.Error
 }
 

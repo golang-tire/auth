@@ -204,7 +204,12 @@
       "type": "object"
     },
     "authV1LogoutResponse": {
-      "type": "object"
+      "type": "object",
+      "properties": {
+        "redirect_to": {
+          "type": "string"
+        }
+      }
     },
     "authV1RefreshTokenRequest": {
       "type": "object",

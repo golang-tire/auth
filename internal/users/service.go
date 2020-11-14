@@ -16,12 +16,12 @@ import (
 
 // Service encapsulates use case logic for users.
 type Service interface {
-	Get(ctx context.Context, uuid string) (*auth.User, error)
+	Get(ctx context.Context, Uuid string) (*auth.User, error)
 	Query(ctx context.Context, offset, limit int64) (*auth.ListUsersResponse, error)
 	Count(ctx context.Context) (int64, error)
 	Create(ctx context.Context, req *auth.CreateUserRequest) (*auth.User, error)
 	Update(ctx context.Context, req *auth.UpdateUserRequest) (*auth.User, error)
-	Delete(ctx context.Context, uuid string) (*auth.User, error)
+	Delete(ctx context.Context, Uuid string) (*auth.User, error)
 
 	// GetByUsername returns the users if username found
 	GetByUsername(ctx context.Context, username string) (*auth.User, error)
@@ -77,9 +77,9 @@ func NewService(repo Repository, domainsRepo domains.Repository, rolesRepo roles
 	return service{repo, domainsRepo, rolesRepo}
 }
 
-// Get returns the user with the specified the user UUID.
-func (s service) Get(ctx context.Context, UUID string) (*auth.User, error) {
-	user, err := s.repo.Get(ctx, UUID)
+// Get returns the user with the specified the user Uuid.
+func (s service) Get(ctx context.Context, Uuid string) (*auth.User, error) {
+	user, err := s.repo.Get(ctx, Uuid)
 	if err != nil {
 		return nil, err
 	}
