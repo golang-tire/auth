@@ -2,6 +2,7 @@ package roles
 
 import (
 	"context"
+	"net/http"
 
 	"github.com/golang-tire/auth/internal/helpers"
 	auth "github.com/golang-tire/auth/internal/proto/v1"
@@ -22,7 +23,7 @@ type api struct {
 	auth.RoleServiceServer
 }
 
-func (a api) InitRest(ctx context.Context, conn *grpc.ClientConn, mux *runtime.ServeMux) {
+func (a api) InitRest(ctx context.Context, conn *grpc.ClientConn, mux *runtime.ServeMux, httpMux *http.ServeMux) {
 	cl := auth.NewRoleServiceClient(conn)
 	_ = auth.RegisterRoleServiceHandlerClient(ctx, mux, cl)
 }

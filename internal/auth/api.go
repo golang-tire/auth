@@ -2,6 +2,7 @@ package auth
 
 import (
 	"context"
+	"net/http"
 
 	"github.com/golang-tire/pkg/log"
 
@@ -26,7 +27,7 @@ type api struct {
 	auth.AuthServiceServer
 }
 
-func (a api) InitRest(ctx context.Context, conn *grpc.ClientConn, mux *runtime.ServeMux) {
+func (a api) InitRest(ctx context.Context, conn *grpc.ClientConn, mux *runtime.ServeMux, httpMux *http.ServeMux) {
 	cl := auth.NewAuthServiceClient(conn)
 	_ = auth.RegisterAuthServiceHandlerClient(ctx, mux, cl)
 }
