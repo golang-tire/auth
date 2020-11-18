@@ -2,7 +2,10 @@ package domains
 
 import (
 	"context"
+	"fmt"
 	"time"
+
+	"gorm.io/gorm"
 
 	"github.com/golang-tire/auth/internal/db"
 
@@ -43,6 +46,9 @@ func NewRepository(db *db.DB) Repository {
 func (r repository) Get(ctx context.Context, uuid string) (entity.Domain, error) {
 	var domain entity.Domain
 	res := r.db.With(ctx).Where("uuid = ?", uuid).First(&domain)
+	if res.Error != nil && res.Error == gorm.ErrRecordNotFound {
+		return entity.Domain{}, fmt.Errorf("domain with uuid `%s` not found", uuid)
+	}
 	return domain, res.Error
 }
 
@@ -50,6 +56,9 @@ func (r repository) Get(ctx context.Context, uuid string) (entity.Domain, error)
 func (r repository) GetByName(ctx context.Context, name string) (entity.Domain, error) {
 	var domain entity.Domain
 	res := r.db.With(ctx).Where("name = ?", name).First(&domain)
+	if res.Error != nil && res.Error == gorm.ErrRecordNotFound {
+		return entity.Domain{}, fmt.Errorf("domain with name `%s` not found", name)
+	}
 	return domain, res.Error
 }
 

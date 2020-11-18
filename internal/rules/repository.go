@@ -2,7 +2,10 @@ package rules
 
 import (
 	"context"
+	"fmt"
 	"time"
+
+	"gorm.io/gorm"
 
 	"github.com/golang-tire/auth/internal/db"
 
@@ -46,6 +49,9 @@ func (r repository) Get(ctx context.Context, uuid string) (entity.Rule, error) {
 		Preload("Domain").
 		Preload("Role").
 		Where("rules.uuid = ?", uuid).First(&rule)
+	if res.Error != nil && res.Error == gorm.ErrRecordNotFound {
+		return entity.Rule{}, fmt.Errorf("rule with uuid `%s` not found", uuid)
+	}
 	return rule, res.Error
 }
 

@@ -2,7 +2,10 @@ package users
 
 import (
 	"context"
+	"fmt"
 	"time"
+
+	"gorm.io/gorm"
 
 	"github.com/golang-tire/auth/internal/db"
 
@@ -56,6 +59,9 @@ func (r repository) Get(ctx context.Context, Uuid string) (entity.User, error) {
 		Preload("UserRoles.Domain").
 		Preload("UserRoles.Role").
 		Where("users.uuid = ?", Uuid).First(&user)
+	if res.Error != nil && res.Error == gorm.ErrRecordNotFound {
+		return entity.User{}, fmt.Errorf("user with uuid `%s` not found", Uuid)
+	}
 	return user, res.Error
 }
 
@@ -130,6 +136,9 @@ func (r repository) AddUserRole(ctx context.Context, userRole entity.UserRole) (
 func (r repository) GetUserRole(ctx context.Context, uuid string) (entity.UserRole, error) {
 	var userRole entity.UserRole
 	res := r.db.With(ctx).Where("uuid = ?", uuid).First(&userRole)
+	if res.Error != nil && res.Error == gorm.ErrRecordNotFound {
+		return entity.UserRole{}, fmt.Errorf("userRole with uuid `%s` not found", uuid)
+	}
 	return userRole, res.Error
 }
 
@@ -150,6 +159,7 @@ func (r repository) AllUserRole(ctx context.Context) ([]entity.UserRole, error) 
 		Preload("Domain").
 		Preload("Role").
 		Preload("User").
+		Where("user_roles.enable = ?", true).
 		Find(&_userRoles)
 	return _userRoles, res.Error
 }

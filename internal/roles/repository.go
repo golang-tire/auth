@@ -2,7 +2,10 @@ package roles
 
 import (
 	"context"
+	"fmt"
 	"time"
+
+	"gorm.io/gorm"
 
 	"github.com/golang-tire/auth/internal/db"
 
@@ -43,6 +46,9 @@ func NewRepository(db *db.DB) Repository {
 func (r repository) Get(ctx context.Context, uuid string) (entity.Role, error) {
 	var role entity.Role
 	res := r.db.With(ctx).Where("uuid = ?", uuid).First(&role)
+	if res.Error != nil && res.Error == gorm.ErrRecordNotFound {
+		return entity.Role{}, fmt.Errorf("role with uuid `%s` not found", uuid)
+	}
 	return role, res.Error
 }
 
@@ -50,6 +56,9 @@ func (r repository) Get(ctx context.Context, uuid string) (entity.Role, error) {
 func (r repository) GetByTitle(ctx context.Context, title string) (entity.Role, error) {
 	var role entity.Role
 	res := r.db.With(ctx).Where("title = ?", title).First(&role)
+	if res.Error != nil && res.Error == gorm.ErrRecordNotFound {
+		return entity.Role{}, fmt.Errorf("role with title `%s` not found", title)
+	}
 	return role, res.Error
 }
 
