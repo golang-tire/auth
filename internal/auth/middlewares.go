@@ -3,7 +3,6 @@ package auth
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	"github.com/casbin/casbin/v2"
 
@@ -67,22 +66,6 @@ func unaryExtractor(ctx context.Context, req interface{}, info *grpc.UnaryServer
 	return handler(ctx, req)
 }
 
-func (m Middleware) checkRbac(ctx context.Context, user *auth.User) (bool, error) {
-
-	var permErr = fmt.Errorf("persmission restricted")
-	domain := ctx.Value(hostNameKey)
-	if domain == nil {
-		return false, permErr
-	}
-
-	domainString, ok := domain.(string)
-	if !ok {
-		return false, permErr
-	}
-
-	return m.enforcer.Enforce(domainString, user.Username, "res", "act", "*")
-}
-
 func (m Middleware) authHandler(ctx context.Context) (context.Context, error) {
 	r := ctx.Value(resourceKey)
 	if r == nil { // No user requested here
@@ -142,9 +125,9 @@ func ExtractHostName(ctx context.Context) (string, error) {
 	return tok, nil
 }
 
-func InitMiddleware(userService users.Service, enforcer *casbin.Enforcer) {
+func InitMiddleware(userService users.Service) {
 
-	middleware := Middleware{userService: userService, enforcer: enforcer}
+	middleware := Middleware{userService: userService}
 	grpcgw.RegisterInterceptors(grpcgw.Interceptor{
 		Unary:  unaryExtractor,
 		Stream: streamExtractor,
