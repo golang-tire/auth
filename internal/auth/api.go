@@ -4,6 +4,8 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/casbin/casbin/v2"
+
 	"github.com/golang-tire/pkg/log"
 
 	"github.com/golang-tire/auth/internal/rules"
@@ -18,18 +20,24 @@ import (
 	"google.golang.org/grpc"
 )
 
+// API RBAC service api
 type API interface {
 	grpcgw.Controller
 }
 
 type api struct {
-	service Service
+	ctx      context.Context
+	usersSrv users.Service
+	enforcer *casbin.Enforcer
+	service  Service
 	auth.AuthServiceServer
 }
 
 func (a api) InitRest(ctx context.Context, conn *grpc.ClientConn, mux *runtime.ServeMux, httpMux *http.ServeMux) {
 	cl := auth.NewAuthServiceClient(conn)
 	_ = auth.RegisterAuthServiceHandlerClient(ctx, mux, cl)
+
+	httpMux.HandleFunc("/v1/auth/credential", a.CheckCredential)
 }
 
 func (a api) InitGrpc(ctx context.Context, server *grpc.Server) {
@@ -76,20 +84,19 @@ func (a api) RefreshToken(ctx context.Context, req *auth.RefreshTokenRequest) (*
 	return res, nil
 }
 
+// New create an RBAC api service
 func New(ctx context.Context, srv Service, rulesService rules.Service, userService users.Service) (API, error) {
-	s := api{service: srv}
+
+	log.Info("load rbac polices...")
+	enf, err := InitRbac(ctx, rulesService, userService)
+	if err != nil {
+		return nil, err
+	}
+
+	s := api{ctx: ctx, service: srv, enforcer: enf, usersSrv: userService}
 	grpcgw.RegisterController(s)
 
-	enforcer, err := InitRbac(ctx, rulesService, userService)
-	if err != nil {
-		return nil, err
-	}
-	log.Info("load rbac polices...")
-	err = enforcer.LoadPolicy()
-	if err != nil {
-		return nil, err
-	}
-	InitMiddleware(userService, enforcer)
+	InitMiddleware(userService)
 	kv.Memory().SetString("/authV1.AuthService/Login", "open")
 	kv.Memory().SetString("/authV1.AuthService/Register", "open")
 	kv.Memory().SetString("/authV1.AuthService/VerifyToken", "open")

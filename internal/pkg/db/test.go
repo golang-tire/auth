@@ -41,7 +41,7 @@ func NewForTest(t *testing.T, models []interface{}) *DB {
 // ResetTables truncates all data in the specified tables.
 func ResetTables(t *testing.T, db *DB, tables ...string) error {
 	for _, table := range tables {
-		err := db.DB().Raw("TRUNCATE TABLE %s;", table).Error
+		err := db.DB().Raw("TRUNCATE TABLE %s CASCADE;", table).Error
 		if err != nil {
 			t.Error(err)
 			t.FailNow()

@@ -8,7 +8,7 @@ import (
 	"github.com/go-ozzo/ozzo-validation/v4/is"
 
 	validation "github.com/go-ozzo/ozzo-validation/v4"
-	"github.com/golang-tire/auth/internal/helpers"
+	"github.com/golang-tire/auth/internal/pkg/helpers"
 	"github.com/golang-tire/pkg/log"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

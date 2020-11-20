@@ -44,7 +44,9 @@ func ValidateCreateRequest(c *auth.CreateUserRequest) error {
 // Validate validates the UpdateUserRequest fields.
 func ValidateUpdateRequest(u *auth.UpdateUserRequest) error {
 	return validation.ValidateStruct(u,
-		validation.Field(&u.Username, validation.Required, validation.Length(0, 128)),
+		validation.Field(&u.Username, validation.Required, validation.Length(6, 128)),
+		validation.Field(&u.Password, validation.Required, validation.Length(8, 128)),
+		validation.Field(&u.Email, validation.Required, validation.Length(4, 128), is.Email),
 	)
 }
 

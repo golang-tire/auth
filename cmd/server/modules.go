@@ -2,6 +2,11 @@ package main
 
 import (
 	"context"
+	"fmt"
+
+	"github.com/golang-tire/pkg/pubsub"
+
+	"github.com/go-redis/redis/v8"
 
 	"github.com/golang-tire/pkg/kv"
 
@@ -24,25 +29,25 @@ import (
 
 	"github.com/golang-tire/auth/internal/roles"
 
-	"github.com/golang-tire/auth/internal/db"
-	_ "github.com/golang-tire/auth/internal/helpers"
+	"github.com/golang-tire/auth/internal/pkg/db"
+	_ "github.com/golang-tire/auth/internal/pkg/helpers"
 )
 
 const (
-	defaultHttpPort       = 8089
+	defaultHTTPPort       = 8089
 	defaultGrpcPort       = 9090
 	defaultSwaggerBaseURL = "/v1/swagger"
 )
 
 var (
-	httpPort       = config.RegisterInt("server.httpPort", defaultHttpPort)
+	httpPort       = config.RegisterInt("server.httpPort", defaultHTTPPort)
 	grpcPort       = config.RegisterInt("server.grpcPort", defaultGrpcPort)
 	swaggerBaseURL = config.RegisterString("server.swaggerBaseURL", defaultSwaggerBaseURL)
 
-	kvHost     = config.RegisterString("redis.host", "localhost")
-	kvPort     = config.RegisterInt("redis.port", 6379)
-	kvDb       = config.RegisterInt64("redis.db", 1)
-	kvPassword = config.RegisterString("redis.password", "")
+	redisHost     = config.RegisterString("redis.host", "localhost")
+	redisPort     = config.RegisterInt("redis.port", 6379)
+	redisDb       = config.RegisterInt64("redis.db", 1)
+	redisPassword = config.RegisterString("redis.password", "")
 )
 
 func setupModules(ctx context.Context) error {
@@ -53,12 +58,18 @@ func setupModules(ctx context.Context) error {
 		return err
 	}
 
-	_, err = kv.Init(ctx, &kv.Config{
-		Host:     kvHost.String(),
-		Port:     kvPort.Int(),
-		Password: kvPassword.String(),
-		DB:       kvDb.Int(),
+	rdb := redis.NewClient(&redis.Options{
+		Addr:     fmt.Sprintf("%s:%d", redisHost.String(), redisPort.Int()),
+		Password: redisPassword.String(),
+		DB:       redisDb.Int(),
 	})
+
+	_, err = kv.InitWithConn(ctx, rdb)
+	if err != nil {
+		return err
+	}
+
+	pubsub.New(rdb)
 
 	dbInstance, err := db.Init(ctx)
 	if err != nil {

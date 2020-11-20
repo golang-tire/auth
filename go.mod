@@ -3,12 +3,14 @@ module github.com/golang-tire/auth
 go 1.15
 
 require (
+	github.com/alicebob/miniredis/v2 v2.14.1
 	github.com/casbin/casbin/v2 v2.17.0
 	github.com/casbin/zap-logger v0.0.0-20201111160603-1487fd4c6e45
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
+	github.com/go-redis/redis/v8 v8.3.4
 	github.com/gogo/protobuf v1.3.1 // indirect
-	github.com/golang-tire/pkg v0.1.7
+	github.com/golang-tire/pkg v0.1.8
 	github.com/golang/protobuf v1.4.3
 	github.com/google/uuid v1.1.2
 	github.com/grpc-ecosystem/go-grpc-middleware v1.2.2
@@ -21,8 +23,8 @@ require (
 	github.com/stretchr/testify v1.6.1
 	golang.org/x/crypto v0.0.0-20201112155050-0c6587e931a9
 	golang.org/x/text v0.3.4 // indirect
-	google.golang.org/genproto v0.0.0-20201029200359-8ce4113da6f7
-	google.golang.org/grpc v1.33.1
+	google.golang.org/genproto v0.0.0-20201119123407-9b1e624d6bc4
+	google.golang.org/grpc v1.33.2
 	google.golang.org/grpc/examples v0.0.0-20201112215255-90f1b3ee835b // indirect
 	google.golang.org/protobuf v1.25.0
 	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect

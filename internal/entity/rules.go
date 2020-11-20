@@ -1,7 +1,11 @@
 package entity
 
 import (
+	"context"
+
 	auth "github.com/golang-tire/auth/internal/proto/v1"
+	"github.com/golang-tire/pkg/log"
+	"github.com/golang-tire/pkg/pubsub"
 	"github.com/golang/protobuf/ptypes"
 	"gorm.io/gorm"
 )
@@ -17,6 +21,26 @@ type Rule struct {
 	Object   string
 	Action   string
 	Effect   string
+}
+
+func (r *Rule) AfterCreate(tx *gorm.DB) (err error) {
+	pubErr := pubsub.Get().Publish(context.Background(), "create-rule", r.ToProto())
+	if pubErr != nil {
+		log.Error("send new-rule event failed", log.Err(pubErr))
+	}
+	return nil
+}
+
+func (r *Rule) AfterUpdate(tx *gorm.DB) (err error) {
+	pubErr := pubsub.Get().Publish(context.Background(), "update-rule", r.ToProto())
+	if pubErr != nil {
+		log.Error("send new-rule event failed", log.Err(pubErr))
+	}
+	return
+}
+
+func (r *Rule) AfterDelete(tx *gorm.DB) (err error) {
+	return
 }
 
 func (r Rule) ToProto() *auth.Rule {

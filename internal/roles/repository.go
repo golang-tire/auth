@@ -7,7 +7,7 @@ import (
 
 	"gorm.io/gorm"
 
-	"github.com/golang-tire/auth/internal/db"
+	"github.com/golang-tire/auth/internal/pkg/db"
 
 	"github.com/google/uuid"
 

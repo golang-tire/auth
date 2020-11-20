@@ -1,7 +1,11 @@
 package entity
 
 import (
+	"context"
+
 	auth "github.com/golang-tire/auth/internal/proto/v1"
+	"github.com/golang-tire/pkg/log"
+	"github.com/golang-tire/pkg/pubsub"
 	"github.com/golang/protobuf/ptypes"
 	"gorm.io/gorm"
 )
@@ -19,6 +23,26 @@ type User struct {
 	Enable    bool
 	RawData   string
 	UserRoles []UserRole
+}
+
+func (r *User) AfterCreate(tx *gorm.DB) (err error) {
+	pubErr := pubsub.Get().Publish(context.Background(), "user-change", r.ToProto(true))
+	if pubErr != nil {
+		log.Error("send user-change event failed", log.Err(pubErr))
+	}
+	return nil
+}
+
+func (r *User) AfterUpdate(tx *gorm.DB) (err error) {
+	pubErr := pubsub.Get().Publish(context.Background(), "user-change", r.ToProto(true))
+	if pubErr != nil {
+		log.Error("send user-change event failed", log.Err(pubErr))
+	}
+	return
+}
+
+func (r *User) AfterDelete(tx *gorm.DB) (err error) {
+	return
 }
 
 type UserRole struct {

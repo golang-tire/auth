@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/golang-tire/auth/internal/helpers"
+	"github.com/golang-tire/auth/internal/pkg/helpers"
 	auth "github.com/golang-tire/auth/internal/proto/v1"
 	"github.com/golang-tire/pkg/grpcgw"
 	"github.com/golang/protobuf/ptypes/empty"
