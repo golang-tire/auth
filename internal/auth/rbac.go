@@ -2,6 +2,7 @@ package auth
 
 import (
 	"context"
+	"regexp"
 	"strings"
 
 	"github.com/golang-tire/pkg/pubsub"
@@ -20,11 +21,20 @@ import (
 )
 
 var (
-	rbacConfig = config.RegisterString("rbac.conf", "")
+	rbacConfig    = config.RegisterString("rbac.conf", "")
+	routePatterns = config.RegisterStringSlice("rbac.routePatterns", defaultPatterns)
+
+	defaultPatterns = []string{
+		`/v\d+/(?P<resource>\w+)`,
+		`/v\d+/(?P<resource>\w+)/(?P<object>\w+)`,
+		`/v\d+/\w+/\w+/-/(?P<resource>\w+)`,
+		`/v\d+/\w+/\w+/-/(?P<resource>\w+)/(?P<object>\w+)`,
+	}
 )
 
 type rbacService struct {
-	enforcer *casbin.Enforcer
+	enforcer      *casbin.Enforcer
+	regexPatterns []*regexp.Regexp
 }
 
 type adapter struct {
@@ -165,7 +175,7 @@ func (a *rbacService) OnPolicyChange(ctx context.Context, msg proto.Message) {
 	}
 }
 
-func InitRbac(ctx context.Context, rulesSrv rules.Service, usersSrv users.Service) (*casbin.Enforcer, error) {
+func InitRbac(ctx context.Context, rulesSrv rules.Service, usersSrv users.Service) (*rbacService, error) {
 
 	log.Info("init rbac module")
 	err := config.Load()
@@ -182,9 +192,15 @@ func InitRbac(ctx context.Context, rulesSrv rules.Service, usersSrv users.Servic
 	logger := zaplogger.NewLoggerByZap(log.Logger(), true)
 	enf, err := casbin.NewEnforcer(m, a, logger, true)
 
-	rbacSrv := &rbacService{enforcer: enf}
+	ruleList := routePatterns.Slice()
+	var regexRules []*regexp.Regexp
+	for _, rl := range ruleList {
+		regexRules = append(regexRules, regexp.MustCompile(rl))
+	}
+
+	rbacSrv := &rbacService{enforcer: enf, regexPatterns: regexRules}
 
 	pubsub.Get().Subscribe(ctx, "rule-change", rbacSrv.OnPolicyChange)
 	pubsub.Get().Subscribe(ctx, "user-change", rbacSrv.OnPolicyChange)
-	return enf, err
+	return rbacSrv, err
 }

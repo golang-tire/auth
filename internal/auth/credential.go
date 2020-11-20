@@ -3,7 +3,6 @@ package auth
 import (
 	"errors"
 	"net/http"
-	"regexp"
 	"strings"
 
 	"github.com/golang-tire/pkg/log"
@@ -21,13 +20,6 @@ const (
 	xAuthUserEmail      = "x-auth-user-email"
 	xAuthUserUuid       = "x-auth-user-uuid"
 )
-
-var patterns = []*regexp.Regexp{
-	regexp.MustCompile(`/v\d+/(?P<resource>\w+)`),
-	regexp.MustCompile(`/v\d+/(?P<resource>\w+)/(?P<object>\w+)`),
-	regexp.MustCompile(`/v\d+/\w+/\w+/-/(?P<resource>\w+)`),
-	regexp.MustCompile(`/v\d+/\w+/\w+/-/(?P<resource>\w+)/(?P<object>\w+)`),
-}
 
 func (a api) CheckCredential(w http.ResponseWriter, r *http.Request) {
 
@@ -114,19 +106,19 @@ func (a api) CheckCredential(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a api) checkRbac(uri, domain, method string, user *auth.User) (bool, error) {
-	resource, object, err := parseURI(uri)
+	resource, object, err := a.parseURI(uri)
 	if err != nil {
 		log.Error("parse uri failed", log.Err(err))
 		return false, errors.New("parse forwarded uri failed")
 	}
 
-	return a.enforcer.Enforce(user.Username, domain, resource, method, object)
+	return a.rbac.enforcer.Enforce(user.Username, domain, resource, method, object)
 }
 
-func parseURI(uri string) (string, string, error) {
+func (a api) parseURI(uri string) (string, string, error) {
 
 	var resource, object string
-	for _, p := range patterns {
+	for _, p := range a.rbac.regexPatterns {
 		var n = 0
 		s := p.String()
 		if strings.Contains(s, "resource") {

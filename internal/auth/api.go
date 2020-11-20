@@ -4,8 +4,6 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/casbin/casbin/v2"
-
 	"github.com/golang-tire/pkg/log"
 
 	"github.com/golang-tire/auth/internal/rules"
@@ -28,7 +26,7 @@ type API interface {
 type api struct {
 	ctx      context.Context
 	usersSrv users.Service
-	enforcer *casbin.Enforcer
+	rbac     *rbacService
 	service  Service
 	auth.AuthServiceServer
 }
@@ -88,12 +86,12 @@ func (a api) RefreshToken(ctx context.Context, req *auth.RefreshTokenRequest) (*
 func New(ctx context.Context, srv Service, rulesService rules.Service, userService users.Service) (API, error) {
 
 	log.Info("load rbac polices...")
-	enf, err := InitRbac(ctx, rulesService, userService)
+	rbacSrv, err := InitRbac(ctx, rulesService, userService)
 	if err != nil {
 		return nil, err
 	}
 
-	s := api{ctx: ctx, service: srv, enforcer: enf, usersSrv: userService}
+	s := api{ctx: ctx, service: srv, rbac: rbacSrv, usersSrv: userService}
 	grpcgw.RegisterController(s)
 
 	InitMiddleware(userService)

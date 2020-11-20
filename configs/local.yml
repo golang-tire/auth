@@ -19,4 +19,27 @@ redis:
   user: redis
   password: redis
 
+rbac:
+  routePatterns:
+    - '/v\d+/(?P<resource>\w+)'
+    - '/v\d+/(?P<resource>\w+)/(?P<object>\w+)'
+    - '/v\d+/\w+/\w+/-/(?P<resource>\w+)'
+    - '/v\d+/\w+/\w+/-/(?P<resource>\w+)/(?P<object>\w+)'
+
+  conf: |+
+    [request_definition]
+    r = sub, dom, res, act, obj
+
+    [policy_definition]
+    p = sub, dom, res, act, obj, eft
+
+    [role_definition]
+    g = _, _, _
+    g2 = _, _
+
+    [policy_effect]
+    e = some(where (p.eft == allow)) && !some(where (p.eft == deny))
+
+    [matchers]
+    m = (g(r.sub, p.sub, r.dom) || g2(r.sub, p.sub)) && globMatch(r.res, p.res) && globMatch(r.act, p.act) && globMatch(r.obj, p.obj)
 

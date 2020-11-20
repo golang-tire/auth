@@ -10,7 +10,7 @@ require (
 	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
 	github.com/go-redis/redis/v8 v8.3.4
 	github.com/gogo/protobuf v1.3.1 // indirect
-	github.com/golang-tire/pkg v0.1.8
+	github.com/golang-tire/pkg v0.1.82
 	github.com/golang/protobuf v1.4.3
 	github.com/google/uuid v1.1.2
 	github.com/grpc-ecosystem/go-grpc-middleware v1.2.2
