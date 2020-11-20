@@ -4,17 +4,19 @@ import (
 	"context"
 	"testing"
 
-	"gorm.io/gorm"
+	"github.com/golang-tire/auth/internal/pkg/testutils"
 
-	"github.com/golang-tire/auth/internal/db"
+	"github.com/golang-tire/auth/internal/pkg/db"
 
 	"github.com/golang-tire/auth/internal/entity"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestRepository(t *testing.T) {
-	database := db.NewForTest(t, []interface{}{(*entity.User)(nil)})
-	err := db.ResetTables(t, database, "users")
+
+	testutils.TestUp()
+	database := db.NewForTest(t, []interface{}{&entity.Role{}, &entity.Domain{}, &entity.User{}, &entity.UserRole{}})
+	err := db.ResetTables(t, database, "roles", "domains", "users", "user_roles")
 	assert.Nil(t, err)
 	repo := NewRepository(database)
 
@@ -31,7 +33,7 @@ func TestRepository(t *testing.T) {
 		Password:  "pass",
 		Gender:    "x",
 		AvatarURL: "https://foo.bar/foo.jpg",
-		Email:     "foo@bar.com",
+		Email:     "foo1@bar.com",
 		Enable:    true,
 		RawData:   "",
 	})
@@ -45,21 +47,10 @@ func TestRepository(t *testing.T) {
 	assert.Equal(t, "foo", user.Firstname)
 	_, err = repo.Get(ctx, "test0")
 	assert.NotNil(t, err)
-	assert.EqualError(t, gorm.ErrRecordNotFound, err.Error())
 
 	// update
-	err = repo.Update(ctx, entity.User{
-		UUID:      testUuid,
-		Firstname: "bar",
-		Lastname:  "foo",
-		Username:  "user1",
-		Password:  "pass",
-		Gender:    "x",
-		AvatarURL: "https://foo.bar/foo.jpg",
-		Email:     "foo@bar.com",
-		Enable:    true,
-		RawData:   "",
-	})
+	user.Firstname = "bar"
+	err = repo.Update(ctx, user)
 	assert.Nil(t, err)
 	user, _ = repo.Get(ctx, testUuid)
 	assert.Equal(t, "bar", user.Firstname)
@@ -74,8 +65,5 @@ func TestRepository(t *testing.T) {
 	assert.Nil(t, err)
 	_, err = repo.Get(ctx, testUuid)
 	assert.NotNil(t, err)
-	assert.EqualError(t, gorm.ErrRecordNotFound, err.Error())
-	err = repo.Delete(ctx, user)
-	assert.NotNil(t, err)
-	assert.EqualError(t, gorm.ErrRecordNotFound, err.Error())
+	testutils.TestDown()
 }

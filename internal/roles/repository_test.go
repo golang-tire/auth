@@ -4,16 +4,14 @@ import (
 	"context"
 	"testing"
 
-	"gorm.io/gorm"
-
-	"github.com/golang-tire/auth/internal/db"
+	"github.com/golang-tire/auth/internal/pkg/db"
 
 	"github.com/golang-tire/auth/internal/entity"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestRepository(t *testing.T) {
-	database := db.NewForTest(t, []interface{}{(*entity.Role)(nil)})
+	database := db.NewForTest(t, []interface{}{&entity.Role{}})
 	err := db.ResetTables(t, database, "roles")
 	assert.Nil(t, err)
 	repo := NewRepository(database)
@@ -38,7 +36,6 @@ func TestRepository(t *testing.T) {
 	assert.Equal(t, "admin", role.Title)
 	_, err = repo.Get(ctx, "test0")
 	assert.NotNil(t, err)
-	assert.EqualError(t, gorm.ErrRecordNotFound, err.Error())
 
 	// get by title
 	role, err = repo.GetByTitle(ctx, "admin")
@@ -46,14 +43,10 @@ func TestRepository(t *testing.T) {
 	assert.Equal(t, "admin", role.Title)
 	_, err = repo.GetByTitle(ctx, "test0")
 	assert.NotNil(t, err)
-	assert.EqualError(t, gorm.ErrRecordNotFound, err.Error())
 
 	// update
-	err = repo.Update(ctx, entity.Role{
-		UUID:   testUuid,
-		Title:  "manager",
-		Enable: true,
-	})
+	role.Title = "manager"
+	err = repo.Update(ctx, role)
 	assert.Nil(t, err)
 	role, _ = repo.Get(ctx, testUuid)
 	assert.Equal(t, "manager", role.Title)
@@ -68,8 +61,4 @@ func TestRepository(t *testing.T) {
 	assert.Nil(t, err)
 	_, err = repo.Get(ctx, testUuid)
 	assert.NotNil(t, err)
-	assert.EqualError(t, gorm.ErrRecordNotFound, err.Error())
-	err = repo.Delete(ctx, role)
-	assert.NotNil(t, err)
-	assert.EqualError(t, gorm.ErrRecordNotFound, err.Error())
 }

@@ -53,7 +53,7 @@ func Test_service_CRUD(t *testing.T) {
 	assert.Equal(t, int64(0), count)
 
 	// successful creation
-	domain, err := s.Create(ctx, &auth.CreateDomainRequest{Name: "test"})
+	domain, err := s.Create(ctx, &auth.CreateDomainRequest{Name: "test", Enable: true})
 	assert.Nil(t, err)
 	assert.NotEmpty(t, domain.Uuid)
 	id := domain.Uuid

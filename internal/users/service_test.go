@@ -5,6 +5,8 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/golang-tire/auth/internal/pkg/testutils"
+
 	"gorm.io/gorm"
 
 	"github.com/golang-tire/auth/internal/roles"
@@ -29,8 +31,8 @@ func TestCreateUserRequest_Validate(t *testing.T) {
 		{"success", auth.CreateUserRequest{
 			Firstname: "foo",
 			Lastname:  "bar",
-			Username:  "user1",
-			Password:  "pass",
+			Username:  "user1user1",
+			Password:  "pass1234pass",
 			Gender:    "x",
 			AvatarUrl: "https://foo.bar/foo.jpg",
 			Email:     "foo@bar.com",
@@ -76,8 +78,8 @@ func TestUpdateUserRequest_Validate(t *testing.T) {
 		{"success", auth.UpdateUserRequest{
 			Firstname: "foo",
 			Lastname:  "bar",
-			Username:  "user1",
-			Password:  "pass",
+			Username:  "foobarfoo",
+			Password:  "pass1234qwer",
 			Gender:    "x",
 			AvatarUrl: "https://foo.bar/foo.jpg",
 			Email:     "foo@bar.com",
@@ -115,6 +117,8 @@ func TestUpdateUserRequest_Validate(t *testing.T) {
 }
 
 func Test_service_CRUD(t *testing.T) {
+
+	testutils.TestUp()
 	s := NewService(&mockRepository{}, domains.NewMockRepository(), roles.NewMockRepository())
 	ctx := context.Background()
 
@@ -126,8 +130,8 @@ func Test_service_CRUD(t *testing.T) {
 	user, err := s.Create(ctx, &auth.CreateUserRequest{
 		Firstname: "foo",
 		Lastname:  "bar",
-		Username:  "user1",
-		Password:  "pass",
+		Username:  "foobarfoo",
+		Password:  "pass1234qwer",
 		Gender:    "x",
 		AvatarUrl: "https://foo.bar/foo.jpg",
 		Email:     "foo@bar.com",
@@ -137,7 +141,7 @@ func Test_service_CRUD(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotEmpty(t, user.Uuid)
 	id := user.Uuid
-	assert.Equal(t, "user1", user.Username)
+	assert.Equal(t, "foobarfoo", user.Username)
 	assert.NotEmpty(t, user.CreatedAt)
 	assert.NotEmpty(t, user.UpdatedAt)
 	count, _ = s.Count(ctx)
@@ -162,9 +166,9 @@ func Test_service_CRUD(t *testing.T) {
 	// unexpected error in creation
 	_, err = s.Create(ctx, &auth.CreateUserRequest{
 		Firstname: "foo",
-		Lastname:  "bar",
-		Username:  "error",
-		Password:  "pass",
+		Lastname:  "barbar",
+		Username:  "errorerror",
+		Password:  "pass1234qwer",
 		Gender:    "x",
 		AvatarUrl: "https://foo.bar/foo.jpg",
 		Email:     "foo@bar.com",
@@ -178,8 +182,8 @@ func Test_service_CRUD(t *testing.T) {
 	_, _ = s.Create(ctx, &auth.CreateUserRequest{
 		Firstname: "foo",
 		Lastname:  "bar",
-		Username:  "user2",
-		Password:  "pass",
+		Username:  "foobarfoo2",
+		Password:  "pass1234qwer",
 		Gender:    "x",
 		AvatarUrl: "https://foo.bar/foo.jpg",
 		Email:     "foo@bar.com",
@@ -192,7 +196,7 @@ func Test_service_CRUD(t *testing.T) {
 		Firstname: "foo",
 		Lastname:  "bar",
 		Username:  "user_updated",
-		Password:  "pass",
+		Password:  "pass1234qwer",
 		Gender:    "x",
 		AvatarUrl: "https://foo.bar/foo.jpg",
 		Email:     "foo@bar.com",
@@ -206,7 +210,7 @@ func Test_service_CRUD(t *testing.T) {
 		Firstname: "foo",
 		Lastname:  "bar",
 		Username:  "user_updated",
-		Password:  "pass",
+		Password:  "pass1234qwer",
 		Gender:    "x",
 		AvatarUrl: "https://foo.bar/foo.jpg",
 		Email:     "foo@bar.com",
@@ -221,7 +225,7 @@ func Test_service_CRUD(t *testing.T) {
 		Firstname: "foo",
 		Lastname:  "bar",
 		Username:  "",
-		Password:  "pass",
+		Password:  "pass1234qwer",
 		Gender:    "x",
 		AvatarUrl: "https://foo.bar/foo.jpg",
 		Email:     "foo@bar.com",
@@ -237,11 +241,11 @@ func Test_service_CRUD(t *testing.T) {
 	_, err = s.Update(ctx, &auth.UpdateUserRequest{
 		Firstname: "foo",
 		Lastname:  "bar",
-		Username:  "error",
-		Password:  "pass",
+		Username:  "errorerror",
+		Password:  "pass1234qwer",
 		Gender:    "x",
 		AvatarUrl: "https://foo.bar/foo.jpg",
-		Email:     "foo@bar.com",
+		Email:     "bar@foo.com",
 		Enable:    true,
 		RawData:   "",
 		Uuid:      id,
@@ -270,10 +274,20 @@ func Test_service_CRUD(t *testing.T) {
 	assert.Equal(t, id, user.Uuid)
 	count, _ = s.Count(ctx)
 	assert.Equal(t, int64(1), count)
+
+	testutils.TestDown()
 }
 
 type mockRepository struct {
 	items []entity.User
+}
+
+func (m mockRepository) AllUserRole(ctx context.Context) ([]entity.UserRole, error) {
+	panic("implement me")
+}
+
+func (m mockRepository) FindOne(ctx context.Context, condition string, params ...interface{}) (entity.User, error) {
+	panic("implement me")
 }
 
 func (m mockRepository) AddUserRole(ctx context.Context, userRole entity.UserRole) (string, error) {
@@ -311,7 +325,8 @@ func (m mockRepository) Query(ctx context.Context, offset, limit int64) ([]entit
 
 func (m *mockRepository) Create(ctx context.Context, user entity.User) (string, error) {
 	Uuid := uuid.New().String()
-	if user.Username == "error" {
+	user.UUID = Uuid
+	if user.Username == "errorerror" {
 		return Uuid, errCRUD
 	}
 	m.items = append(m.items, user)
@@ -319,7 +334,7 @@ func (m *mockRepository) Create(ctx context.Context, user entity.User) (string, 
 }
 
 func (m *mockRepository) Update(ctx context.Context, user entity.User) error {
-	if user.Username == "error" {
+	if user.Username == "errorerror" {
 		return errCRUD
 	}
 	for i, item := range m.items {

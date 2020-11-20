@@ -48,6 +48,7 @@ func (m mockRepository) Query(ctx context.Context, offset, limit int64) ([]entit
 
 func (m *mockRepository) Create(ctx context.Context, role entity.Role) (string, error) {
 	Uuid := uuid.New().String()
+	role.UUID = Uuid
 	if role.Title == "error" {
 		return Uuid, errCRUD
 	}

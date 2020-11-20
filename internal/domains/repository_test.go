@@ -4,16 +4,14 @@ import (
 	"context"
 	"testing"
 
-	"gorm.io/gorm"
-
-	"github.com/golang-tire/auth/internal/db"
+	"github.com/golang-tire/auth/internal/pkg/db"
 
 	"github.com/golang-tire/auth/internal/entity"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestRepository(t *testing.T) {
-	database := db.NewForTest(t, []interface{}{(*entity.Domain)(nil)})
+	database := db.NewForTest(t, []interface{}{&entity.Domain{}})
 	err := db.ResetTables(t, database, "domains")
 	assert.Nil(t, err)
 	repo := NewRepository(database)
@@ -38,14 +36,10 @@ func TestRepository(t *testing.T) {
 	assert.Equal(t, "foo.bar", domain.Name)
 	_, err = repo.Get(ctx, "test0")
 	assert.NotNil(t, err)
-	assert.EqualError(t, gorm.ErrRecordNotFound, err.Error())
 
 	// update
-	err = repo.Update(ctx, entity.Domain{
-		UUID:   testUuid,
-		Name:   "bar.foo",
-		Enable: true,
-	})
+	domain.Name = "bar.foo"
+	err = repo.Update(ctx, domain)
 	assert.Nil(t, err)
 	domain, _ = repo.Get(ctx, testUuid)
 	assert.Equal(t, "bar.foo", domain.Name)
@@ -60,8 +54,4 @@ func TestRepository(t *testing.T) {
 	assert.Nil(t, err)
 	_, err = repo.Get(ctx, testUuid)
 	assert.NotNil(t, err)
-	assert.EqualError(t, gorm.ErrRecordNotFound, err.Error())
-	err = repo.Delete(ctx, domain)
-	assert.NotNil(t, err)
-	assert.EqualError(t, gorm.ErrRecordNotFound, err.Error())
 }

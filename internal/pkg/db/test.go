@@ -40,5 +40,12 @@ func NewForTest(t *testing.T, models []interface{}) *DB {
 
 // ResetTables truncates all data in the specified tables.
 func ResetTables(t *testing.T, db *DB, tables ...string) error {
-	return db.DB().Migrator().DropTable(tables)
+	for _, table := range tables {
+		err := db.DB().Raw("TRUNCATE TABLE %s;", table).Error
+		if err != nil {
+			t.Error(err)
+			t.FailNow()
+		}
+	}
+	return nil
 }
