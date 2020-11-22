@@ -5,6 +5,7 @@ package authV1;
 option go_package = "internal/proto/v1;auth";
 
 import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
 
 message LoginRequest {
     string username = 1;
@@ -62,6 +63,9 @@ message RefreshTokenResponse {
     string refresh_token = 2;
 }
 
+message ValidateRequest {
+}
+
 service AuthService {
 
     // Login login user
@@ -101,6 +105,13 @@ service AuthService {
         option (google.api.http) = {
             post: "/v1/auth/token/refresh"
             body: "*"
+        };
+    }
+
+    // Validate will check token and return user data in response header
+    rpc Validate(ValidateRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            get: "/v1/auth/validate"
         };
     }
 }

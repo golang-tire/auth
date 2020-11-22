@@ -175,6 +175,29 @@
           "AuthService"
         ]
       }
+    },
+    "/v1/auth/validate": {
+      "get": {
+        "summary": "Validate will check token and return user data in response header",
+        "operationId": "AuthService_Validate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "tags": [
+          "AuthService"
+        ]
+      }
     }
   },
   "definitions": {

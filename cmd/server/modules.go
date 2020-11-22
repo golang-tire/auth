@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/golang-tire/pkg/pubsub"
 
@@ -105,7 +106,12 @@ func setupModules(ctx context.Context) error {
 	usersSrv := users.NewService(usersRepo, domainsRepo, rolesRepo)
 	users.New(usersSrv)
 
-	authService := auth.NewService(usersSrv)
+	rbacSrv, err := auth.InitRbac(ctx, rulesSrv, usersSrv)
+	if err != nil {
+		return err
+	}
+
+	authService := auth.NewService(usersSrv, rbacSrv)
 	_, err = auth.New(ctx, authService, rulesSrv, usersSrv)
 	if err != nil {
 		return err
@@ -127,8 +133,19 @@ func setupModules(ctx context.Context) error {
 		grpcgw.SwaggerBaseURL(swaggerBaseURL.String()),
 		grpcgw.ServeMuxOptions(
 			runtime.WithMarshalerOption(runtime.MIMEWildcard, jsonpb),
+			runtime.WithIncomingHeaderMatcher(grpcHeaderMatcher),
+			runtime.WithOutgoingHeaderMatcher(grpcHeaderMatcher),
 		),
 	)
 
 	return err
+}
+
+func grpcHeaderMatcher(key string) (string, bool) {
+	switch strings.ToLower(key) {
+	case "x-forwarded-uri", "x-forwarded-method", "x-auth-user-email", "x-auth-user-uuid", "x-auth-user-name":
+		return key, true
+	default:
+		return runtime.DefaultHeaderMatcher(key)
+	}
 }

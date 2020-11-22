@@ -42,12 +42,18 @@ func streamExtractor(srv interface{}, ss grpc.ServerStream, info *grpc.StreamSer
 }
 
 func unaryExtractor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) {
+	ctx, err = extractor(ctx, info.FullMethod)
+	if err != nil {
+		return nil, err
+	}
+	return handler(ctx, req)
+}
 
+func extractor(ctx context.Context, fullMethod string) (context.Context, error) {
 	m, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
 		return ctx, status.Errorf(codes.InvalidArgument, "metadata is not readable!")
 	}
-
 	// TODO find a better way to read x-forward-host and authority field
 	forwardedHost := m.Get("x-forwarded-host")
 	if len(forwardedHost) == 1 {
@@ -58,12 +64,12 @@ func unaryExtractor(ctx context.Context, req interface{}, info *grpc.UnaryServer
 		ctx = context.WithValue(ctx, hostNameKey, m.Get(":authority")[0])
 	}
 
-	res, ok := kv.Memory().Get(info.FullMethod)
+	res, ok := kv.Memory().Get(fullMethod)
 	if !ok {
 		ctx = context.WithValue(ctx, resourceKey, res)
 	}
-	ctx = context.WithValue(ctx, fullMethodKey, info.FullMethod)
-	return handler(ctx, req)
+	ctx = context.WithValue(ctx, fullMethodKey, fullMethod)
+	return ctx, nil
 }
 
 func (m Middleware) authHandler(ctx context.Context) (context.Context, error) {

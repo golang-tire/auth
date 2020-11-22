@@ -4,6 +4,7 @@ package auth
 
 import (
 	context "context"
+	empty "github.com/golang/protobuf/ptypes/empty"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -27,6 +28,8 @@ type AuthServiceClient interface {
 	VerifyToken(ctx context.Context, in *VerifyTokenRequest, opts ...grpc.CallOption) (*VerifyTokenResponse, error)
 	// RefreshToken will check and return new token
 	RefreshToken(ctx context.Context, in *RefreshTokenRequest, opts ...grpc.CallOption) (*RefreshTokenResponse, error)
+	// Validate will check token and return user data in response header
+	Validate(ctx context.Context, in *ValidateRequest, opts ...grpc.CallOption) (*empty.Empty, error)
 }
 
 type authServiceClient struct {
@@ -82,6 +85,15 @@ func (c *authServiceClient) RefreshToken(ctx context.Context, in *RefreshTokenRe
 	return out, nil
 }
 
+func (c *authServiceClient) Validate(ctx context.Context, in *ValidateRequest, opts ...grpc.CallOption) (*empty.Empty, error) {
+	out := new(empty.Empty)
+	err := c.cc.Invoke(ctx, "/authV1.AuthService/Validate", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AuthServiceServer is the server API for AuthService service.
 // All implementations must embed UnimplementedAuthServiceServer
 // for forward compatibility
@@ -96,6 +108,8 @@ type AuthServiceServer interface {
 	VerifyToken(context.Context, *VerifyTokenRequest) (*VerifyTokenResponse, error)
 	// RefreshToken will check and return new token
 	RefreshToken(context.Context, *RefreshTokenRequest) (*RefreshTokenResponse, error)
+	// Validate will check token and return user data in response header
+	Validate(context.Context, *ValidateRequest) (*empty.Empty, error)
 	mustEmbedUnimplementedAuthServiceServer()
 }
 
@@ -117,6 +131,9 @@ func (UnimplementedAuthServiceServer) VerifyToken(context.Context, *VerifyTokenR
 }
 func (UnimplementedAuthServiceServer) RefreshToken(context.Context, *RefreshTokenRequest) (*RefreshTokenResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RefreshToken not implemented")
+}
+func (UnimplementedAuthServiceServer) Validate(context.Context, *ValidateRequest) (*empty.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Validate not implemented")
 }
 func (UnimplementedAuthServiceServer) mustEmbedUnimplementedAuthServiceServer() {}
 
@@ -221,6 +238,24 @@ func _AuthService_RefreshToken_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AuthService_Validate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ValidateRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).Validate(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/authV1.AuthService/Validate",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).Validate(ctx, req.(*ValidateRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _AuthService_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "authV1.AuthService",
 	HandlerType: (*AuthServiceServer)(nil),
@@ -244,6 +279,10 @@ var _AuthService_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "RefreshToken",
 			Handler:    _AuthService_RefreshToken_Handler,
+		},
+		{
+			MethodName: "Validate",
+			Handler:    _AuthService_Validate_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

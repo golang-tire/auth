@@ -2,6 +2,14 @@ package auth
 
 import (
 	"context"
+	"errors"
+	"strings"
+
+	"google.golang.org/grpc"
+
+	"google.golang.org/grpc/metadata"
+
+	"github.com/golang/protobuf/ptypes/empty"
 
 	"github.com/golang-tire/pkg/session"
 
@@ -18,6 +26,23 @@ import (
 	auth "github.com/golang-tire/auth/internal/proto/v1"
 )
 
+const (
+	xForwardedURI    = "x-forwarded-uri"
+	xForwardedHost   = "x-forwarded-host"
+	xForwardedMethod = "x-forwarded-method"
+
+	//authorizationHeader = "authorization"
+	xAuthUsername  = "x-auth-user-name"
+	xAuthUserEmail = "x-auth-user-email"
+	xAuthUserUuid  = "x-auth-user-uuid"
+)
+
+type Headers struct {
+	ForwardedHost   string
+	ForwardedURI    string
+	ForwardedMethod string
+}
+
 // Service encapsulates use case logic for auth.
 type Service interface {
 	Login(ctx context.Context, req *auth.LoginRequest) (*auth.LoginResponse, error)
@@ -25,6 +50,7 @@ type Service interface {
 	Logout(ctx context.Context, req *auth.LogoutRequest) (*auth.LogoutResponse, error)
 	VerifyToken(ctx context.Context, req *auth.VerifyTokenRequest) (*auth.VerifyTokenResponse, error)
 	RefreshToken(ctx context.Context, req *auth.RefreshTokenRequest) (*auth.RefreshTokenResponse, error)
+	Validate(ctx context.Context, req *auth.ValidateRequest) (*empty.Empty, error)
 }
 
 // ValidateLoginRequest validates the LoginRequest fields.
@@ -45,6 +71,7 @@ func ValidateRegisterRequest(c *auth.RegisterRequest) error {
 }
 
 type service struct {
+	rbac        *rbacService
 	userService users.Service
 }
 
@@ -193,7 +220,124 @@ func (s service) RefreshToken(ctx context.Context, req *auth.RefreshTokenRequest
 	}, nil
 }
 
+func (s service) Validate(ctx context.Context, req *auth.ValidateRequest) (*empty.Empty, error) {
+
+	headers, err := getHeaders(ctx)
+	if err != nil {
+		return &empty.Empty{}, err
+	}
+	user := ctx.Value(userKey).(*auth.User)
+
+	// check for rbac
+	ok, err := s.checkRbac(headers.ForwardedURI, headers.ForwardedHost, headers.ForwardedMethod, user)
+	if err != nil {
+		log.Error("check rbac permission failed", log.Err(err))
+		return &empty.Empty{}, status.Errorf(codes.Internal, "check permission failed")
+	}
+
+	if !ok {
+		return &empty.Empty{}, status.Errorf(codes.PermissionDenied, "forbidden")
+	}
+
+	err = grpc.SendHeader(ctx, metadata.New(map[string]string{
+		xAuthUsername:  user.Username,
+		xAuthUserEmail: user.Email,
+		xAuthUserUuid:  user.Uuid,
+	}))
+
+	if err != nil {
+		return &empty.Empty{}, status.Errorf(codes.Internal, "complete auth process failed")
+	}
+	return &empty.Empty{}, nil
+}
+
+func (s service) checkRbac(uri, domain, method string, user *auth.User) (bool, error) {
+	resource, object, err := s.parseURI(uri)
+	if err != nil {
+		log.Error("parse uri failed", log.Err(err))
+		return false, errors.New("parse forwarded uri failed")
+	}
+
+	return s.rbac.enforcer.Enforce(user.Username, domain, resource, method, object)
+}
+
+func (s service) parseURI(uri string) (string, string, error) {
+
+	var resource, object string
+	for _, p := range s.rbac.regexPatterns {
+		var n = 0
+		s := p.String()
+		if strings.Contains(s, "resource") {
+			n++
+		}
+		if strings.Contains(s, "object") {
+			n++
+		}
+
+		res := p.FindStringSubmatch(uri)
+		names := p.SubexpNames()
+
+		if len(res)-1 != n {
+			continue
+		}
+
+		for i := range res {
+			if i == 0 {
+				continue
+			}
+
+			if names[i] == "resource" {
+				resource = res[i]
+			}
+
+			if names[i] == "object" {
+				object = res[i]
+			}
+		}
+	}
+	if resource == "" && object == "" {
+		return "", "", errors.New("resource or object not found")
+	}
+
+	if resource == "" {
+		resource = "*"
+	}
+
+	if object == "" {
+		object = "*"
+	}
+
+	return resource, object, nil
+}
+
+func getHeaders(ctx context.Context) (*Headers, error) {
+	m, ok := metadata.FromIncomingContext(ctx)
+	if !ok {
+		return nil, status.Errorf(codes.InvalidArgument, "metadata is not readable!")
+	}
+
+	headers := &Headers{
+		ForwardedHost:   m.Get(xForwardedHost)[0],
+		ForwardedURI:    m.Get(xForwardedURI)[0],
+		ForwardedMethod: m.Get(xForwardedMethod)[0],
+	}
+
+	if headers.ForwardedHost == "" {
+		return nil, status.Errorf(codes.InvalidArgument, xForwardedHost+" is required ")
+	}
+
+	if headers.ForwardedURI == "" {
+		return nil, status.Errorf(codes.InvalidArgument, xForwardedURI+" is required ")
+	}
+
+	if headers.ForwardedMethod == "" {
+		return nil, status.Errorf(codes.InvalidArgument, xForwardedMethod+" is required ")
+	}
+
+	return headers, nil
+}
+
 // NewService creates a new auth service.
-func NewService(userService users.Service) Service {
-	return service{userService}
+func NewService(userService users.Service, rbac *rbacService) Service {
+	return service{rbac, userService}
 }
