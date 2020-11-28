@@ -1,11 +1,12 @@
 import React, {useEffect, useState} from 'react';
-import { Table , Input , Menu, Dropdown, Button, message} from 'antd';
+import {Table, Input, Menu, Dropdown, Button, message, Modal} from 'antd';
 import {configs} from 'services/Network/config';
 import ApiService from "services/Network/api";
 import {Link, useHistory} from "react-router-dom";
 import {DownOutlined, DeleteOutlined, PlusOutlined, ExclamationCircleOutlined} from '@ant-design/icons';
-import { DropOption } from 'components'
+import { DropOption } from 'components';
 
+const {confirm} = Modal;
 const URL = "users"
 const PageSize = configs.PAGE_SIZE;
 
@@ -100,11 +101,11 @@ const Users = props => {
     const deleteItem = (record) => {
         confirm({
             icon: <ExclamationCircleOutlined/>,
-            content: "Are you sure you want to delete `" + record.name + "` ?",
+            content: "Are you sure you want to delete `" + record.username + "` ?",
             onOk() {
                 ApiService.delete(URL, record.uuid).then(
                     (result) => {
-                        message.info("`" + record.name + "` removed")
+                        message.info("`" + record.username + "` removed")
                         loadItems(pagination.current);
                     },
                     (error) => {
@@ -152,7 +153,7 @@ const Users = props => {
         <div>
             <div style={{margin: "10px 0px"}}>
                 {showActions && (
-                    <Dropdown overlay={menu} style={{ marginRight: "10px"}}>
+                    <Dropdown overlay={bulkMenu} style={{ marginRight: "10px"}}>
                         <Button>
                             With selected items <DownOutlined />
                         </Button>

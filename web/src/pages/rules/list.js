@@ -1,10 +1,11 @@
 import React, {useEffect, useState} from 'react';
-import { Table , Input , Menu, Dropdown, Button, message} from 'antd';
+import {Table, Input, Menu, Dropdown, Button, message, Modal} from 'antd';
 import {configs} from 'services/Network/config';
 import ApiService from "services/Network/api";
 import {Link, useHistory} from "react-router-dom";
 import {DownOutlined, DeleteOutlined, PlusOutlined, ExclamationCircleOutlined} from '@ant-design/icons';
 import { DropOption } from 'components'
+const {confirm} = Modal;
 
 const URL = "rules";
 const PageSize = configs.PAGE_SIZE;
@@ -100,11 +101,11 @@ const Rules = props => {
     const deleteItem = (record) => {
         confirm({
             icon: <ExclamationCircleOutlined/>,
-            content: "Are you sure you want to delete `" + record.name + "` ?",
+            content: "Are you sure you want to delete `" + record.role + "` ?",
             onOk() {
                 ApiService.delete(URL, record.uuid).then(
                     (result) => {
-                        message.info("`" + record.name + "` removed")
+                        message.info("`" + record.role + "` removed")
                         loadItems(pagination.current);
                     },
                     (error) => {
