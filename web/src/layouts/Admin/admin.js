@@ -43,13 +43,13 @@ const Admin = props => {
                         <NavLink to="/dashboard" activeClassName="active">Dashboard</NavLink>
                     </Menu.Item>
                     <Menu.Item key="2" icon={<AppstoreAddOutlined />}>
-                        Domains
+                        <NavLink to="/domains" activeClassName="active">Domains</NavLink>
                     </Menu.Item>
                     <Menu.Item key="3" icon={<UserOutlined />}>
                         <NavLink to="/users" activeClassName="active">Users</NavLink>
                     </Menu.Item>
                     <Menu.Item key="4" icon={<TeamOutlined />}>
-                        Roles
+                        <NavLink to="/roles" activeClassName="active">Roles</NavLink>
                     </Menu.Item>
                     <Menu.Item key="5" icon={<ClusterOutlined />}>
                         <NavLink to="/rules" activeClassName="active" >Rules</NavLink>

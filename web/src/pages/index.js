@@ -1,5 +1,11 @@
 export { default as Dashboard } from './dashboard/dashboard';
 export { default as NotFound } from './notFound/notFound';
-export { default as Users } from './users/users';
+export { default as Users } from './users/list';
 export { default as UserEdit } from './users/edit';
+export { default as Domains } from './domains/list';
+export { default as DomainEdit } from './domains/edit';
+export { default as Roles } from './roles/list';
+export { default as RoleEdit } from './roles/edit';
+export { default as Rules } from './rules/list';
+export { default as RuleEdit } from './rules/edit';
 export { default as Login } from './login/login';

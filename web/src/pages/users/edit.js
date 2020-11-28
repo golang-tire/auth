@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import ApiService from "services/Network/api";
 import {useParams} from 'react-router-dom';
-import {Button, Form, Input, InputNumber, Radio, Switch} from 'antd';
+import {Button, Form, Input, Radio, Switch} from 'antd';
 import {configs} from 'services/Network/config';
 
 const layout = {

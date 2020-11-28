@@ -7,11 +7,13 @@ import { DownOutlined, DeleteOutlined , PlusOutlined} from '@ant-design/icons';
 import { DropOption } from 'components'
 const { Search } = Input;
 
+const URL = "users"
+
 const columns = [
     {
         title: 'Username',
         dataIndex: 'username',
-        render: (text, record) => <Link to={`users/edit/${record.uuid}`}>{text}</Link>,
+        render: (text, record) => <Link to={`${URL}/edit/${record.uuid}`}>{text}</Link>,
     },
     {
         title: 'Full name',
@@ -64,16 +66,14 @@ const handleMenuClick = (e) =>{
 
 const menu = (
     <Menu onClick={handleMenuClick}>
-        <Menu.Item key="remove_users" icon={<DeleteOutlined />}>
-           Remove selected users
+        <Menu.Item key="remove_items" icon={<DeleteOutlined />}>
+           Remove selected {URL}
         </Menu.Item>
     </Menu>
 );
 
-const USERS_URL = configs.API_URL + "/users"
-
-const getUsers = () => {
-    return ApiService.get(USERS_URL)
+const getItems = () => {
+    return ApiService.get(configs.API_URL + "/" + URL)
 }
 
 const Users = props => {
@@ -97,9 +97,9 @@ const Users = props => {
 
     useEffect(() => {
         setIsLoading(true);
-        getUsers().then(
+        getItems().then(
             (result) => {
-                setItems(result.data.users);
+                setItems(result.data[URL]);
                 setIsLoading(false);
                 setPagination({
                     pageSize: result.data.limit,
@@ -132,7 +132,7 @@ const Users = props => {
                     enterButton
                 />
 
-                <Button onClick={()=>{ history.push("/users/edit")}}
+                <Button onClick={()=>{ history.push("/" + URL + "/edit")}}
                         type="primary" icon={<PlusOutlined />}
                         style={{float:"right"}}>
                     Create
