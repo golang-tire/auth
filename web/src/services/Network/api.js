@@ -35,7 +35,11 @@ axios.interceptors.response.use(
 
 // ApiService service is responsible for call rest api
 const ApiService = {
-    get(url) {
+    get(Url, uuid) {
+        let url = configs.API_URL + "/" + Url;
+        if (uuid !== undefined){
+            url = url + "/" + uuid;
+        }
         return axios.get(url)
     },
     request(method, url, data){

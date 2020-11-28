@@ -2,7 +2,6 @@ import React, {useState, useEffect} from 'react';
 import ApiService from "services/Network/api";
 import {useParams} from 'react-router-dom';
 import {Button, Form, Input, Switch} from 'antd';
-import {configs} from 'services/Network/config';
 
 const URL = "roles"
 
@@ -16,19 +15,15 @@ const DomainEdit = props => {
     const [form] = Form.useForm();
 
     const initData = {role: {
-            name: "",
+            title: "",
             enable: true,
         }}
-
-    const getItem = (Uuid) => {
-        return ApiService.get(configs.API_URL + "/" + URL + "/" + Uuid)
-    }
 
     useEffect(() => {
         if (Uuid === undefined) {
             return
         }
-        getItem(Uuid).then(
+        ApiService.get(URL, Uuid).then(
             (result) => {
                 form.setFieldsValue({role:{...result.data}});
             },
@@ -48,7 +43,7 @@ const DomainEdit = props => {
                   name="nest-messages"
                   initialValues={initData}
                   onFinish={onFinish}>
-                <Form.Item name={['role', 'name']} label="Name" rules={[{required: true}]}>
+                <Form.Item name={['role', 'title']} label="Name" rules={[{required: true}]}>
                     <Input/>
                 </Form.Item>
                 <Form.Item name={['role', 'enable']} label="Enable" valuePropName="checked">

@@ -1,6 +1,5 @@
 import React, {useEffect, useState} from 'react';
 import { Table , Input , Menu, Dropdown, Button, message} from 'antd';
-import {configs} from 'services/Network/config';
 import ApiService from "services/Network/api";
 import {Link, useHistory} from "react-router-dom";
 import { DownOutlined, DeleteOutlined , PlusOutlined} from '@ant-design/icons';
@@ -57,10 +56,6 @@ const menu = (
     </Menu>
 );
 
-const getItems = () => {
-    return ApiService.get(configs.API_URL + "/" + URL)
-}
-
 const Domains = props => {
     let history = useHistory();
     const [items, setItems] = useState([])
@@ -82,7 +77,7 @@ const Domains = props => {
 
     useEffect(() => {
         setIsLoading(true);
-        getItems().then(
+        ApiService.get(URL).then(
             (result) => {
                 setItems(result.data[URL]);
                 setIsLoading(false);

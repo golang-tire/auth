@@ -2,7 +2,6 @@ import React, {useState, useEffect} from 'react';
 import ApiService from "services/Network/api";
 import {useParams} from 'react-router-dom';
 import {Button, Form, Input, Switch} from 'antd';
-import {configs} from 'services/Network/config';
 
 const URL = "domains"
 
@@ -20,15 +19,11 @@ const DomainEdit = props => {
             enable: true,
         }}
 
-    const getItem = (Uuid) => {
-        return ApiService.get(configs.API_URL + "/" + URL + "/" + Uuid)
-    }
-
     useEffect(() => {
         if (Uuid === undefined) {
             return
         }
-        getItem(Uuid).then(
+        ApiService.get(URL, Uuid).then(
             (result) => {
                 form.setFieldsValue({domain:{...result.data}});
             },

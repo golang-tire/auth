@@ -1,13 +1,15 @@
 import React, {useEffect, useState} from 'react';
-import { Table , Input , Menu, Dropdown, Button, message} from 'antd';
-import {configs} from 'services/Network/config';
+import { Table ,
+    Input , Menu, Dropdown, Button, message, Modal,
+} from 'antd';
 import ApiService from "services/Network/api";
 import {Link, useHistory} from "react-router-dom";
-import { DownOutlined, DeleteOutlined , PlusOutlined} from '@ant-design/icons';
+import { DownOutlined, DeleteOutlined , PlusOutlined, ExclamationCircleOutlined} from '@ant-design/icons';
 import { DropOption } from 'components'
 const { Search } = Input;
+const { confirm } = Modal;
 
-const URL = "domains"
+const URL = "domains";
 
 const columns = [
     {
@@ -30,8 +32,8 @@ const columns = [
                 <DropOption
                     onMenuClick={e => handleOperationClick(record, e)}
                     menuOptions={[
-                        { key: '1', name: "Delete" },
-                        { key: '2', name: "Disable" },
+                        { key: 'delete', name: "Delete" },
+                        { key: 'disable', name: "Disable" },
                     ]}
                 />
             )
@@ -39,26 +41,32 @@ const columns = [
     },
 ];
 
-const handleOperationClick = (record, e) => {
-    message.info("click operation " + e.key)
-    console.log(e)
-}
-
-const handleMenuClick = (e) =>{
+const handleBulkOperationClick = (e) =>{
     message.info('Click on menu item.');
     console.log('click', e);
 }
 
-const menu = (
-    <Menu onClick={handleMenuClick}>
+const bulkMenu = (
+    <Menu onClick={handleBulkOperationClick}>
         <Menu.Item key="remove_items" icon={<DeleteOutlined />}>
             Remove selected {URL}
         </Menu.Item>
     </Menu>
 );
 
-const getItems = () => {
-    return ApiService.get(configs.API_URL + "/" + URL)
+const handleOperationClick = (record, e) => {
+    if (e.key === "delete") {
+        confirm({
+            icon: <ExclamationCircleOutlined />,
+            content: "Are you sure you want to delete `" + record.name + "` ?",
+            onOk() {
+                console.log(record, "deleted")
+            },
+            onCancel() {
+
+            },
+        });
+    }
 }
 
 const Domains = props => {
@@ -82,7 +90,7 @@ const Domains = props => {
 
     useEffect(() => {
         setIsLoading(true);
-        getItems().then(
+        ApiService.get(URL).then(
             (result) => {
                 setItems(result.data[URL]);
                 setIsLoading(false);
@@ -103,7 +111,7 @@ const Domains = props => {
         <div>
             <div style={{margin: "10px 0px"}}>
                 {showActions && (
-                    <Dropdown overlay={menu} style={{ marginRight: "10px"}}>
+                    <Dropdown overlay={bulkMenu} style={{ marginRight: "10px"}}>
                         <Button>
                             With selected items <DownOutlined />
                         </Button>

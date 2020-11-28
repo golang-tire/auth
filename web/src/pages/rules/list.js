@@ -72,9 +72,6 @@ const menu = (
     </Menu>
 );
 
-const getItems = () => {
-    return ApiService.get(configs.API_URL + "/" + URL)
-}
 
 const Rules = props => {
     let history = useHistory();
@@ -97,7 +94,7 @@ const Rules = props => {
 
     useEffect(() => {
         setIsLoading(true);
-        getItems().then(
+        ApiService.get(URL).then(
             (result) => {
                 setItems(result.data[URL]);
                 setIsLoading(false);

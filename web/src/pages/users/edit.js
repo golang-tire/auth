@@ -4,6 +4,8 @@ import {useParams} from 'react-router-dom';
 import {Button, Form, Input, Radio, Switch} from 'antd';
 import {configs} from 'services/Network/config';
 
+const URL = "users"
+
 const layout = {
     labelCol: {span: 2},
     wrapperCol: {span: 8},
@@ -19,9 +21,8 @@ const validateMessages = {
 
 const UserEdit = props => {
 
-    let {userUuid} = useParams();
+    let {Uuid} = useParams();
     const [form] = Form.useForm();
-    const USERS_URL = configs.API_URL + "/users";
     const initData = {user: {
         firstname: "",
         lastname: "",
@@ -34,15 +35,11 @@ const UserEdit = props => {
         raw_data: ""
     }}
 
-    const getUser = (userUuid) => {
-        return ApiService.get(USERS_URL + "/" + userUuid)
-    }
-
     useEffect(() => {
-        if (userUuid === undefined) {
+        if (Uuid === undefined) {
             return
         }
-        getUser(userUuid).then(
+        ApiService.get(URL, Uuid).then(
             (result) => {
                 form.setFieldsValue({user:{...result.data}});
             },
