@@ -94,7 +94,7 @@ const Rules = props => {
 
     useEffect(() => {
         setIsLoading(true);
-        ApiService.get(URL).then(
+        ApiService.getAll(URL).then(
             (result) => {
                 setItems(result.data[URL]);
                 setIsLoading(false);
