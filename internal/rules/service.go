@@ -16,7 +16,7 @@ import (
 // Service encapsulates use case logic for rules.
 type Service interface {
 	Get(ctx context.Context, uuid string) (*auth.Rule, error)
-	Query(ctx context.Context, offset, limit int64) (*auth.ListRulesResponse, error)
+	Query(ctx context.Context, query string, offset, limit int64) (*auth.ListRulesResponse, error)
 	Count(ctx context.Context) (int64, error)
 	Create(ctx context.Context, input *auth.CreateRuleRequest) (*auth.Rule, error)
 	Update(ctx context.Context, input *auth.UpdateRuleRequest) (*auth.Rule, error)
@@ -150,8 +150,8 @@ func (s service) Count(ctx context.Context) (int64, error) {
 }
 
 // Query returns the rules with the specified offset and limit.
-func (s service) Query(ctx context.Context, offset, limit int64) (*auth.ListRulesResponse, error) {
-	items, count, err := s.repo.Query(ctx, offset, limit)
+func (s service) Query(ctx context.Context, query string, offset, limit int64) (*auth.ListRulesResponse, error) {
+	items, count, err := s.repo.Query(ctx, query, offset, limit)
 	if err != nil {
 		return nil, err
 	}

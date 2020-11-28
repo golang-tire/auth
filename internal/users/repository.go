@@ -21,7 +21,7 @@ type Repository interface {
 	// Count returns the number of users.
 	Count(ctx context.Context) (int64, error)
 	// Query returns the list of users with the given offset and limit.
-	Query(ctx context.Context, offset, limit int64) ([]entity.User, int, error)
+	Query(ctx context.Context, query string, offset, limit int64) ([]entity.User, int, error)
 	// Create saves a new user in the storage.
 	Create(ctx context.Context, user entity.User) (string, error)
 	// Update updates the user with given UUID in the storage.
@@ -96,15 +96,20 @@ func (r repository) Count(ctx context.Context) (int64, error) {
 }
 
 // Query retrieves the user records with the specified offset and limit from the database.
-func (r repository) Query(ctx context.Context, offset, limit int64) ([]entity.User, int, error) {
+func (r repository) Query(ctx context.Context, query string, offset, limit int64) ([]entity.User, int, error) {
 	var _users []entity.User
 	res := r.db.With(ctx).
 		Limit(int(limit)).
 		Offset(int(offset)).
 		Order("users.id asc").
 		Preload("UserRoles.Domain").
-		Preload("UserRoles.Role").
-		Find(&_users)
+		Preload("UserRoles.Role")
+
+	if len(query) >= 1 {
+		res = res.Where("username LIKE ? OR email LIKE ? OR firstname LIKE ? OR lastname LIKE ?", "%"+query+"%").Find(&_users)
+	} else {
+		res = res.Find(&_users)
+	}
 
 	count, err := r.Count(ctx)
 	if err != nil {

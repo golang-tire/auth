@@ -17,7 +17,7 @@ import (
 // Service encapsulates use case logic for users.
 type Service interface {
 	Get(ctx context.Context, Uuid string) (*auth.User, error)
-	Query(ctx context.Context, offset, limit int64) (*auth.ListUsersResponse, error)
+	Query(ctx context.Context, query string, offset, limit int64) (*auth.ListUsersResponse, error)
 	Count(ctx context.Context) (int64, error)
 	Create(ctx context.Context, req *auth.CreateUserRequest) (*auth.User, error)
 	Update(ctx context.Context, req *auth.UpdateUserRequest) (*auth.User, error)
@@ -156,8 +156,8 @@ func (s service) Count(ctx context.Context) (int64, error) {
 }
 
 // Query returns the users with the specified offset and limit.
-func (s service) Query(ctx context.Context, offset, limit int64) (*auth.ListUsersResponse, error) {
-	items, count, err := s.repo.Query(ctx, offset, limit)
+func (s service) Query(ctx context.Context, query string, offset, limit int64) (*auth.ListUsersResponse, error) {
+	items, count, err := s.repo.Query(ctx, query, offset, limit)
 	if err != nil {
 		return nil, err
 	}

@@ -23,7 +23,7 @@ type Repository interface {
 	// Count returns the number of domains.
 	Count(ctx context.Context) (int64, error)
 	// Query returns the list of domains with the given offset and limit.
-	Query(ctx context.Context, offset, limit int64) ([]entity.Domain, int, error)
+	Query(ctx context.Context, query string, offset, limit int64) ([]entity.Domain, int, error)
 	// Create saves a new domain in the storage.
 	Create(ctx context.Context, domain entity.Domain) (string, error)
 	// Update updates the domain with given UUID in the storage.
@@ -93,13 +93,18 @@ func (r repository) Count(ctx context.Context) (int64, error) {
 }
 
 // Query retrieves the domain records with the specified offset and limit from the database.
-func (r repository) Query(ctx context.Context, offset, limit int64) ([]entity.Domain, int, error) {
+func (r repository) Query(ctx context.Context, query string, offset, limit int64) ([]entity.Domain, int, error) {
 	var _domains []entity.Domain
 	res := r.db.With(ctx).
 		Limit(int(limit)).
 		Offset(int(offset)).
-		Order("id asc").
-		Find(&_domains)
+		Order("id asc")
+
+	if len(query) >= 1 {
+		res = res.Where("name LIKE ?", "%"+query+"%").Find(&_domains)
+	} else {
+		res = res.Find(&_domains)
+	}
 
 	count, err := r.Count(ctx)
 	if err != nil {

@@ -23,7 +23,7 @@ type Repository interface {
 	// Count returns the number of roles.
 	Count(ctx context.Context) (int64, error)
 	// Query returns the list of roles with the given offset and limit.
-	Query(ctx context.Context, offset, limit int64) ([]entity.Role, int, error)
+	Query(ctx context.Context, query string, offset, limit int64) ([]entity.Role, int, error)
 	// Create saves a new role in the storage.
 	Create(ctx context.Context, role entity.Role) (string, error)
 	// Update updates the role with given UUID in the storage.
@@ -93,13 +93,18 @@ func (r repository) Count(ctx context.Context) (int64, error) {
 }
 
 // Query retrieves the role records with the specified offset and limit from the database.
-func (r repository) Query(ctx context.Context, offset, limit int64) ([]entity.Role, int, error) {
+func (r repository) Query(ctx context.Context, query string, offset, limit int64) ([]entity.Role, int, error) {
 	var _roles []entity.Role
 	res := r.db.With(ctx).
 		Limit(int(limit)).
 		Offset(int(offset)).
-		Order("id asc").
-		Find(&_roles)
+		Order("id asc")
+
+	if len(query) >= 1 {
+		res = res.Where("title LIKE ?", "%"+query+"%").Find(&_roles)
+	} else {
+		res = res.Find(&_roles)
+	}
 
 	count, err := r.Count(ctx)
 	if err != nil {

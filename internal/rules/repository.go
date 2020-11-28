@@ -21,7 +21,7 @@ type Repository interface {
 	// Count returns the number of rules.
 	Count(ctx context.Context) (int64, error)
 	// Query returns the list of rules with the given offset and limit.
-	Query(ctx context.Context, offset, limit int64) ([]entity.Rule, int, error)
+	Query(ctx context.Context, query string, offset, limit int64) ([]entity.Rule, int, error)
 	// Create saves a new rule in the storage.
 	Create(ctx context.Context, rule entity.Rule) (string, error)
 	// Update updates the rule with given UUID in the storage.
@@ -86,15 +86,21 @@ func (r repository) Count(ctx context.Context) (int64, error) {
 }
 
 // Query retrieves the rule records with the specified offset and limit from the database.
-func (r repository) Query(ctx context.Context, offset, limit int64) ([]entity.Rule, int, error) {
+func (r repository) Query(ctx context.Context, query string, offset, limit int64) ([]entity.Rule, int, error) {
 	var _rule []entity.Rule
 	res := r.db.With(ctx).
 		Limit(int(limit)).
 		Offset(int(offset)).
 		Order("rules.id asc").
 		Preload("Domain").
-		Preload("Role").
-		Find(&_rule)
+		Preload("Role")
+
+	if len(query) >= 1 {
+		subQuery := r.db.With(ctx).Select("id").Where("title LIKE ?", "%"+query+"%").Table("roles")
+		res = res.Where("role_id IN (?)", subQuery).Find(&_rule)
+	} else {
+		res = res.Find(&_rule)
+	}
 
 	count, err := r.Count(ctx)
 	if err != nil {

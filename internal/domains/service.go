@@ -12,7 +12,7 @@ import (
 // Service encapsulates use case logic for domains.
 type Service interface {
 	Get(ctx context.Context, uuid string) (*auth.Domain, error)
-	Query(ctx context.Context, offset, limit int64) (*auth.ListDomainsResponse, error)
+	Query(ctx context.Context, query string, offset, limit int64) (*auth.ListDomainsResponse, error)
 	Count(ctx context.Context) (int64, error)
 	Create(ctx context.Context, input *auth.CreateDomainRequest) (*auth.Domain, error)
 	Update(ctx context.Context, input *auth.UpdateDomainRequest) (*auth.Domain, error)
@@ -105,8 +105,8 @@ func (s service) Count(ctx context.Context) (int64, error) {
 }
 
 // Query returns the domains with the specified offset and limit.
-func (s service) Query(ctx context.Context, offset, limit int64) (*auth.ListDomainsResponse, error) {
-	items, count, err := s.repo.Query(ctx, offset, limit)
+func (s service) Query(ctx context.Context, query string, offset, limit int64) (*auth.ListDomainsResponse, error) {
+	items, count, err := s.repo.Query(ctx, query, offset, limit)
 	if err != nil {
 		return nil, err
 	}

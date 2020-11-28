@@ -43,6 +43,12 @@
             "required": false,
             "type": "string",
             "format": "int64"
+          },
+          {
+            "name": "query",
+            "in": "query",
+            "required": false,
+            "type": "string"
           }
         ],
         "tags": [

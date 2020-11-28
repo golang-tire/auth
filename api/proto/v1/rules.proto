@@ -28,6 +28,7 @@ message Rule {
 message ListRulesRequest {
     int64 limit = 1;
     int64 offset = 2;
+    string query = 3;
 }
 
 message ListRulesResponse {
