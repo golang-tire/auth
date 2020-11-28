@@ -78,19 +78,19 @@ type service struct {
 func (s service) Login(ctx context.Context, req *auth.LoginRequest) (*auth.LoginResponse, error) {
 
 	if err := ValidateLoginRequest(req); err != nil {
-		return nil, err
+		return nil, status.Error(codes.Unauthenticated, err.Error())
 	}
 
 	hostname, err := ExtractHostName(ctx)
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "hostname not found")
+		return nil, status.Errorf(codes.Unauthenticated, "hostname not found")
 	}
 
 	log.Info("hostname", log.String("hostname", hostname))
 
 	user, err := s.userService.GetByUsername(ctx, req.Username)
 	if err != nil {
-		return nil, status.Errorf(codes.NotFound, "username %s not found", req.Username)
+		return nil, status.Errorf(codes.Unauthenticated, "username %s not found", req.Username)
 	}
 
 	if !helpers.CheckPasswordHash(req.Password, user.Password) {
