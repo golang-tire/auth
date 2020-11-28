@@ -42,6 +42,13 @@ const ApiService = {
         }
         return axios.get(url)
     },
+    delete(Url, uuid) {
+        let url = configs.API_URL + "/" + Url;
+        if (uuid !== undefined){
+            url = url + "/" + uuid;
+        }
+        return axios.delete(url)
+    },
     request(method, url, data){
         return axios({method, url, data})
     }

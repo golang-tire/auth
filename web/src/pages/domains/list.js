@@ -1,13 +1,12 @@
 import React, {useEffect, useState} from 'react';
-import { Table ,
-    Input , Menu, Dropdown, Button, message, Modal,
-} from 'antd';
+import {Button, Dropdown, Input, Menu, message, Modal, Table} from 'antd';
 import ApiService from "services/Network/api";
 import {Link, useHistory} from "react-router-dom";
-import { DownOutlined, DeleteOutlined , PlusOutlined, ExclamationCircleOutlined} from '@ant-design/icons';
-import { DropOption } from 'components'
-const { Search } = Input;
-const { confirm } = Modal;
+import {DeleteOutlined, DownOutlined, ExclamationCircleOutlined, PlusOutlined} from '@ant-design/icons';
+import {DropOption} from 'components'
+
+const {Search} = Input;
+const {confirm} = Modal;
 
 const URL = "domains";
 
@@ -20,7 +19,7 @@ const columns = [
     {
         title: 'Status',
         dataIndex: 'enable',
-        render: text => <span>{text? 'Enable': 'Disable'}</span>,
+        render: text => <span>{text ? 'Enable' : 'Disable'}</span>,
     },
     {
         title: '',
@@ -32,8 +31,8 @@ const columns = [
                 <DropOption
                     onMenuClick={e => handleOperationClick(record, e)}
                     menuOptions={[
-                        { key: 'delete', name: "Delete" },
-                        { key: 'disable', name: "Disable" },
+                        {key: 'delete', name: "Delete"},
+                        {key: 'disable', name: "Disable"},
                     ]}
                 />
             )
@@ -41,14 +40,14 @@ const columns = [
     },
 ];
 
-const handleBulkOperationClick = (e) =>{
+const handleBulkOperationClick = (e) => {
     message.info('Click on menu item.');
     console.log('click', e);
 }
 
 const bulkMenu = (
     <Menu onClick={handleBulkOperationClick}>
-        <Menu.Item key="remove_items" icon={<DeleteOutlined />}>
+        <Menu.Item key="remove_items" icon={<DeleteOutlined/>}>
             Remove selected {URL}
         </Menu.Item>
     </Menu>
@@ -57,13 +56,17 @@ const bulkMenu = (
 const handleOperationClick = (record, e) => {
     if (e.key === "delete") {
         confirm({
-            icon: <ExclamationCircleOutlined />,
+            icon: <ExclamationCircleOutlined/>,
             content: "Are you sure you want to delete `" + record.name + "` ?",
             onOk() {
-                console.log(record, "deleted")
-            },
-            onCancel() {
-
+                ApiService.delete(URL, record.uuid).then(
+                    (result) => {
+                        message.info("`" + record.name + "` removed")
+                    },
+                    (error) => {
+                        message.error("operation failed ," + error)
+                    }
+                )
             },
         });
     }
@@ -111,9 +114,9 @@ const Domains = props => {
         <div>
             <div style={{margin: "10px 0px"}}>
                 {showActions && (
-                    <Dropdown overlay={bulkMenu} style={{ marginRight: "10px"}}>
+                    <Dropdown overlay={bulkMenu} style={{marginRight: "10px"}}>
                         <Button>
-                            With selected items <DownOutlined />
+                            With selected items <DownOutlined/>
                         </Button>
                     </Dropdown>
                 )}
@@ -121,13 +124,15 @@ const Domains = props => {
                     placeholder="input search text"
                     allowClear
                     onSearch={onSearch}
-                    style={{ width: "300px"}}
+                    style={{width: "300px"}}
                     enterButton
                 />
 
-                <Button onClick={()=>{ history.push("/" + URL + "/edit")}}
-                        type="primary" icon={<PlusOutlined />}
-                        style={{float:"right"}}>
+                <Button onClick={() => {
+                    history.push("/" + URL + "/edit")
+                }}
+                        type="primary" icon={<PlusOutlined/>}
+                        style={{float: "right"}}>
                     Create
                 </Button>
             </div>
