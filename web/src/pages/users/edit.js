@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import ApiService from "services/Network/api";
 import {useParams} from 'react-router-dom';
-import {Button, Form, Input, Radio, Switch} from 'antd';
+import {Button, Form, Input, message, Radio, Switch} from 'antd';
 import {configs} from 'services/Network/config';
 
 const URL = "users"
@@ -11,19 +11,11 @@ const layout = {
     wrapperCol: {span: 8},
 };
 
-const validateMessages = {
-    required: '${label} is required!',
-    types: {
-        email: '${label} is not a valid email!',
-    }
-};
-
-
 const UserEdit = props => {
 
     let {Uuid} = useParams();
     const [form] = Form.useForm();
-    const initData = {user: {
+    const initData = {
         firstname: "",
         lastname: "",
         gender: "",
@@ -33,7 +25,7 @@ const UserEdit = props => {
         email: "",
         enable: true,
         raw_data: ""
-    }}
+    }
 
     useEffect(() => {
         if (Uuid === undefined) {
@@ -41,7 +33,7 @@ const UserEdit = props => {
         }
         ApiService.get(URL, Uuid).then(
             (result) => {
-                form.setFieldsValue({user:{...result.data}});
+                form.setFieldsValue({...result.data});
             },
             (error) => {
             }
@@ -49,7 +41,28 @@ const UserEdit = props => {
     }, [form])
 
     const onFinish = values => {
-        console.log(values);
+        if (Uuid === undefined) {
+            // we will create new
+            ApiService.post(URL, values).then(
+                (result) => {
+                    message.info("new " + URL + " created")
+                    form.setFieldsValue(initData)
+                },
+                (error) => {
+                    message.error("operation failed ," + error)
+                }
+            )
+        }else{
+            // we will update
+            ApiService.put(URL,Uuid, values).then(
+                (result) => {
+                    message.info(" item updated")
+                },
+                (error) => {
+                    message.error("operation failed ," + error)
+                }
+            )
+        }
     };
 
     return (
@@ -58,11 +71,11 @@ const UserEdit = props => {
                   form={form}
                   name="nest-messages"
                   initialValues={initData}
-                  onFinish={onFinish} validateMessages={validateMessages}>
-                <Form.Item name={['user', 'username']} label="Username" rules={[{required: true}]}>
+                  onFinish={onFinish}>
+                <Form.Item name="username" label="Username" rules={[{required: true}]}>
                     <Input/>
                 </Form.Item>
-                <Form.Item name={['user', 'password']} label="Password"
+                <Form.Item name="password" label="Password"
                            rules={[
                                {
                                    required: true,
@@ -72,13 +85,13 @@ const UserEdit = props => {
                 >
                     <Input.Password/>
                 </Form.Item>
-                <Form.Item name={['user', 'firstname']} label="Firstname">
+                <Form.Item name="firstname" label="Firstname">
                     <Input/>
                 </Form.Item>
-                <Form.Item name={['user', 'lastname']} label="Lastname">
+                <Form.Item name="lastname" label="Lastname">
                     <Input/>
                 </Form.Item>
-                <Form.Item name={['user', 'email']} label="Email" rules={[
+                <Form.Item name="email" label="Email" rules={[
                     {
                         required: true,
                         type: 'email'
@@ -86,17 +99,17 @@ const UserEdit = props => {
                 ]}>
                     <Input/>
                 </Form.Item>
-                <Form.Item label="Gender" name={['user', 'gender']}>
+                <Form.Item label="Gender" name="gender">
                     <Radio.Group>
                         <Radio.Button value="male">Male</Radio.Button>
                         <Radio.Button value="female">Female</Radio.Button>
                         <Radio.Button value="other">Other</Radio.Button>
                     </Radio.Group>
                 </Form.Item>
-                <Form.Item name={['user', 'enable']} label="Enable" valuePropName="checked">
+                <Form.Item name="enable" label="Enable" valuePropName="checked">
                     <Switch />
                 </Form.Item>
-                <Form.Item name={['user', 'raw_data']} label="Raw data">
+                <Form.Item name="raw_data" label="Raw data">
                     <Input.TextArea/>
                 </Form.Item>
                 <Form.Item wrapperCol={{...layout.wrapperCol, offset: 2}}>

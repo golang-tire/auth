@@ -3,79 +3,16 @@ import { Table , Input , Menu, Dropdown, Button, message} from 'antd';
 import {configs} from 'services/Network/config';
 import ApiService from "services/Network/api";
 import {Link, useHistory} from "react-router-dom";
-import { DownOutlined, DeleteOutlined , PlusOutlined} from '@ant-design/icons';
+import {DownOutlined, DeleteOutlined, PlusOutlined, ExclamationCircleOutlined} from '@ant-design/icons';
 import { DropOption } from 'components'
-const { Search } = Input;
 
-const URL = "rules"
-
-const columns = [
-    {
-        title: 'Role',
-        dataIndex: 'role',
-        render: (text, record) => <Link to={`${URL}/edit/${record.uuid}`}>{text}</Link>,
-    },
-    {
-        title: 'Domain',
-        dataIndex: 'domain',
-    },
-    {
-        title: 'Object',
-        dataIndex: 'object',
-    },
-    {
-        title: 'Resource',
-        dataIndex: 'resource',
-    },
-    {
-        title: 'Action',
-        dataIndex: 'action',
-    },
-    {
-        title: 'Effect',
-        dataIndex: 'effect',
-    },
-    {
-        title: '',
-        width: 30,
-        key: 'operation',
-        fixed: 'right',
-        render: (text, record) => {
-            return (
-                <DropOption
-                    onMenuClick={e => handleOperationClick(record, e)}
-                    menuOptions={[
-                        { key: '1', name: "Delete" },
-                        { key: '2', name: "Disable" },
-                    ]}
-                />
-            )
-        },
-    },
-];
-
-const handleOperationClick = (record, e) => {
-    message.info("click operation " + e.key)
-    console.log(e)
-}
-
-const handleMenuClick = (e) =>{
-    message.info('Click on menu item.');
-    console.log('click', e);
-}
-
-const menu = (
-    <Menu onClick={handleMenuClick}>
-        <Menu.Item key="remove_items" icon={<DeleteOutlined />}>
-            Remove selected {URL}
-        </Menu.Item>
-    </Menu>
-);
-
+const URL = "rules";
+const PageSize = configs.PAGE_SIZE;
 
 const Rules = props => {
     let history = useHistory();
     const [items, setItems] = useState([])
+    const [lastQuery, setLastQuery] = useState("")
     const [isLoading, setIsLoading] = useState(false);
     const [showActions, setShowActions] = useState(false);
     const [pagination, setPagination] = useState({
@@ -83,6 +20,106 @@ const Rules = props => {
         pageSize: 10,
         total: 0,
     })
+
+    const columns = [
+        {
+            title: 'Role',
+            dataIndex: 'role',
+            render: (text, record) => <Link to={`${URL}/edit/${record.uuid}`}>{text}</Link>,
+        },
+        {
+            title: 'Domain',
+            dataIndex: 'domain',
+        },
+        {
+            title: 'Object',
+            dataIndex: 'object',
+        },
+        {
+            title: 'Resource',
+            dataIndex: 'resource',
+        },
+        {
+            title: 'Action',
+            dataIndex: 'action',
+        },
+        {
+            title: 'Effect',
+            dataIndex: 'effect',
+        },
+        {
+            title: '',
+            width: 30,
+            key: 'operation',
+            fixed: 'right',
+            render: (text, record) => {
+                return (
+                    <DropOption
+                        onMenuClick={e => handleOperationClick(record, e)}
+                        menuOptions={[
+                            {key: 'delete', name: "Delete"},
+                            {key: 'disable', name: "Disable"},
+                        ]}
+                    />
+                )
+            },
+        },
+    ];
+
+    const handleBulkOperationClick = (e) => {
+        message.info('Click on menu item.');
+        console.log('click', e);
+    }
+
+    const bulkMenu = (
+        <Menu onClick={handleBulkOperationClick}>
+            <Menu.Item key="remove_items" icon={<DeleteOutlined/>}>
+                Remove selected {URL}
+            </Menu.Item>
+        </Menu>
+    );
+
+    const loadItems = (page, query="") => {
+        setIsLoading(true);
+        ApiService.getAll(URL, {limit:PageSize, offset: PageSize * (page-1), query}).then(
+            (result) => {
+                setItems(result.data[URL]);
+                setIsLoading(false);
+                setPagination({
+                    pageSize: result.data.limit,
+                    current: page,
+                    total: result.data.total_count,
+                })
+            },
+            (error) => {
+                setIsLoading(false);
+            }
+        )
+    }
+
+    const deleteItem = (record) => {
+        confirm({
+            icon: <ExclamationCircleOutlined/>,
+            content: "Are you sure you want to delete `" + record.name + "` ?",
+            onOk() {
+                ApiService.delete(URL, record.uuid).then(
+                    (result) => {
+                        message.info("`" + record.name + "` removed")
+                        loadItems(pagination.current);
+                    },
+                    (error) => {
+                        message.error("operation failed ," + error)
+                    }
+                )
+            },
+        });
+    }
+
+    const handleOperationClick = (record, e) => {
+        if (e.key === "delete") {
+            deleteItem(record)
+        }
+    }
 
     // rowSelection object indicates the need for row selection
     const rowSelection = {
@@ -93,40 +130,40 @@ const Rules = props => {
     };
 
     useEffect(() => {
-        setIsLoading(true);
-        ApiService.getAll(URL).then(
-            (result) => {
-                setItems(result.data[URL]);
-                setIsLoading(false);
-                setPagination({
-                    pageSize: result.data.limit,
-                    current: 1,
-                    total: result.data.total_count,
-                })
-            },
-            (error) => {
-                setIsLoading(false);
-            }
-        )
+        loadItems(pagination.current);
     }, [])
 
-    const onSearch = value => console.log(value);
+    const handleTableChange = (pagination, filters, sorter) => {
+        loadItems(pagination.current);
+    };
+
+    const onChange = ({ target: { value } }) => {
+        if (value.length >= 3) {
+            setLastQuery(value)
+            loadItems(pagination.current, value);
+        }
+
+        if (lastQuery.length > 0 && value.length < 3){
+            setLastQuery("")
+            loadItems(pagination.current);
+        }
+    }
+
     return (
         <div>
             <div style={{margin: "10px 0px"}}>
                 {showActions && (
-                    <Dropdown overlay={menu} style={{ marginRight: "10px"}}>
+                    <Dropdown overlay={bulkMenu} style={{ marginRight: "10px"}}>
                         <Button>
                             With selected items <DownOutlined />
                         </Button>
                     </Dropdown>
                 )}
-                <Search
+                <Input
                     placeholder="input search text"
                     allowClear
-                    onSearch={onSearch}
-                    style={{ width: "300px"}}
-                    enterButton
+                    onChange={onChange}
+                    style={{width: "300px"}}
                 />
 
                 <Button onClick={()=>{ history.push("/" + URL + "/edit")}}
@@ -143,6 +180,7 @@ const Rules = props => {
                 pagination={pagination}
                 columns={columns}
                 dataSource={items}
+                onChange={handleTableChange}
             />
         </div>
     );

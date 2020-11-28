@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import ApiService from "services/Network/api";
 import {useParams} from 'react-router-dom';
-import {Button, Form, Input, Switch} from 'antd';
+import {Button, Form, Input, message, Switch} from 'antd';
 
 const URL = "rules"
 
@@ -14,10 +14,10 @@ const DomainEdit = props => {
     let {Uuid} = useParams();
     const [form] = Form.useForm();
 
-    const initData = {rule: {
-            name: "",
-            enable: true,
-        }}
+    const initData = {
+        name: "",
+        enable: true,
+    }
 
     useEffect(() => {
         if (Uuid === undefined) {
@@ -25,7 +25,7 @@ const DomainEdit = props => {
         }
         ApiService.get(URL, Uuid).then(
             (result) => {
-                form.setFieldsValue({rule:{...result.data}});
+                form.setFieldsValue({...result.data});
             },
             (error) => {
             }
@@ -33,8 +33,30 @@ const DomainEdit = props => {
     }, [form])
 
     const onFinish = values => {
-        console.log(values);
+        if (Uuid === undefined) {
+            // we will create new
+            ApiService.post(URL, values).then(
+                (result) => {
+                    message.info("new " + URL + " created")
+                    form.setFieldsValue(initData)
+                },
+                (error) => {
+                    message.error("operation failed ," + error)
+                }
+            )
+        }else{
+            // we will update
+            ApiService.put(URL,Uuid, values).then(
+                (result) => {
+                    message.info(" item updated")
+                },
+                (error) => {
+                    message.error("operation failed ," + error)
+                }
+            )
+        }
     };
+
 
     return (
         <div>
@@ -43,10 +65,10 @@ const DomainEdit = props => {
                   name="nest-messages"
                   initialValues={initData}
                   onFinish={onFinish}>
-                <Form.Item name={['rule', 'role']} label="Role" rules={[{required: true}]}>
+                <Form.Item name="role" label="Role" rules={[{required: true}]}>
                     <Input/>
                 </Form.Item>
-                <Form.Item name={['rule', 'enable']} label="Enable" valuePropName="checked">
+                <Form.Item name="enable" label="Enable" valuePropName="checked">
                     <Switch />
                 </Form.Item>
                 <Form.Item wrapperCol={{...layout.wrapperCol, offset: 2}}>
