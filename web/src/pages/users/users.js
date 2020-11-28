@@ -1,0 +1,154 @@
+import React, {useEffect, useState} from 'react';
+import { Table , Input , Menu, Dropdown, Button, message} from 'antd';
+import {configs} from 'services/Network/config';
+import ApiService from "services/Network/api";
+import {Link, useHistory} from "react-router-dom";
+import { DownOutlined, DeleteOutlined , PlusOutlined} from '@ant-design/icons';
+import { DropOption } from 'components'
+const { Search } = Input;
+
+const columns = [
+    {
+        title: 'Username',
+        dataIndex: 'username',
+        render: (text, record) => <Link to={`users/edit/${record.uuid}`}>{text}</Link>,
+    },
+    {
+        title: 'Full name',
+        key: "full_name",
+        render: (record) => record.firstname + " " + record.lastname
+    },
+    {
+        title: 'Email',
+        dataIndex: 'email',
+    },
+    {
+        title: 'Gender',
+        dataIndex: 'gender',
+        render: text => <span>{text? text: '-'}</span>,
+    },
+    {
+        title: 'Status',
+        dataIndex: 'enable',
+        render: text => <span>{text? 'Enable': 'Disable'}</span>,
+    },
+    {
+        title: '',
+        width: 30,
+        key: 'operation',
+        fixed: 'right',
+        render: (text, record) => {
+            return (
+                <DropOption
+                    onMenuClick={e => handleOperationClick(record, e)}
+                    menuOptions={[
+                        { key: '1', name: "Delete" },
+                        { key: '2', name: "Disable" },
+                        { key: '3', name: "Change password" },
+                    ]}
+                />
+            )
+        },
+    },
+];
+
+const handleOperationClick = (record, e) => {
+    message.info("click operation " + e.key)
+    console.log(e)
+}
+
+const handleMenuClick = (e) =>{
+    message.info('Click on menu item.');
+    console.log('click', e);
+}
+
+const menu = (
+    <Menu onClick={handleMenuClick}>
+        <Menu.Item key="remove_users" icon={<DeleteOutlined />}>
+           Remove selected users
+        </Menu.Item>
+    </Menu>
+);
+
+const USERS_URL = configs.API_URL + "/users"
+
+const getUsers = () => {
+    return ApiService.get(USERS_URL)
+}
+
+const Users = props => {
+    let history = useHistory();
+    const [items, setItems] = useState([])
+    const [isLoading, setIsLoading] = useState(false);
+    const [showActions, setShowActions] = useState(false);
+    const [pagination, setPagination] = useState({
+        current: 1,
+        pageSize: 10,
+        total: 0,
+    })
+
+    // rowSelection object indicates the need for row selection
+    const rowSelection = {
+        onChange: (selectedRowKeys, selectedRows) => {
+            setShowActions(selectedRowKeys.length > 0);
+            console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
+        },
+    };
+
+    useEffect(() => {
+        setIsLoading(true);
+        getUsers().then(
+            (result) => {
+                setItems(result.data.users);
+                setIsLoading(false);
+                setPagination({
+                    pageSize: result.data.limit,
+                    current: 1,
+                    total: result.data.total_count,
+                })
+            },
+            (error) => {
+                setIsLoading(false);
+            }
+        )
+    }, [])
+
+    const onSearch = value => console.log(value);
+    return (
+        <div>
+            <div style={{margin: "10px 0px"}}>
+                {showActions && (
+                    <Dropdown overlay={menu} style={{ marginRight: "10px"}}>
+                        <Button>
+                            With selected items <DownOutlined />
+                        </Button>
+                    </Dropdown>
+                )}
+                <Search
+                    placeholder="input search text"
+                    allowClear
+                    onSearch={onSearch}
+                    style={{ width: "300px"}}
+                    enterButton
+                />
+
+                <Button onClick={()=>{ history.push("/users/edit")}}
+                        type="primary" icon={<PlusOutlined />}
+                        style={{float:"right"}}>
+                    Create
+                </Button>
+            </div>
+            <Table
+                bordered={true}
+                rowSelection={rowSelection}
+                loading={isLoading}
+                rowKey={record => record.uuid}
+                pagination={pagination}
+                columns={columns}
+                dataSource={items}
+            />
+        </div>
+    );
+};
+
+export default Users;
