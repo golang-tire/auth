@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/golang-tire/auth/internal/audit_logs"
+
 	"github.com/golang-tire/pkg/pubsub"
 
 	"github.com/go-redis/redis/v8"
@@ -83,6 +85,7 @@ func setupModules(ctx context.Context) error {
 		&entity.Rule{},
 		&entity.User{},
 		&entity.UserRole{},
+		&entity.AuditLog{},
 	}
 
 	err = db.CreateSchema(dbInstance.DB(), models)
@@ -105,6 +108,10 @@ func setupModules(ctx context.Context) error {
 	usersRepo := users.NewRepository(dbInstance)
 	usersSrv := users.NewService(usersRepo, domainsRepo, rolesRepo)
 	users.New(usersSrv)
+
+	auditLogRepo := audit_logs.NewRepository(dbInstance)
+	auditLogSrv := audit_logs.NewService(auditLogRepo)
+	audit_logs.New(auditLogSrv)
 
 	rbacSrv, err := auth.InitRbac(ctx, rulesSrv, usersSrv)
 	if err != nil {

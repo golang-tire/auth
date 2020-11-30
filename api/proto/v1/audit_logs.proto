@@ -1,0 +1,51 @@
+syntax = "proto3";
+
+package authV1;
+
+option go_package = "internal/proto/v1;auth";
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "api/proto/v1/users.proto";
+
+message AuditLog {
+    string uuid = 1;
+    User user = 2;
+    string object = 3;
+    string old_value = 4;
+    string new_value = 5;
+    google.protobuf.Timestamp created_at = 6;
+    google.protobuf.Timestamp updated_at = 7;
+}
+
+message ListAuditLogsRequest {
+    int64 limit = 1;
+    int64 offset = 2;
+    string query = 3;
+}
+
+message ListAuditLogsResponse {
+    repeated AuditLog audit_logs = 1;
+    int64 total_count = 2;
+    int64 limit = 3;
+    int64 offset = 4;
+}
+
+message GetAuditLogRequest {
+    string uuid = 1;
+}
+
+service AuditLogService {
+    // List AuditLogs
+    rpc ListAuditLogs (ListAuditLogsRequest) returns (ListAuditLogsResponse) {
+        option (google.api.http) = {
+            get: "/v1/audit-logs"
+        };
+    }
+    // Get AuditLog
+    rpc GetAuditLog (GetAuditLogRequest) returns (AuditLog) {
+        option (google.api.http) = {
+          get: "/v1/audit-logs/{uuid}"
+        };
+    }
+}
