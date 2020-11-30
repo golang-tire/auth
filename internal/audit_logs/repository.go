@@ -3,6 +3,9 @@ package audit_logs
 import (
 	"context"
 	"fmt"
+	"time"
+
+	"github.com/google/uuid"
 
 	"gorm.io/gorm"
 
@@ -19,11 +22,22 @@ type Repository interface {
 	Count(ctx context.Context) (int64, error)
 	// Query returns the list of auditLogs with the given offset and limit.
 	Query(ctx context.Context, query string, offset, limit int64) ([]entity.AuditLog, int, error)
+	// Create saves a new auditLogs in the storage.
+	Create(ctx context.Context, auditLog entity.AuditLog) (string, error)
 }
 
 // repository persists audit logs in database
 type repository struct {
 	db *db.DB
+}
+
+func (r repository) Create(ctx context.Context, auditLog entity.AuditLog) (string, error) {
+	now := time.Now()
+	auditLog.UUID = uuid.New().String()
+	auditLog.CreatedAt = now
+	auditLog.UpdatedAt = now
+	res := r.db.With(ctx).Create(&auditLog)
+	return auditLog.UUID, res.Error
 }
 
 func (r repository) Get(ctx context.Context, uuid string) (entity.AuditLog, error) {
@@ -46,7 +60,8 @@ func (r repository) Query(ctx context.Context, query string, offset, limit int64
 	res := r.db.With(ctx).
 		Limit(int(limit)).
 		Offset(int(offset)).
-		Order("id asc")
+		Order("id asc").
+		Preload("User")
 
 	if len(query) >= 1 {
 		subQuery := r.db.With(ctx).Select("id").Where("username LIKE ?", "%"+query+"%").Table("users")

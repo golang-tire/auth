@@ -11,11 +11,12 @@ import "api/proto/v1/users.proto";
 message AuditLog {
     string uuid = 1;
     User user = 2;
-    string object = 3;
-    string old_value = 4;
-    string new_value = 5;
-    google.protobuf.Timestamp created_at = 6;
-    google.protobuf.Timestamp updated_at = 7;
+    string action = 3;
+    string object = 4;
+    string old_value = 5;
+    string new_value = 6;
+    google.protobuf.Timestamp created_at = 7;
+    google.protobuf.Timestamp updated_at = 8;
 }
 
 message ListAuditLogsRequest {
@@ -33,6 +34,14 @@ message ListAuditLogsResponse {
 
 message GetAuditLogRequest {
     string uuid = 1;
+}
+
+message CreateAuditLogRequest {
+    string user_uuid = 1;
+    string action = 2;
+    string object = 3;
+    string old_value = 4;
+    string new_value = 5;
 }
 
 service AuditLogService {

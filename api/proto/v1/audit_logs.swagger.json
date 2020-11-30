@@ -98,6 +98,9 @@
         "user": {
           "$ref": "#/definitions/authV1User"
         },
+        "action": {
+          "type": "string"
+        },
         "object": {
           "type": "string"
         },
