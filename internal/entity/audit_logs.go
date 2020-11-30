@@ -24,6 +24,7 @@ func (al AuditLog) ToProto() *auth.AuditLog {
 	role := &auth.AuditLog{
 		Uuid:      al.UUID,
 		User:      al.User.ToProto(true),
+		Action:    al.Action,
 		Object:    al.Object,
 		OldValue:  al.OldValue,
 		NewValue:  al.NewValue,

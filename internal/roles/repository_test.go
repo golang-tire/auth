@@ -52,7 +52,7 @@ func TestRepository(t *testing.T) {
 	assert.Equal(t, "manager", role.Title)
 
 	// query
-	_, count3, err := repo.Query(ctx, 0, count2)
+	_, count3, err := repo.Query(ctx, "", 0, count2)
 	assert.Nil(t, err)
 	assert.Equal(t, count2, int64(count3))
 

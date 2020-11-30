@@ -42,7 +42,7 @@ func (m mockRepository) Count(ctx context.Context) (int64, error) {
 	return int64(len(m.items)), nil
 }
 
-func (m mockRepository) Query(ctx context.Context, offset, limit int64) ([]entity.Domain, int, error) {
+func (m mockRepository) Query(ctx context.Context, query string, offset, limit int64) ([]entity.Domain, int, error) {
 	return m.items, len(m.items), nil
 }
 

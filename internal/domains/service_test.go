@@ -105,7 +105,7 @@ func Test_service_CRUD(t *testing.T) {
 	assert.Equal(t, id, domain.Uuid)
 
 	// query
-	_domains, _ := s.Query(ctx, 0, 0)
+	_domains, _ := s.Query(ctx, "", 0, 0)
 	assert.Equal(t, 2, int(_domains.TotalCount))
 
 	// delete

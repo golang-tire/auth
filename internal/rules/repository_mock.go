@@ -35,7 +35,7 @@ func (m MockRepository) Count(ctx context.Context) (int64, error) {
 	return int64(len(m.items)), nil
 }
 
-func (m MockRepository) Query(ctx context.Context, offset, limit int64) ([]entity.Rule, int, error) {
+func (m MockRepository) Query(ctx context.Context, query string, offset, limit int64) ([]entity.Rule, int, error) {
 	return m.items, len(m.items), nil
 }
 
