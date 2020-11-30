@@ -8,4 +8,5 @@ export { default as Roles } from './roles/list';
 export { default as RoleEdit } from './roles/edit';
 export { default as Rules } from './rules/list';
 export { default as RuleEdit } from './rules/edit';
+export { default as AuditLogs } from './auditLogs/list';
 export { default as Login } from './login/login';

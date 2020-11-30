@@ -55,7 +55,7 @@ const Admin = props => {
                         <NavLink to="/rules" activeClassName="active" >Rules</NavLink>
                     </Menu.Item>
                     <Menu.Item key="6" icon={<AuditOutlined />}>
-                        Audit Logs
+                        <NavLink to="/audit-logs" activeClassName="active" >Audit Logs</NavLink>
                     </Menu.Item>
                 </Menu>
             </Sider>

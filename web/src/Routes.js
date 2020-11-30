@@ -12,6 +12,7 @@ import {
     RoleEdit,
     Rules,
     RuleEdit,
+    AuditLogs,
     Login,
     NotFound,
 } from './pages'
@@ -77,6 +78,12 @@ const Routes = () => {
                 exact
                 layout={AdminLayout}
                 path={["/rules/edit", "/rules/edit/:Uuid"]}
+            />
+            <ProtectedRouteWithLayout
+                component={AuditLogs}
+                exact
+                layout={AdminLayout}
+                path="/audit-logs"
             />
             <RouteWithLayout
                 component={Login}

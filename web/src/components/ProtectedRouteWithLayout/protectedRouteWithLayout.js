@@ -1,7 +1,7 @@
 import React from 'react';
 import { Route, Redirect } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import AuthService from "services/Auth/authService";
+import TokenService from "services/Auth/tokenService";
 
 const ProtectedRouteWithLayout = props => {
     const { layout: Layout, component: Component, ...rest } = props;
@@ -10,7 +10,7 @@ const ProtectedRouteWithLayout = props => {
         <Route
             {...rest}
             render={matchProps => (
-                AuthService.isAuthenticated() ? (
+                TokenService.isAuthenticated() ? (
                     <Layout>
                         <Component {...matchProps} />
                     </Layout>
