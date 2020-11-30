@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import AuthService from "services/Auth/authService";
 import {useHistory, useLocation, Link} from "react-router-dom";
-import {Form, Input, Button, Checkbox, Row, Col, Card} from 'antd';
+import {Form, Input, Button, Alert, Row, Col, Card} from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 
 const Login = props => {
@@ -22,18 +22,13 @@ const Login = props => {
             })
     };
 
+    const OnErrorClose = () => {
+        setError(null)
+    }
+
     return (
         <Row type="flex" justify="center" align="middle" style={{minHeight: '100vh'}}>
             <Col span={4}>
-
-            {error && (
-                <div className="alert alert-danger alert-dismissible fade show" role="alert">
-                    email address or password is not correct.
-                    <button type="button" className="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-            )}
 
             <div className={"login-form-wrapper"}>
 
@@ -47,6 +42,15 @@ const Login = props => {
                 initialValues={{ remember: true }}
                 onFinish={onFinish}
             >
+
+                {error && (
+                    <div style={{marginBottom: 10}}>
+                    <Alert message="Error"
+                           afterClose={OnErrorClose}
+                           description={"username or password is not correct."}
+                           type="error" showIcon closable/>
+                    </div>
+                 )}
                 <Form.Item
                     name="username"
                     rules={[{ required: true, message: 'Please input your Username!' }]}
@@ -75,6 +79,7 @@ const Login = props => {
                         Log in
                     </Button>
                 </Form.Item>
+
             </Form>
             </div>
             </Col>

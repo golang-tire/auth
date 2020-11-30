@@ -21,6 +21,16 @@ axios.interceptors.response.use( (response) => {
             reject(error);
         });
     }
+
+    console.log(error.response.status);
+    console.log(error.config.url);
+
+    if (error.response.status === 401 && error.config.url === BASE_AUTH_URL + '/login') {
+        return new Promise((resolve, reject) => {
+            reject(error);
+        });
+    }
+
     // Logout user if token refresh didn't work or user is disabled
     if (error.config.url === BASE_AUTH_URL + '/token/refresh' || error.response.status === 500) {
         TokenService.clear();
