@@ -86,7 +86,7 @@ const AuditLogs = props => {
         }
     }
     return (
-        <div>
+        <div className={"section"}>
             <div style={{margin: "10px 0px"}}>
                 <Input
                     placeholder="input search text"

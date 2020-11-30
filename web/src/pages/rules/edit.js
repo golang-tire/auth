@@ -114,7 +114,7 @@ const DomainEdit = props => {
     }
 
     return (
-        <div>
+        <div className={"section"}>
             <Form {...layout}
                   form={form}
                   name="nest-messages"

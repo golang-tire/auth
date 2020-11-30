@@ -150,7 +150,7 @@ const Users = props => {
         }
     }
     return (
-        <div>
+        <div className={"section"}>
             <div style={{margin: "10px 0px"}}>
                 {showActions && (
                     <Dropdown overlay={bulkMenu} style={{ marginRight: "10px"}}>

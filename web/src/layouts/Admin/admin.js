@@ -60,7 +60,7 @@ const Admin = props => {
                 </Menu>
             </Sider>
             <Layout className="site-layout">
-                <Header className="site-layout-background" style={{ padding: 0 }}>
+                <Header className="header-background" style={{ padding: 0 }}>
                     <div style={{float:"left"}}>
                         {React.createElement(collapsed ? MenuUnfoldOutlined : MenuFoldOutlined, {
                             className: 'trigger',
@@ -106,9 +106,7 @@ const Admin = props => {
                     </Breadcrumb.Item>
                 </Breadcrumb>
                 <Content style={{ margin: '0 16px 16px 16px', padding: '0 12px 12px 0', minHeight: 280}}>
-                    <div className="site-layout-background" style={{ padding: 24 }}>
                         {children}
-                    </div>
                 </Content>
                 <Footer style={{ textAlign: 'center' }}>Auth ©2020 Created by Mohsen</Footer>
             </Layout>
