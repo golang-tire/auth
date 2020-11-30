@@ -110,7 +110,7 @@ func setupModules(ctx context.Context) error {
 	users.New(usersSrv)
 
 	auditLogRepo := audit_logs.NewRepository(dbInstance)
-	auditLogSrv := audit_logs.NewService(auditLogRepo)
+	auditLogSrv := audit_logs.NewService(auditLogRepo, usersRepo)
 	audit_logs.New(auditLogSrv)
 
 	rbacSrv, err := auth.InitRbac(ctx, rulesSrv, usersSrv)
