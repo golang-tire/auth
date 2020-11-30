@@ -1,7 +1,7 @@
 import React, {useState, Fragment} from "react";
 import PropTypes from 'prop-types';
-import {Layout, Avatar, Menu, Popover, Badge, List, Breadcrumb} from 'antd';
-import {NavLink, useLocation} from "react-router-dom";
+import {Layout, Avatar, Menu, Popover, Badge, Breadcrumb} from 'antd';
+import {NavLink, useHistory} from "react-router-dom";
 import {
     DashboardOutlined,
     BellOutlined,
@@ -13,20 +13,30 @@ import {
     ClusterOutlined,
     AuditOutlined,
 } from '@ant-design/icons';
+import AuthService from "services/Auth/authService";
 
 const { Header, Content, Footer, Sider } = Layout;
 const { SubMenu } = Menu;
 
+
 const Admin = props => {
+    let history = useHistory();
     const {children} = props;
     const [collapsed, setCollapsed] = useState(false)
-    const location = useLocation();
 
     const toggle = () =>{
         setCollapsed(!collapsed);
-
-        console.log(location.pathname);
     }
+
+    const handleClick = (e) => {
+        if (e.key === "SignOut") {
+            AuthService.logout().then(
+                (res) => {
+                    history.push("/login")
+                }
+            )
+        }
+    };
 
     return (
         <Layout>
@@ -81,11 +91,11 @@ const Admin = props => {
                                 <BellOutlined/>
                             </Badge>
                         </Popover>
-                        <Menu key="user" mode="horizontal" style={{float:"right"}}>
+                        <Menu key="user" mode="horizontal" style={{float:"right"}} onClick={handleClick}>
                             <SubMenu title={
                                 <Fragment>
                                     <span style={{ color: '#999', marginRight: 4 }}>Hi,</span>
-                                    <span>Mohsen</span>
+                                    <span>USERNAME</span>
                                     <Avatar style={{ marginLeft: 8 }} src="" />
                                 </Fragment>
                             }>

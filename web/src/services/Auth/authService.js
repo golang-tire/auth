@@ -100,7 +100,20 @@ const AuthService = {
         })
     },
     logout() {
-        TokenService.clear()
+        return axios.post(
+            BASE_AUTH_URL + "/logout",
+        ).then((res) =>{
+            TokenService.clear();
+            return {
+                status: res.status,
+                ...res.data
+            }
+        },(error) => {
+            return {
+                status: error.response.status,
+                error: error
+            }
+        })
     },
 };
 
