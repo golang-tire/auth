@@ -33,7 +33,7 @@ const Login = props => {
             <div className={"login-form-wrapper"}>
 
                 <div className={"login-logo"}>
-                 Auth service
+                    <img src="/logo.png" alt="Auth" height={64} />
                 </div>
 
             <Form
