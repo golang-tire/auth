@@ -3,7 +3,7 @@ import { Card, Col, Row } from 'antd';
 
 const Dashboard = props => {
     return (
-        <div style={{padding: 24}}>
+        <div className="dashboard">
         <Row gutter={16}>
             <Col span={6}>
                 <Card title="Users" bordered={false}>

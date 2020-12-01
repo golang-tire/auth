@@ -99,6 +99,10 @@
     flex: 1;
 }
 
+.container .body .dashboard {
+    padding: 24px;
+}
+
 .container .footer {
     text-align: center;
     background: #fff;

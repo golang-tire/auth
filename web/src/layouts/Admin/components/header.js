@@ -1,38 +1,77 @@
-import React, {useState} from "react";
-import {Avatar, Badge, Layout, Menu, Popover} from "antd";
-import {BellOutlined, MenuFoldOutlined, MenuUnfoldOutlined} from "@ant-design/icons";
+import React, {useState, Fragment} from "react";
+import {Avatar, Menu, Popover, Badge, List, Layout} from 'antd';
+import {BellOutlined, MenuFoldOutlined, MenuUnfoldOutlined, RightOutlined} from "@ant-design/icons";
+import moment from "moment";
 
-const Header = props => {
-    const [username] = props
-    const [collapsed, setCollapsed] = useState(props.collapsed);
-
-    const toggle = () =>{
-        setCollapsed(!collapsed);
-    }
+const TopHeader = (props) => {
 
     return (
-        <Layout.Header>
-            <div style={{float:"left"}}>
-                {React.createElement(collapsed ? MenuUnfoldOutlined : MenuFoldOutlined, {
-                    className: 'trigger',
-                    onClick: toggle,
-                })}
+        <Layout.Header className={`header ${props.collapsed? "collapsed-header": ""}`} >
+            <div className="toggle-btn"
+                 onClick={props.OnToggleClick}
+            >
+                {props.collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
             </div>
-            <div style={{float:"right"}}>
-                <Menu key="user" mode="horizontal" style={{float:"right"}} onClick={handleClick}>
-                    <SubMenu title={
+            <div className="right-container">
+                <Popover
+                    placement="bottomRight"
+                    trigger="click"
+                    key="notifications"
+                    getPopupContainer={() => document.querySelector('#mainLayout')}
+                    content={
+                        <div className={"notifications"}>
+                            <List
+                                itemLayout="horizontal"
+                                dataSource={props.notifications}
+                                locale={{
+                                    emptyText: <span>You have viewed all notifications.</span>,
+                                }}
+                                renderItem={item => (
+                                    <List.Item className={"item"}>
+                                        <List.Item.Meta
+                                            title={item.title}
+                                            description={moment(item.date).fromNow()}
+                                        />
+                                        <RightOutlined style={{ fontSize: 10, color: '#ccc' }} />
+                                    </List.Item>
+                                )}
+                            />
+                            {props.notifications.length ? (
+                                <div
+                                    onClick={props.onClearNotifications}
+                                    className={"clear-btn"}
+                                >
+                                    <span>Clear notifications</span>
+                                </div>
+                            ) : null}
+                        </div>
+                    }
+                >
+                    <Badge
+                        count={props.notifications.length}
+                        dot
+                        className="icon-btn"
+                        offset={[-10, 10]}
+                    >
+                        <BellOutlined/>
+                    </Badge>
+                </Popover>
+                <Menu key="user" mode="horizontal" onClick={props.onMenuClick}>
+                    <Menu.SubMenu title={
                         <Fragment>
                             <span style={{ color: '#999', marginRight: 4 }}>Hi,</span>
-                            <span>{username}</span>
+                            <span>{props.username}</span>
                             <Avatar style={{ marginLeft: 8 }} src="" />
                         </Fragment>
                     }>
                         <Menu.Item key="Profile">Profile</Menu.Item>
                         <Menu.Divider/>
                         <Menu.Item key="SignOut">Sign out</Menu.Item>
-                    </SubMenu>
+                    </Menu.SubMenu>
                 </Menu>
             </div>
         </Layout.Header>
     )
 }
+
+export default TopHeader;
