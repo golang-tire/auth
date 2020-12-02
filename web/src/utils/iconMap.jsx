@@ -1,5 +1,6 @@
 import {
     MessageOutlined,
+    ApartmentOutlined,
     AppstoreAddOutlined,
     UserOutlined,
     ClusterOutlined,
@@ -11,7 +12,8 @@ import {
 export default {
     message: <MessageOutlined />,
     dashboard: <DashboardOutlined/>,
-    domains: <AppstoreAddOutlined />,
+    domains: <ApartmentOutlined />,
+    apps: <AppstoreAddOutlined />,
     users: <UserOutlined />,
     roles: <TeamOutlined />,
     rules: <ClusterOutlined />,

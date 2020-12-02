@@ -4,6 +4,8 @@ import {
     UserEdit,
     Domains,
     DomainEdit,
+    Apps,
+    AppEdit,
     Roles,
     RoleEdit,
     Rules,
@@ -14,9 +16,10 @@ import {
 } from './pages'
 
 export default {
+    defaultSelectedMenus: ["dashboard"],
     routeList: [
         {
-            id: '1',
+            id: 'dashboard',
             icon: 'dashboard',
             name: 'Dashboard',
             path: '/dashboard',
@@ -25,7 +28,7 @@ export default {
             sideMenu: true
         },
         {
-            id: '2',
+            id: 'users',
             icon: 'users',
             name: 'Users',
             path: '/users',
@@ -40,7 +43,7 @@ export default {
             sideMenu: false
         },
         {
-            id: '3',
+            id: 'domains',
             icon: 'domains',
             name: 'Domains',
             path: '/domains',
@@ -55,7 +58,22 @@ export default {
             sideMenu: false
         },
         {
-            id: '4',
+            id: 'apps',
+            icon: 'apps',
+            name: 'Apps',
+            path: '/apps',
+            component: Apps,
+            protected: true,
+            sideMenu: true
+        },
+        {
+            path: ["/apps/edit", "/apps/edit/:Uuid"],
+            component: AppEdit,
+            protected: true,
+            sideMenu: false
+        },
+        {
+            id: 'roles',
             icon: 'roles',
             name: 'Roles',
             path: '/roles',
@@ -70,7 +88,7 @@ export default {
             sideMenu: false
         },
         {
-            id: '5',
+            id: 'rules',
             icon: 'rules',
             name: 'Rules',
             path: '/rules',
@@ -85,7 +103,7 @@ export default {
             sideMenu: false
         },
         {
-            id: '6',
+            id: 'audit-logs',
             icon: 'audit-logs',
             name: 'Audit Logs',
             path: '/audit-logs',

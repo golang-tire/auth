@@ -2,7 +2,7 @@ import React from "react";
 import {ScrollBar} from "components";
 import {Menu, Layout} from "antd";
 import {NavLink} from "react-router-dom";
-import routes from "settings";
+import settings from "settings";
 import iconMap from "utils/iconMap";
 
 const SideMenu = (props) => {
@@ -19,9 +19,9 @@ const SideMenu = (props) => {
                         suppressScrollX: true,
                     }}
                 >
-                    <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']}>
+                    <Menu theme="dark" mode="inline" defaultSelectedKeys={settings.defaultSelectedMenus}>
                         {
-                            routes.routeList.map(item => {
+                            settings.routeList.map(item => {
                                 if (item.sideMenu){
                                     return(
                                         <Menu.Item key={item.id} icon={iconMap[item.icon]}>

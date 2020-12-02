@@ -4,6 +4,8 @@ export { default as Users } from './users/list';
 export { default as UserEdit } from './users/edit';
 export { default as Domains } from './domains/list';
 export { default as DomainEdit } from './domains/edit';
+export { default as Apps } from './apps/list';
+export { default as AppEdit } from './apps/edit';
 export { default as Roles } from './roles/list';
 export { default as RoleEdit } from './roles/edit';
 export { default as Rules } from './rules/list';
