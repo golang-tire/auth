@@ -23,11 +23,27 @@ const SideMenu = (props) => {
                         {
                             settings.routeList.map(item => {
                                 if (item.sideMenu){
-                                    return(
-                                        <Menu.Item key={item.id} icon={iconMap[item.icon]}>
-                                            <NavLink to={item.path}>{item.name}</NavLink>
-                                        </Menu.Item>
-                                    )
+                                    if (item.subMenus) {
+                                        return (
+                                            <Menu.SubMenu key={item.id} icon={iconMap[item.icon]} title={item.name}>
+                                                {
+                                                    item.subMenus.map(subMenu => {
+                                                        return (
+                                                            <Menu.Item key={subMenu.id}>
+                                                                <NavLink to={subMenu.path}>{subMenu.name}</NavLink>
+                                                            </Menu.Item>
+                                                        )
+                                                    })
+                                                }
+                                            </Menu.SubMenu>
+                                        )
+                                    }else {
+                                        return (
+                                            <Menu.Item key={item.id} icon={iconMap[item.icon]}>
+                                                <NavLink to={item.path}>{item.name}</NavLink>
+                                            </Menu.Item>
+                                        )
+                                    }
                                 }
                             })
                         }

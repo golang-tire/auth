@@ -58,13 +58,17 @@ export default {
             sideMenu: false
         },
         {
-            id: 'apps',
+            id: 'applications',
             icon: 'apps',
-            name: 'Apps',
-            path: '/apps',
-            component: Apps,
+            name: 'Applications',
             protected: true,
-            sideMenu: true
+            sideMenu: true,
+            subMenus:[{
+                id: 'apps',
+                name: 'Apps',
+                path: '/apps',
+                component: Apps,
+            }]
         },
         {
             path: ["/apps/edit", "/apps/edit/:Uuid"],
