@@ -1,0 +1,242 @@
+syntax = "proto3";
+
+package authV1;
+
+option go_package = "internal/proto/v1;auth";
+
+import "google/protobuf/timestamp.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+
+message App {
+    string uuid = 1;
+    string name = 2;
+    bool enable = 3;
+    google.protobuf.Timestamp created_at = 4;
+    google.protobuf.Timestamp updated_at = 5;
+}
+
+message Resource {
+    string uuid = 1;
+    string name = 2;
+    App app = 3;
+    google.protobuf.Timestamp created_at = 4;
+    google.protobuf.Timestamp updated_at = 5;
+}
+
+message Object {
+    string uuid = 1;
+    string identifier = 2;
+    App app = 3;
+    google.protobuf.Timestamp created_at = 4;
+    google.protobuf.Timestamp updated_at = 5;
+}
+
+message ListAppsRequest {
+    int64 limit = 1;
+    int64 offset = 2;
+    string query = 3;
+}
+
+message ListAppsResponse {
+    repeated App apps = 1;
+    int64 total_count = 2;
+    int64 limit = 3;
+    int64 offset = 4;
+}
+
+message GetAppRequest {
+    string uuid = 1;
+}
+
+message CreateAppRequest {
+    string name = 1;
+    bool enable = 2;
+}
+
+message UpdateAppRequest {
+    string uuid = 1;
+    string name = 2;
+    bool enable = 3;
+}
+
+message DeleteAppRequest {
+    string uuid = 1;
+}
+
+message ListResourcesRequest {
+    int64 limit = 1;
+    int64 offset = 2;
+    string query = 3;
+    string uuid = 4;
+}
+
+message ListResourcesResponse {
+    repeated Resource resources = 1;
+    int64 total_count = 2;
+    int64 limit = 3;
+    int64 offset = 4;
+}
+
+message GetResourceRequest {
+    string uuid = 1;
+}
+
+message CreateResourceRequest {
+    string uuid = 1;
+    string name = 2;
+}
+
+message UpdateResourceRequest {
+    string uuid = 1;
+    string name = 2;
+}
+
+message DeleteResourceRequest {
+    string uuid = 1;
+}
+
+message ListObjectsRequest {
+    int64 limit = 1;
+    int64 offset = 2;
+    string query = 3;
+    string uuid = 4;
+}
+
+message ListObjectsResponse {
+    repeated Object objects = 1;
+    int64 total_count = 2;
+    int64 limit = 3;
+    int64 offset = 4;
+}
+
+message GetObjectRequest {
+    string uuid = 1;
+}
+
+message CreateObjectRequest {
+    string uuid = 1;
+    string identifier = 2;
+}
+
+message UpdateObjectRequest {
+    string uuid = 1;
+    string identifier = 2;
+}
+
+message DeleteObjectRequest {
+    string uuid = 1;
+}
+
+service AppService {
+
+    // List Apps
+    rpc ListApps (ListAppsRequest) returns (ListAppsResponse) {
+        option (google.api.http) = {
+            get: "/v1/apps"
+        };
+    }
+    // Get App
+    rpc GetApp (GetAppRequest) returns (App) {
+        option (google.api.http) = {
+          get: "/v1/apps/{uuid}"
+        };
+    }
+
+    // Create App request
+    rpc CreateApp (CreateAppRequest) returns (App) {
+        option (google.api.http) = {
+            post: "/v1/apps"
+            body: "*"
+        };
+    }
+
+    // Update App request
+    rpc UpdateApp (UpdateAppRequest) returns (App) {
+        option (google.api.http) = {
+            put: "/v1/apps/{uuid}"
+            body: "*"
+        };
+    }
+
+    // Delete App request
+    rpc DeleteApp (DeleteAppRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+          delete: "/v1/apps/{uuid}"
+        };
+    }
+
+    // List App Resources
+    rpc ListAppResources (ListResourcesRequest) returns (ListResourcesResponse) {
+        option (google.api.http) = {
+            get: "/v1/apps/{uuid}/resources"
+        };
+    }
+
+    // Get App Resource
+    rpc GetAppResource (GetResourceRequest) returns (Resource) {
+        option (google.api.http) = {
+          get: "/v1/apps/-/resources/{uuid}"
+        };
+    }
+
+    // Create App Resource object request
+    rpc CreateAppResource (CreateResourceRequest) returns (Resource) {
+        option (google.api.http) = {
+            post: "/v1/apps/{uuid}/resources"
+            body: "*"
+        };
+    }
+
+    // Update App Resource object request
+    rpc UpdateAppResource (UpdateResourceRequest) returns (Resource) {
+        option (google.api.http) = {
+            put: "/v1/apps/-/resources/{uuid}"
+            body: "*"
+        };
+    }
+
+    // Delete App Resource object request
+    rpc DeleteAppResource (DeleteAppRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+          delete: "/v1/apps/-/resources/{uuid}"
+        };
+    }
+
+    // List App Objects
+    rpc ListAppObjects (ListObjectsRequest) returns (ListObjectsResponse) {
+        option (google.api.http) = {
+            get: "/v1/apps/{uuid}/objects"
+        };
+    }
+
+    // Get App Object
+    rpc GetAppObject (GetObjectRequest) returns (Object) {
+        option (google.api.http) = {
+          get: "/v1/apps/-/objects/{uuid}"
+        };
+    }
+
+    // Create App Object request
+    rpc CreateAppObject (CreateObjectRequest) returns (Object) {
+        option (google.api.http) = {
+            post: "/v1/apps/{uuid}/objects"
+            body: "*"
+        };
+    }
+
+    // Update App Object request
+    rpc UpdateAppObject (UpdateObjectRequest) returns (Object) {
+        option (google.api.http) = {
+            put: "/v1/apps/-/objects/{uuid}"
+            body: "*"
+        };
+    }
+
+    // Delete App Object request
+    rpc DeleteAppObjectResource (DeleteObjectRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+          delete: "/v1/apps/-/objects/{uuid}"
+        };
+    }
+}

@@ -30,6 +30,7 @@ func ValidateCreateRequest(c *auth.CreateRuleRequest) error {
 		validation.Field(&c.Role, validation.Required, validation.Length(0, 128)),
 		validation.Field(&c.Object, validation.Required, validation.Length(0, 128)),
 		validation.Field(&c.Domain, validation.Required, validation.Length(0, 128)),
+		validation.Field(&c.Resource, validation.Required, validation.Length(0, 128)),
 		validation.Field(&c.Action, validation.Required, validation.Length(0, 128)),
 		validation.Field(&c.Effect, validation.Required),
 	)
@@ -41,6 +42,7 @@ func ValidateUpdateRequest(u *auth.UpdateRuleRequest) error {
 		validation.Field(&u.Role, validation.Required, validation.Length(0, 128)),
 		validation.Field(&u.Object, validation.Required, validation.Length(0, 128)),
 		validation.Field(&u.Domain, validation.Required, validation.Length(0, 128)),
+		validation.Field(&u.Resource, validation.Required, validation.Length(0, 128)),
 		validation.Field(&u.Action, validation.Required, validation.Length(0, 128)),
 		validation.Field(&u.Effect, validation.Required),
 	)
