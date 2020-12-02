@@ -39,7 +39,6 @@ type Service interface {
 func ValidateAppCreateRequest(c *auth.CreateAppRequest) error {
 	return validation.ValidateStruct(c,
 		validation.Field(&c.Name, validation.Required, validation.Length(0, 128)),
-		validation.Field(&c.Enable, validation.Required),
 	)
 }
 
@@ -47,7 +46,6 @@ func ValidateAppCreateRequest(c *auth.CreateAppRequest) error {
 func ValidateAppUpdateRequest(u *auth.UpdateAppRequest) error {
 	return validation.ValidateStruct(u,
 		validation.Field(&u.Name, validation.Required, validation.Length(0, 128)),
-		validation.Field(&u.Enable, validation.Required),
 	)
 }
 
