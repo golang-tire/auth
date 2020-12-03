@@ -1,4 +1,4 @@
-import React, {useState, Fragment} from "react";
+import React, {Fragment} from "react";
 import {Avatar, Menu, Popover, Badge, List, Layout} from 'antd';
 import {BellOutlined, MenuFoldOutlined, MenuUnfoldOutlined, RightOutlined} from "@ant-design/icons";
 import moment from "moment";

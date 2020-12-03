@@ -18,7 +18,6 @@ const Routes = () => {
                         if (item.subMenus) {
                             return (
                                 item.subMenus.map(subMenu =>{
-                                    console.log("sub", subMenu)
                                     return (
                                         <ProtectedRouteWithLayout
                                             component={subMenu.component}

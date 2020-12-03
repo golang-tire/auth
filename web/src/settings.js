@@ -6,6 +6,10 @@ import {
     DomainEdit,
     Apps,
     AppEdit,
+    Resources,
+    ResourceEdit,
+    Objects,
+    ObjectEdit,
     Roles,
     RoleEdit,
     Rules,
@@ -68,11 +72,37 @@ export default {
                 name: 'Apps',
                 path: '/apps',
                 component: Apps,
-            }]
+            },{
+
+                id: 'resources',
+                name: 'Resources',
+                path: '/resources',
+                component: Resources,
+            },
+            {
+
+                id: 'objects',
+                name: 'Objects',
+                path: '/objects',
+                component: Objects,
+            }
+            ]
         },
         {
             path: ["/apps/edit", "/apps/edit/:Uuid"],
             component: AppEdit,
+            protected: true,
+            sideMenu: false
+        },
+        {
+            path: ["/resources/edit", "/resources/edit/:Uuid"],
+            component: ResourceEdit,
+            protected: true,
+            sideMenu: false
+        },
+        {
+            path: ["/objects/edit", "/objects/edit/:Uuid"],
+            component: ObjectEdit,
             protected: true,
             sideMenu: false
         },
