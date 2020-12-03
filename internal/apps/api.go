@@ -19,8 +19,8 @@ type API interface {
 }
 
 type api struct {
-	service Service
 	auth.AppServiceServer
+	service Service
 }
 
 func (a api) InitRest(ctx context.Context, conn *grpc.ClientConn, mux *runtime.ServeMux, httpMux *http.ServeMux) {

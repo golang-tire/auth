@@ -2,6 +2,7 @@ package apps
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/go-ozzo/ozzo-validation/v4/is"
@@ -53,7 +54,7 @@ func ValidateAppUpdateRequest(u *auth.UpdateAppRequest) error {
 func ValidateResourceCreateRequest(c *auth.CreateResourceRequest) error {
 	return validation.ValidateStruct(c,
 		validation.Field(&c.Name, validation.Required, validation.Length(0, 128)),
-		validation.Field(&c.Uuid, validation.Required, is.UUIDv4),
+		validation.Field(&c.Uuid, validation.Required, is.UUID),
 	)
 }
 
@@ -61,7 +62,8 @@ func ValidateResourceCreateRequest(c *auth.CreateResourceRequest) error {
 func ValidateResourceUpdateRequest(u *auth.UpdateResourceRequest) error {
 	return validation.ValidateStruct(u,
 		validation.Field(&u.Name, validation.Required, validation.Length(0, 128)),
-		validation.Field(&u.Uuid, validation.Required, is.UUIDv4),
+		validation.Field(&u.Uuid, validation.Required, is.UUID),
+		validation.Field(&u.AppUuid, validation.Required, is.UUID),
 	)
 }
 
@@ -69,7 +71,7 @@ func ValidateResourceUpdateRequest(u *auth.UpdateResourceRequest) error {
 func ValidateObjectCreateRequest(c *auth.CreateObjectRequest) error {
 	return validation.ValidateStruct(c,
 		validation.Field(&c.Identifier, validation.Required, validation.Length(0, 128)),
-		validation.Field(&c.Uuid, validation.Required, is.UUIDv4),
+		validation.Field(&c.Uuid, validation.Required, is.UUID),
 	)
 }
 
@@ -77,7 +79,8 @@ func ValidateObjectCreateRequest(c *auth.CreateObjectRequest) error {
 func ValidateObjectUpdateRequest(u *auth.UpdateObjectRequest) error {
 	return validation.ValidateStruct(u,
 		validation.Field(&u.Identifier, validation.Required, validation.Length(0, 128)),
-		validation.Field(&u.Uuid, validation.Required, is.UUIDv4),
+		validation.Field(&u.Uuid, validation.Required, is.UUID),
+		validation.Field(&u.AppUuid, validation.Required, is.UUID),
 	)
 }
 
@@ -177,6 +180,9 @@ func (s service) GetResource(ctx context.Context, UUID string) (*auth.Resource, 
 
 // CreateResource creates a new resource.
 func (s service) CreateResource(ctx context.Context, req *auth.CreateResourceRequest) (*auth.Resource, error) {
+
+	fmt.Println("dddddddddddddddddd", req)
+
 	if err := ValidateResourceCreateRequest(req); err != nil {
 		return nil, err
 	}
@@ -206,7 +212,7 @@ func (s service) UpdateResource(ctx context.Context, req *auth.UpdateResourceReq
 		return nil, err
 	}
 
-	app, err := s.repo.GetApp(ctx, resource.App.UUID)
+	app, err := s.repo.GetApp(ctx, req.AppUuid)
 	if err != nil {
 		return nil, err
 	}
@@ -292,7 +298,7 @@ func (s service) UpdateObject(ctx context.Context, req *auth.UpdateObjectRequest
 		return nil, err
 	}
 
-	app, err := s.repo.GetApp(ctx, object.App.UUID)
+	app, err := s.repo.GetApp(ctx, req.AppUuid)
 	if err != nil {
 		return nil, err
 	}

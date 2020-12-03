@@ -29,25 +29,25 @@ type AppServiceClient interface {
 	// Delete App request
 	DeleteApp(ctx context.Context, in *DeleteAppRequest, opts ...grpc.CallOption) (*empty.Empty, error)
 	// List App Resources
-	ListAppResources(ctx context.Context, in *ListResourcesRequest, opts ...grpc.CallOption) (*ListResourcesResponse, error)
+	ListResources(ctx context.Context, in *ListResourcesRequest, opts ...grpc.CallOption) (*ListResourcesResponse, error)
 	// Get App Resource
-	GetAppResource(ctx context.Context, in *GetResourceRequest, opts ...grpc.CallOption) (*Resource, error)
+	GetResource(ctx context.Context, in *GetResourceRequest, opts ...grpc.CallOption) (*Resource, error)
 	// Create App Resource object request
-	CreateAppResource(ctx context.Context, in *CreateResourceRequest, opts ...grpc.CallOption) (*Resource, error)
+	CreateResource(ctx context.Context, in *CreateResourceRequest, opts ...grpc.CallOption) (*Resource, error)
 	// Update App Resource object request
-	UpdateAppResource(ctx context.Context, in *UpdateResourceRequest, opts ...grpc.CallOption) (*Resource, error)
+	UpdateResource(ctx context.Context, in *UpdateResourceRequest, opts ...grpc.CallOption) (*Resource, error)
 	// Delete App Resource object request
-	DeleteAppResource(ctx context.Context, in *DeleteAppRequest, opts ...grpc.CallOption) (*empty.Empty, error)
+	DeleteResource(ctx context.Context, in *DeleteResourceRequest, opts ...grpc.CallOption) (*empty.Empty, error)
 	// List App Objects
-	ListAppObjects(ctx context.Context, in *ListObjectsRequest, opts ...grpc.CallOption) (*ListObjectsResponse, error)
+	ListObjects(ctx context.Context, in *ListObjectsRequest, opts ...grpc.CallOption) (*ListObjectsResponse, error)
 	// Get App Object
-	GetAppObject(ctx context.Context, in *GetObjectRequest, opts ...grpc.CallOption) (*Object, error)
+	GetObject(ctx context.Context, in *GetObjectRequest, opts ...grpc.CallOption) (*Object, error)
 	// Create App Object request
-	CreateAppObject(ctx context.Context, in *CreateObjectRequest, opts ...grpc.CallOption) (*Object, error)
+	CreateObject(ctx context.Context, in *CreateObjectRequest, opts ...grpc.CallOption) (*Object, error)
 	// Update App Object request
-	UpdateAppObject(ctx context.Context, in *UpdateObjectRequest, opts ...grpc.CallOption) (*Object, error)
+	UpdateObject(ctx context.Context, in *UpdateObjectRequest, opts ...grpc.CallOption) (*Object, error)
 	// Delete App Object request
-	DeleteAppObjectResource(ctx context.Context, in *DeleteObjectRequest, opts ...grpc.CallOption) (*empty.Empty, error)
+	DeleteObject(ctx context.Context, in *DeleteObjectRequest, opts ...grpc.CallOption) (*empty.Empty, error)
 }
 
 type appServiceClient struct {
@@ -103,90 +103,90 @@ func (c *appServiceClient) DeleteApp(ctx context.Context, in *DeleteAppRequest, 
 	return out, nil
 }
 
-func (c *appServiceClient) ListAppResources(ctx context.Context, in *ListResourcesRequest, opts ...grpc.CallOption) (*ListResourcesResponse, error) {
+func (c *appServiceClient) ListResources(ctx context.Context, in *ListResourcesRequest, opts ...grpc.CallOption) (*ListResourcesResponse, error) {
 	out := new(ListResourcesResponse)
-	err := c.cc.Invoke(ctx, "/authV1.AppService/ListAppResources", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/authV1.AppService/ListResources", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *appServiceClient) GetAppResource(ctx context.Context, in *GetResourceRequest, opts ...grpc.CallOption) (*Resource, error) {
+func (c *appServiceClient) GetResource(ctx context.Context, in *GetResourceRequest, opts ...grpc.CallOption) (*Resource, error) {
 	out := new(Resource)
-	err := c.cc.Invoke(ctx, "/authV1.AppService/GetAppResource", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/authV1.AppService/GetResource", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *appServiceClient) CreateAppResource(ctx context.Context, in *CreateResourceRequest, opts ...grpc.CallOption) (*Resource, error) {
+func (c *appServiceClient) CreateResource(ctx context.Context, in *CreateResourceRequest, opts ...grpc.CallOption) (*Resource, error) {
 	out := new(Resource)
-	err := c.cc.Invoke(ctx, "/authV1.AppService/CreateAppResource", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/authV1.AppService/CreateResource", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *appServiceClient) UpdateAppResource(ctx context.Context, in *UpdateResourceRequest, opts ...grpc.CallOption) (*Resource, error) {
+func (c *appServiceClient) UpdateResource(ctx context.Context, in *UpdateResourceRequest, opts ...grpc.CallOption) (*Resource, error) {
 	out := new(Resource)
-	err := c.cc.Invoke(ctx, "/authV1.AppService/UpdateAppResource", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/authV1.AppService/UpdateResource", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *appServiceClient) DeleteAppResource(ctx context.Context, in *DeleteAppRequest, opts ...grpc.CallOption) (*empty.Empty, error) {
+func (c *appServiceClient) DeleteResource(ctx context.Context, in *DeleteResourceRequest, opts ...grpc.CallOption) (*empty.Empty, error) {
 	out := new(empty.Empty)
-	err := c.cc.Invoke(ctx, "/authV1.AppService/DeleteAppResource", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/authV1.AppService/DeleteResource", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *appServiceClient) ListAppObjects(ctx context.Context, in *ListObjectsRequest, opts ...grpc.CallOption) (*ListObjectsResponse, error) {
+func (c *appServiceClient) ListObjects(ctx context.Context, in *ListObjectsRequest, opts ...grpc.CallOption) (*ListObjectsResponse, error) {
 	out := new(ListObjectsResponse)
-	err := c.cc.Invoke(ctx, "/authV1.AppService/ListAppObjects", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/authV1.AppService/ListObjects", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *appServiceClient) GetAppObject(ctx context.Context, in *GetObjectRequest, opts ...grpc.CallOption) (*Object, error) {
+func (c *appServiceClient) GetObject(ctx context.Context, in *GetObjectRequest, opts ...grpc.CallOption) (*Object, error) {
 	out := new(Object)
-	err := c.cc.Invoke(ctx, "/authV1.AppService/GetAppObject", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/authV1.AppService/GetObject", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *appServiceClient) CreateAppObject(ctx context.Context, in *CreateObjectRequest, opts ...grpc.CallOption) (*Object, error) {
+func (c *appServiceClient) CreateObject(ctx context.Context, in *CreateObjectRequest, opts ...grpc.CallOption) (*Object, error) {
 	out := new(Object)
-	err := c.cc.Invoke(ctx, "/authV1.AppService/CreateAppObject", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/authV1.AppService/CreateObject", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *appServiceClient) UpdateAppObject(ctx context.Context, in *UpdateObjectRequest, opts ...grpc.CallOption) (*Object, error) {
+func (c *appServiceClient) UpdateObject(ctx context.Context, in *UpdateObjectRequest, opts ...grpc.CallOption) (*Object, error) {
 	out := new(Object)
-	err := c.cc.Invoke(ctx, "/authV1.AppService/UpdateAppObject", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/authV1.AppService/UpdateObject", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *appServiceClient) DeleteAppObjectResource(ctx context.Context, in *DeleteObjectRequest, opts ...grpc.CallOption) (*empty.Empty, error) {
+func (c *appServiceClient) DeleteObject(ctx context.Context, in *DeleteObjectRequest, opts ...grpc.CallOption) (*empty.Empty, error) {
 	out := new(empty.Empty)
-	err := c.cc.Invoke(ctx, "/authV1.AppService/DeleteAppObjectResource", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/authV1.AppService/DeleteObject", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -208,25 +208,25 @@ type AppServiceServer interface {
 	// Delete App request
 	DeleteApp(context.Context, *DeleteAppRequest) (*empty.Empty, error)
 	// List App Resources
-	ListAppResources(context.Context, *ListResourcesRequest) (*ListResourcesResponse, error)
+	ListResources(context.Context, *ListResourcesRequest) (*ListResourcesResponse, error)
 	// Get App Resource
-	GetAppResource(context.Context, *GetResourceRequest) (*Resource, error)
+	GetResource(context.Context, *GetResourceRequest) (*Resource, error)
 	// Create App Resource object request
-	CreateAppResource(context.Context, *CreateResourceRequest) (*Resource, error)
+	CreateResource(context.Context, *CreateResourceRequest) (*Resource, error)
 	// Update App Resource object request
-	UpdateAppResource(context.Context, *UpdateResourceRequest) (*Resource, error)
+	UpdateResource(context.Context, *UpdateResourceRequest) (*Resource, error)
 	// Delete App Resource object request
-	DeleteAppResource(context.Context, *DeleteAppRequest) (*empty.Empty, error)
+	DeleteResource(context.Context, *DeleteResourceRequest) (*empty.Empty, error)
 	// List App Objects
-	ListAppObjects(context.Context, *ListObjectsRequest) (*ListObjectsResponse, error)
+	ListObjects(context.Context, *ListObjectsRequest) (*ListObjectsResponse, error)
 	// Get App Object
-	GetAppObject(context.Context, *GetObjectRequest) (*Object, error)
+	GetObject(context.Context, *GetObjectRequest) (*Object, error)
 	// Create App Object request
-	CreateAppObject(context.Context, *CreateObjectRequest) (*Object, error)
+	CreateObject(context.Context, *CreateObjectRequest) (*Object, error)
 	// Update App Object request
-	UpdateAppObject(context.Context, *UpdateObjectRequest) (*Object, error)
+	UpdateObject(context.Context, *UpdateObjectRequest) (*Object, error)
 	// Delete App Object request
-	DeleteAppObjectResource(context.Context, *DeleteObjectRequest) (*empty.Empty, error)
+	DeleteObject(context.Context, *DeleteObjectRequest) (*empty.Empty, error)
 	mustEmbedUnimplementedAppServiceServer()
 }
 
@@ -249,35 +249,35 @@ func (UnimplementedAppServiceServer) UpdateApp(context.Context, *UpdateAppReques
 func (UnimplementedAppServiceServer) DeleteApp(context.Context, *DeleteAppRequest) (*empty.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteApp not implemented")
 }
-func (UnimplementedAppServiceServer) ListAppResources(context.Context, *ListResourcesRequest) (*ListResourcesResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ListAppResources not implemented")
+func (UnimplementedAppServiceServer) ListResources(context.Context, *ListResourcesRequest) (*ListResourcesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListResources not implemented")
 }
-func (UnimplementedAppServiceServer) GetAppResource(context.Context, *GetResourceRequest) (*Resource, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetAppResource not implemented")
+func (UnimplementedAppServiceServer) GetResource(context.Context, *GetResourceRequest) (*Resource, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetResource not implemented")
 }
-func (UnimplementedAppServiceServer) CreateAppResource(context.Context, *CreateResourceRequest) (*Resource, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CreateAppResource not implemented")
+func (UnimplementedAppServiceServer) CreateResource(context.Context, *CreateResourceRequest) (*Resource, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateResource not implemented")
 }
-func (UnimplementedAppServiceServer) UpdateAppResource(context.Context, *UpdateResourceRequest) (*Resource, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpdateAppResource not implemented")
+func (UnimplementedAppServiceServer) UpdateResource(context.Context, *UpdateResourceRequest) (*Resource, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateResource not implemented")
 }
-func (UnimplementedAppServiceServer) DeleteAppResource(context.Context, *DeleteAppRequest) (*empty.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method DeleteAppResource not implemented")
+func (UnimplementedAppServiceServer) DeleteResource(context.Context, *DeleteResourceRequest) (*empty.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteResource not implemented")
 }
-func (UnimplementedAppServiceServer) ListAppObjects(context.Context, *ListObjectsRequest) (*ListObjectsResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ListAppObjects not implemented")
+func (UnimplementedAppServiceServer) ListObjects(context.Context, *ListObjectsRequest) (*ListObjectsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListObjects not implemented")
 }
-func (UnimplementedAppServiceServer) GetAppObject(context.Context, *GetObjectRequest) (*Object, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetAppObject not implemented")
+func (UnimplementedAppServiceServer) GetObject(context.Context, *GetObjectRequest) (*Object, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetObject not implemented")
 }
-func (UnimplementedAppServiceServer) CreateAppObject(context.Context, *CreateObjectRequest) (*Object, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CreateAppObject not implemented")
+func (UnimplementedAppServiceServer) CreateObject(context.Context, *CreateObjectRequest) (*Object, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateObject not implemented")
 }
-func (UnimplementedAppServiceServer) UpdateAppObject(context.Context, *UpdateObjectRequest) (*Object, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpdateAppObject not implemented")
+func (UnimplementedAppServiceServer) UpdateObject(context.Context, *UpdateObjectRequest) (*Object, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateObject not implemented")
 }
-func (UnimplementedAppServiceServer) DeleteAppObjectResource(context.Context, *DeleteObjectRequest) (*empty.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method DeleteAppObjectResource not implemented")
+func (UnimplementedAppServiceServer) DeleteObject(context.Context, *DeleteObjectRequest) (*empty.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteObject not implemented")
 }
 func (UnimplementedAppServiceServer) mustEmbedUnimplementedAppServiceServer() {}
 
@@ -382,182 +382,182 @@ func _AppService_DeleteApp_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AppService_ListAppResources_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _AppService_ListResources_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ListResourcesRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AppServiceServer).ListAppResources(ctx, in)
+		return srv.(AppServiceServer).ListResources(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/authV1.AppService/ListAppResources",
+		FullMethod: "/authV1.AppService/ListResources",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AppServiceServer).ListAppResources(ctx, req.(*ListResourcesRequest))
+		return srv.(AppServiceServer).ListResources(ctx, req.(*ListResourcesRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AppService_GetAppResource_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _AppService_GetResource_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetResourceRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AppServiceServer).GetAppResource(ctx, in)
+		return srv.(AppServiceServer).GetResource(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/authV1.AppService/GetAppResource",
+		FullMethod: "/authV1.AppService/GetResource",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AppServiceServer).GetAppResource(ctx, req.(*GetResourceRequest))
+		return srv.(AppServiceServer).GetResource(ctx, req.(*GetResourceRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AppService_CreateAppResource_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _AppService_CreateResource_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CreateResourceRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AppServiceServer).CreateAppResource(ctx, in)
+		return srv.(AppServiceServer).CreateResource(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/authV1.AppService/CreateAppResource",
+		FullMethod: "/authV1.AppService/CreateResource",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AppServiceServer).CreateAppResource(ctx, req.(*CreateResourceRequest))
+		return srv.(AppServiceServer).CreateResource(ctx, req.(*CreateResourceRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AppService_UpdateAppResource_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _AppService_UpdateResource_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UpdateResourceRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AppServiceServer).UpdateAppResource(ctx, in)
+		return srv.(AppServiceServer).UpdateResource(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/authV1.AppService/UpdateAppResource",
+		FullMethod: "/authV1.AppService/UpdateResource",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AppServiceServer).UpdateAppResource(ctx, req.(*UpdateResourceRequest))
+		return srv.(AppServiceServer).UpdateResource(ctx, req.(*UpdateResourceRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AppService_DeleteAppResource_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DeleteAppRequest)
+func _AppService_DeleteResource_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteResourceRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AppServiceServer).DeleteAppResource(ctx, in)
+		return srv.(AppServiceServer).DeleteResource(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/authV1.AppService/DeleteAppResource",
+		FullMethod: "/authV1.AppService/DeleteResource",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AppServiceServer).DeleteAppResource(ctx, req.(*DeleteAppRequest))
+		return srv.(AppServiceServer).DeleteResource(ctx, req.(*DeleteResourceRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AppService_ListAppObjects_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _AppService_ListObjects_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ListObjectsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AppServiceServer).ListAppObjects(ctx, in)
+		return srv.(AppServiceServer).ListObjects(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/authV1.AppService/ListAppObjects",
+		FullMethod: "/authV1.AppService/ListObjects",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AppServiceServer).ListAppObjects(ctx, req.(*ListObjectsRequest))
+		return srv.(AppServiceServer).ListObjects(ctx, req.(*ListObjectsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AppService_GetAppObject_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _AppService_GetObject_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetObjectRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AppServiceServer).GetAppObject(ctx, in)
+		return srv.(AppServiceServer).GetObject(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/authV1.AppService/GetAppObject",
+		FullMethod: "/authV1.AppService/GetObject",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AppServiceServer).GetAppObject(ctx, req.(*GetObjectRequest))
+		return srv.(AppServiceServer).GetObject(ctx, req.(*GetObjectRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AppService_CreateAppObject_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _AppService_CreateObject_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CreateObjectRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AppServiceServer).CreateAppObject(ctx, in)
+		return srv.(AppServiceServer).CreateObject(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/authV1.AppService/CreateAppObject",
+		FullMethod: "/authV1.AppService/CreateObject",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AppServiceServer).CreateAppObject(ctx, req.(*CreateObjectRequest))
+		return srv.(AppServiceServer).CreateObject(ctx, req.(*CreateObjectRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AppService_UpdateAppObject_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _AppService_UpdateObject_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UpdateObjectRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AppServiceServer).UpdateAppObject(ctx, in)
+		return srv.(AppServiceServer).UpdateObject(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/authV1.AppService/UpdateAppObject",
+		FullMethod: "/authV1.AppService/UpdateObject",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AppServiceServer).UpdateAppObject(ctx, req.(*UpdateObjectRequest))
+		return srv.(AppServiceServer).UpdateObject(ctx, req.(*UpdateObjectRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AppService_DeleteAppObjectResource_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _AppService_DeleteObject_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(DeleteObjectRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AppServiceServer).DeleteAppObjectResource(ctx, in)
+		return srv.(AppServiceServer).DeleteObject(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/authV1.AppService/DeleteAppObjectResource",
+		FullMethod: "/authV1.AppService/DeleteObject",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AppServiceServer).DeleteAppObjectResource(ctx, req.(*DeleteObjectRequest))
+		return srv.(AppServiceServer).DeleteObject(ctx, req.(*DeleteObjectRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -587,44 +587,44 @@ var _AppService_serviceDesc = grpc.ServiceDesc{
 			Handler:    _AppService_DeleteApp_Handler,
 		},
 		{
-			MethodName: "ListAppResources",
-			Handler:    _AppService_ListAppResources_Handler,
+			MethodName: "ListResources",
+			Handler:    _AppService_ListResources_Handler,
 		},
 		{
-			MethodName: "GetAppResource",
-			Handler:    _AppService_GetAppResource_Handler,
+			MethodName: "GetResource",
+			Handler:    _AppService_GetResource_Handler,
 		},
 		{
-			MethodName: "CreateAppResource",
-			Handler:    _AppService_CreateAppResource_Handler,
+			MethodName: "CreateResource",
+			Handler:    _AppService_CreateResource_Handler,
 		},
 		{
-			MethodName: "UpdateAppResource",
-			Handler:    _AppService_UpdateAppResource_Handler,
+			MethodName: "UpdateResource",
+			Handler:    _AppService_UpdateResource_Handler,
 		},
 		{
-			MethodName: "DeleteAppResource",
-			Handler:    _AppService_DeleteAppResource_Handler,
+			MethodName: "DeleteResource",
+			Handler:    _AppService_DeleteResource_Handler,
 		},
 		{
-			MethodName: "ListAppObjects",
-			Handler:    _AppService_ListAppObjects_Handler,
+			MethodName: "ListObjects",
+			Handler:    _AppService_ListObjects_Handler,
 		},
 		{
-			MethodName: "GetAppObject",
-			Handler:    _AppService_GetAppObject_Handler,
+			MethodName: "GetObject",
+			Handler:    _AppService_GetObject_Handler,
 		},
 		{
-			MethodName: "CreateAppObject",
-			Handler:    _AppService_CreateAppObject_Handler,
+			MethodName: "CreateObject",
+			Handler:    _AppService_CreateObject_Handler,
 		},
 		{
-			MethodName: "UpdateAppObject",
-			Handler:    _AppService_UpdateAppObject_Handler,
+			MethodName: "UpdateObject",
+			Handler:    _AppService_UpdateObject_Handler,
 		},
 		{
-			MethodName: "DeleteAppObjectResource",
-			Handler:    _AppService_DeleteAppObjectResource_Handler,
+			MethodName: "DeleteObject",
+			Handler:    _AppService_DeleteObject_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

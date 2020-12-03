@@ -87,10 +87,61 @@
         ]
       }
     },
+    "/v1/apps/-/objects": {
+      "get": {
+        "summary": "List App Objects",
+        "operationId": "AppService_ListObjects",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/authV1ListObjectsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "query",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "uuid",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AppService"
+        ]
+      }
+    },
     "/v1/apps/-/objects/{uuid}": {
       "get": {
         "summary": "Get App Object",
-        "operationId": "AppService_GetAppObject",
+        "operationId": "AppService_GetObject",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -119,7 +170,7 @@
       },
       "delete": {
         "summary": "Delete App Object request",
-        "operationId": "AppService_DeleteAppObjectResource",
+        "operationId": "AppService_DeleteObject",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -148,7 +199,7 @@
       },
       "put": {
         "summary": "Update App Object request",
-        "operationId": "AppService_UpdateAppObject",
+        "operationId": "AppService_UpdateObject",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -184,10 +235,61 @@
         ]
       }
     },
+    "/v1/apps/-/resources": {
+      "get": {
+        "summary": "List App Resources",
+        "operationId": "AppService_ListResources",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/authV1ListResourcesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "query",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "uuid",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AppService"
+        ]
+      }
+    },
     "/v1/apps/-/resources/{uuid}": {
       "get": {
         "summary": "Get App Resource",
-        "operationId": "AppService_GetAppResource",
+        "operationId": "AppService_GetResource",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -216,7 +318,7 @@
       },
       "delete": {
         "summary": "Delete App Resource object request",
-        "operationId": "AppService_DeleteAppResource",
+        "operationId": "AppService_DeleteResource",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -245,7 +347,7 @@
       },
       "put": {
         "summary": "Update App Resource object request",
-        "operationId": "AppService_UpdateAppResource",
+        "operationId": "AppService_UpdateResource",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -379,58 +481,9 @@
       }
     },
     "/v1/apps/{uuid}/objects": {
-      "get": {
-        "summary": "List App Objects",
-        "operationId": "AppService_ListAppObjects",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/authV1ListObjectsResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/runtimeError"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "uuid",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "limit",
-            "in": "query",
-            "required": false,
-            "type": "string",
-            "format": "int64"
-          },
-          {
-            "name": "offset",
-            "in": "query",
-            "required": false,
-            "type": "string",
-            "format": "int64"
-          },
-          {
-            "name": "query",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "AppService"
-        ]
-      },
       "post": {
         "summary": "Create App Object request",
-        "operationId": "AppService_CreateAppObject",
+        "operationId": "AppService_CreateObject",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -467,58 +520,9 @@
       }
     },
     "/v1/apps/{uuid}/resources": {
-      "get": {
-        "summary": "List App Resources",
-        "operationId": "AppService_ListAppResources",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/authV1ListResourcesResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/runtimeError"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "uuid",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "limit",
-            "in": "query",
-            "required": false,
-            "type": "string",
-            "format": "int64"
-          },
-          {
-            "name": "offset",
-            "in": "query",
-            "required": false,
-            "type": "string",
-            "format": "int64"
-          },
-          {
-            "name": "query",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "AppService"
-        ]
-      },
       "post": {
         "summary": "Create App Resource object request",
-        "operationId": "AppService_CreateAppResource",
+        "operationId": "AppService_CreateResource",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -746,6 +750,9 @@
         },
         "identifier": {
           "type": "string"
+        },
+        "app_uuid": {
+          "type": "string"
         }
       }
     },
@@ -756,6 +763,9 @@
           "type": "string"
         },
         "name": {
+          "type": "string"
+        },
+        "app_uuid": {
           "type": "string"
         }
       }

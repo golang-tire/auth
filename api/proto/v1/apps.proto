@@ -90,6 +90,7 @@ message CreateResourceRequest {
 message UpdateResourceRequest {
     string uuid = 1;
     string name = 2;
+    string app_uuid = 3;
 }
 
 message DeleteResourceRequest {
@@ -122,6 +123,7 @@ message CreateObjectRequest {
 message UpdateObjectRequest {
     string uuid = 1;
     string identifier = 2;
+    string app_uuid = 3;
 }
 
 message DeleteObjectRequest {
@@ -167,21 +169,21 @@ service AppService {
     }
 
     // List App Resources
-    rpc ListAppResources (ListResourcesRequest) returns (ListResourcesResponse) {
+    rpc ListResources (ListResourcesRequest) returns (ListResourcesResponse) {
         option (google.api.http) = {
-            get: "/v1/apps/{uuid}/resources"
+            get: "/v1/apps/-/resources"
         };
     }
 
     // Get App Resource
-    rpc GetAppResource (GetResourceRequest) returns (Resource) {
+    rpc GetResource (GetResourceRequest) returns (Resource) {
         option (google.api.http) = {
           get: "/v1/apps/-/resources/{uuid}"
         };
     }
 
     // Create App Resource object request
-    rpc CreateAppResource (CreateResourceRequest) returns (Resource) {
+    rpc CreateResource (CreateResourceRequest) returns (Resource) {
         option (google.api.http) = {
             post: "/v1/apps/{uuid}/resources"
             body: "*"
@@ -189,7 +191,7 @@ service AppService {
     }
 
     // Update App Resource object request
-    rpc UpdateAppResource (UpdateResourceRequest) returns (Resource) {
+    rpc UpdateResource (UpdateResourceRequest) returns (Resource) {
         option (google.api.http) = {
             put: "/v1/apps/-/resources/{uuid}"
             body: "*"
@@ -197,28 +199,28 @@ service AppService {
     }
 
     // Delete App Resource object request
-    rpc DeleteAppResource (DeleteAppRequest) returns (google.protobuf.Empty) {
+    rpc DeleteResource (DeleteResourceRequest) returns (google.protobuf.Empty) {
         option (google.api.http) = {
           delete: "/v1/apps/-/resources/{uuid}"
         };
     }
 
     // List App Objects
-    rpc ListAppObjects (ListObjectsRequest) returns (ListObjectsResponse) {
+    rpc ListObjects (ListObjectsRequest) returns (ListObjectsResponse) {
         option (google.api.http) = {
-            get: "/v1/apps/{uuid}/objects"
+            get: "/v1/apps/-/objects"
         };
     }
 
     // Get App Object
-    rpc GetAppObject (GetObjectRequest) returns (Object) {
+    rpc GetObject (GetObjectRequest) returns (Object) {
         option (google.api.http) = {
           get: "/v1/apps/-/objects/{uuid}"
         };
     }
 
     // Create App Object request
-    rpc CreateAppObject (CreateObjectRequest) returns (Object) {
+    rpc CreateObject (CreateObjectRequest) returns (Object) {
         option (google.api.http) = {
             post: "/v1/apps/{uuid}/objects"
             body: "*"
@@ -226,7 +228,7 @@ service AppService {
     }
 
     // Update App Object request
-    rpc UpdateAppObject (UpdateObjectRequest) returns (Object) {
+    rpc UpdateObject (UpdateObjectRequest) returns (Object) {
         option (google.api.http) = {
             put: "/v1/apps/-/objects/{uuid}"
             body: "*"
@@ -234,7 +236,7 @@ service AppService {
     }
 
     // Delete App Object request
-    rpc DeleteAppObjectResource (DeleteObjectRequest) returns (google.protobuf.Empty) {
+    rpc DeleteObject (DeleteObjectRequest) returns (google.protobuf.Empty) {
         option (google.api.http) = {
           delete: "/v1/apps/-/objects/{uuid}"
         };

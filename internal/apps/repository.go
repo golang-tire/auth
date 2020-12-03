@@ -146,7 +146,7 @@ func (r repository) QueryApps(ctx context.Context, query string, offset, limit i
 // GetResource reads the resource with the specified ID from the database.
 func (r repository) GetResource(ctx context.Context, uuid string) (entity.Resource, error) {
 	var resource entity.Resource
-	res := r.db.With(ctx).Where("uuid = ?", uuid).First(&resource)
+	res := r.db.With(ctx).Where("uuid = ?", uuid).Preload("App").First(&resource)
 	if res.Error != nil && res.Error == gorm.ErrRecordNotFound {
 		return entity.Resource{}, fmt.Errorf("resource with uuid `%s` not found", uuid)
 	}
@@ -156,7 +156,7 @@ func (r repository) GetResource(ctx context.Context, uuid string) (entity.Resour
 // GetResourceByName returns the resource with the specified resource name.
 func (r repository) GetResourceByName(ctx context.Context, name string) (entity.Resource, error) {
 	var resource entity.Resource
-	res := r.db.With(ctx).Where("name = ?", name).First(&resource)
+	res := r.db.With(ctx).Where("name = ?", name).Preload("App").First(&resource)
 	if res.Error != nil && res.Error == gorm.ErrRecordNotFound {
 		return entity.Resource{}, fmt.Errorf("resource with name `%s` not found", name)
 	}
@@ -203,7 +203,8 @@ func (r repository) QueryResources(ctx context.Context, query string, offset, li
 	res := r.db.With(ctx).
 		Limit(int(limit)).
 		Offset(int(offset)).
-		Order("id asc")
+		Order("id asc").
+		Preload("App")
 
 	if len(query) >= 1 {
 		res = res.Where("name LIKE ?", "%"+query+"%").Find(&_resources)
@@ -221,7 +222,7 @@ func (r repository) QueryResources(ctx context.Context, query string, offset, li
 // GetObject reads the object with the specified ID from the database.
 func (r repository) GetObject(ctx context.Context, uuid string) (entity.Object, error) {
 	var object entity.Object
-	res := r.db.With(ctx).Where("uuid = ?", uuid).First(&object)
+	res := r.db.With(ctx).Where("uuid = ?", uuid).Preload("App").First(&object)
 	if res.Error != nil && res.Error == gorm.ErrRecordNotFound {
 		return entity.Object{}, fmt.Errorf("object with uuid `%s` not found", uuid)
 	}
@@ -231,7 +232,7 @@ func (r repository) GetObject(ctx context.Context, uuid string) (entity.Object, 
 // GetObjectByName returns the object with the specified object identifier.
 func (r repository) GetObjectByIdentifier(ctx context.Context, identifier string) (entity.Object, error) {
 	var object entity.Object
-	res := r.db.With(ctx).Where("identifier = ?", identifier).First(&object)
+	res := r.db.With(ctx).Where("identifier = ?", identifier).Preload("App").First(&object)
 	if res.Error != nil && res.Error == gorm.ErrRecordNotFound {
 		return entity.Object{}, fmt.Errorf("object with identifier `%s` not found", identifier)
 	}
@@ -278,7 +279,8 @@ func (r repository) QueryObjects(ctx context.Context, query string, offset, limi
 	res := r.db.With(ctx).
 		Limit(int(limit)).
 		Offset(int(offset)).
-		Order("id asc")
+		Order("id asc").
+		Preload("App")
 
 	if len(query) >= 1 {
 		res = res.Where("identifier LIKE ?", "%"+query+"%").Find(&_objects)
