@@ -170,7 +170,7 @@ const DomainEdit = props => {
                         <Option value="DELETE">DELETE</Option>
                     </Select>
                 </Form.Item>
-                <Form.Item name="effect" label="Resource">
+                <Form.Item name="effect" label="Effect">
                     <Select placeholder="Select effect">
                         <Option value="ALLOW">ALLOW</Option>
                         <Option value="DENY">DENY</Option>

@@ -4,11 +4,7 @@ import {Layout, Breadcrumb} from 'antd';
 import {useHistory} from "react-router-dom";
 import TopHeader from './components/header'
 import SideMenu from './components/sideMenu'
-
-import {
-    DashboardOutlined,
-    UserOutlined,
-} from '@ant-design/icons';
+import BreadCrumb from './components/BreadCrumb'
 import AuthService from "services/Auth/authService";
 
 const { Content, Footer } = Layout;
@@ -58,15 +54,7 @@ const Admin = props => {
                 />
                 <Content className="body">
                     <div className="breadcrumb">
-                        <Breadcrumb>
-                            <Breadcrumb.Item href="">
-                                <DashboardOutlined />
-                            </Breadcrumb.Item>
-                            <Breadcrumb.Item href="">
-                                <UserOutlined />
-                                <span>User List</span>
-                            </Breadcrumb.Item>
-                        </Breadcrumb>
+                        <BreadCrumb/>
                     </div>
                     <div className="content-wrapper">
                         {children}

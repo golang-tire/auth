@@ -15,20 +15,19 @@ const Routes = () => {
             {
                 routes.routeList.map(item => {
                     if (item.protected) {
-                        if (item.subMenus) {
+                        if (item.subRoutes) {
                             return (
-                                item.subMenus.map(subMenu =>{
+                                item.subRoutes.map(subRoute =>{
                                     return (
                                         <ProtectedRouteWithLayout
-                                            component={subMenu.component}
+                                            component={subRoute.component}
                                             exact
                                             layout={AdminLayout}
-                                            path={subMenu.path}
+                                            path={subRoute.path}
                                         />
                                     )
                                 })
                             )
-
                         }else {
                             return (
                                 <ProtectedRouteWithLayout

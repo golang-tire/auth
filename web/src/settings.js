@@ -32,34 +32,77 @@ export default {
             sideMenu: true
         },
         {
-            id: 'users',
-            icon: 'users',
-            name: 'Users',
-            path: '/users',
-            component: Users,
-            protected: true,
-            sideMenu: true
-        },
-        {
-            path: ["/users/edit", "/users/edit/:Uuid"],
-            component: UserEdit,
-            protected: true,
-            sideMenu: false
-        },
-        {
-            id: 'domains',
+            id: 'workspaces',
             icon: 'domains',
-            name: 'Domains',
-            path: '/domains',
-            component: Domains,
+            name: 'Workspaces',
             protected: true,
-            sideMenu: true
+            sideMenu: true,
+            subRoutes: [
+                {
+                    id: 'domains',
+                    name: 'Domains',
+                    path: '/domains',
+                    component: Domains,
+                    sideMenu: true,
+                },
+                {
+                    id:"domains-edit",
+                    path: ["/domains/edit", "/domains/edit/:Uuid"],
+                    component: DomainEdit,
+                    sideMenu: false
+                },
+            ]
         },
         {
-            path: ["/domains/edit", "/domains/edit/:Uuid"],
-            component: DomainEdit,
+            id: 'user-management',
+            icon: 'users',
+            name: 'User Management',
             protected: true,
-            sideMenu: false
+            sideMenu: true,
+            subRoutes: [
+                {
+                    id: 'users',
+                    name: 'Users',
+                    path: '/users',
+                    component: Users,
+                    sideMenu: true,
+                },
+                {
+                    id: "users-edit",
+                    path: ["/users/edit", "/users/edit/:Uuid"],
+                    component: UserEdit,
+                    sideMenu: false
+                },
+                {
+                    id: 'roles',
+                    icon: 'roles',
+                    name: 'Roles',
+                    path: '/roles',
+                    component: Roles,
+                    sideMenu: true
+                },
+                {
+                    id: "roles-edit",
+                    name: 'Roles',
+                    path: ["/roles/edit", "/roles/edit/:Uuid"],
+                    component: RoleEdit,
+                    sideMenu: false
+                },
+                {
+                    id: 'rules',
+                    icon: 'rules',
+                    name: 'Rules',
+                    path: '/rules',
+                    component: Rules,
+                    sideMenu: true
+                },
+                {
+                    id: "rules-edit",
+                    path: ["/rules/edit", "/rules/edit/:Uuid"],
+                    component: RuleEdit,
+                    sideMenu: false
+                },
+            ]
         },
         {
             id: 'applications',
@@ -67,74 +110,48 @@ export default {
             name: 'Applications',
             protected: true,
             sideMenu: true,
-            subMenus:[{
-                id: 'apps',
-                name: 'Apps',
-                path: '/apps',
-                component: Apps,
-            },{
+            subRoutes:[
+                {
+                    id: 'apps',
+                    name: 'Apps',
+                    path: '/apps',
+                    component: Apps,
+                    sideMenu: true
+                },
+                {
+                    id: "apps-edit",
+                    path: ["/apps/edit", "/apps/edit/:Uuid"],
+                    component: AppEdit,
+                    sideMenu: false
+                },
+                {
+                    id: 'resources',
+                    name: 'Resources',
+                    path: '/resources',
+                    component: Resources,
+                    sideMenu: true
+                },
+                {
+                    id: "resources-edit",
+                    path: ["/resources/edit", "/resources/edit/:Uuid"],
+                    component: ResourceEdit,
+                    sideMenu: false
+                },
+                {
 
-                id: 'resources',
-                name: 'Resources',
-                path: '/resources',
-                component: Resources,
-            },
-            {
-
-                id: 'objects',
-                name: 'Objects',
-                path: '/objects',
-                component: Objects,
-            }
+                    id: 'objects',
+                    name: 'Objects',
+                    path: '/objects',
+                    component: Objects,
+                    sideMenu: true
+                },
+                {
+                    id: "objects-edit",
+                    path: ["/objects/edit", "/objects/edit/:Uuid"],
+                    component: ObjectEdit,
+                    sideMenu: false
+                },
             ]
-        },
-        {
-            path: ["/apps/edit", "/apps/edit/:Uuid"],
-            component: AppEdit,
-            protected: true,
-            sideMenu: false
-        },
-        {
-            path: ["/resources/edit", "/resources/edit/:Uuid"],
-            component: ResourceEdit,
-            protected: true,
-            sideMenu: false
-        },
-        {
-            path: ["/objects/edit", "/objects/edit/:Uuid"],
-            component: ObjectEdit,
-            protected: true,
-            sideMenu: false
-        },
-        {
-            id: 'roles',
-            icon: 'roles',
-            name: 'Roles',
-            path: '/roles',
-            component: Roles,
-            protected: true,
-            sideMenu: true
-        },
-        {
-            path: ["/roles/edit", "/roles/edit/:Uuid"],
-            component: RoleEdit,
-            protected: true,
-            sideMenu: false
-        },
-        {
-            id: 'rules',
-            icon: 'rules',
-            name: 'Rules',
-            path: '/rules',
-            component: Rules,
-            protected: true,
-            sideMenu: true
-        },
-        {
-            path: ["/rules/edit", "/rules/edit/:Uuid"],
-            component: RuleEdit,
-            protected: true,
-            sideMenu: false
         },
         {
             id: 'audit-logs',
