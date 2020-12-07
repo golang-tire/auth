@@ -4,6 +4,8 @@ PACKAGES := $(shell go list ./... | grep -v /vendor/)
 GOFILES := $(shell find . -type f -name '*.go' -not -path "./vendor/*")
 LDFLAGS := -ldflags "-X main.Version=${VERSION}"
 ROOT:=$(realpath $(dir $(firstword $(MAKEFILE_LIST))))
+PACKAGE_NAME = "auth";
+PROTO_OUTPUT_DIR = "internal/proto/v1"
 
 CONFIG_FILE ?= ./configs/local.yml
 APP_DSN ?= $(shell sed -n 's/^dsn:[[:space:]]*"\(.*\)"/\1/p' $(CONFIG_FILE))
@@ -98,15 +100,11 @@ lint: ## run golint on all Go package
 fmt: ## run "go fmt" on all Go packages
 	@go fmt $(PACKAGES)
 
-.PHONY: swagger-to-go
-swagger-to-go:
-	@$(foreach file,$(shell find -type f -name "*.json"), \
-		tire swagger-to-go $(ROOT)/${file} --pkg "auth" --out "$(ROOT)/internal/proto/v1/$(${file}).go" ;)
-
 .PHONY: proto
 proto:  ## run "prototool generate"
-	@echo "Running prototool generate..."
+	@echo "Running generate..."
 	@prototool generate
+	@for f in $(find -type f -name "*.swagger.json"); do tire swagger-to-go $f --pkg $PACKAGE_NAME --out $PROTO_OUTPUT_DIR/$(basename $f).go; done
 
 .PHONY: gen
 gen:  ## run proto and swagger-to-go
