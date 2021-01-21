@@ -5,8 +5,8 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/golang-tire/pkg/pubsub"
-	"google.golang.org/protobuf/proto"
+	"github.com/ThreeDotsLabs/watermill/message"
+	"github.com/golang-tire/auth/internal/pkg/pubsub"
 
 	zaplogger "github.com/casbin/zap-logger"
 
@@ -168,11 +168,12 @@ func (a *adapter) RemoveFilteredPolicy(sec string, ptype string, fieldIndex int,
 	panic("implement me")
 }
 
-func (a *rbacService) OnPolicyChange(ctx context.Context, msg proto.Message) {
+func (a *rbacService) OnPolicyChange(msg *message.Message) error {
 	err := a.enforcer.LoadPolicy()
 	if err != nil {
 		log.Error("reload polices failed", log.Err(err))
 	}
+	return err
 }
 
 func InitRbac(ctx context.Context, rulesSrv rules.Service, usersSrv users.Service) (*rbacService, error) {
@@ -200,7 +201,7 @@ func InitRbac(ctx context.Context, rulesSrv rules.Service, usersSrv users.Servic
 
 	rbacSrv := &rbacService{enforcer: enf, regexPatterns: regexRules}
 
-	pubsub.Get().Subscribe(ctx, "rule-change", rbacSrv.OnPolicyChange)
-	pubsub.Get().Subscribe(ctx, "user-change", rbacSrv.OnPolicyChange)
+	pubsub.AddHandler("rule-change", rbacSrv.OnPolicyChange)
+	pubsub.AddHandler("user-change", rbacSrv.OnPolicyChange)
 	return rbacSrv, err
 }

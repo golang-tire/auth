@@ -1,11 +1,14 @@
 package entity
 
 import (
-	"context"
+	"google.golang.org/protobuf/proto"
+
+	"github.com/ThreeDotsLabs/watermill/message"
+
+	"github.com/golang-tire/auth/internal/pkg/pubsub"
 
 	auth "github.com/golang-tire/auth/internal/proto/v1"
 	"github.com/golang-tire/pkg/log"
-	"github.com/golang-tire/pkg/pubsub"
 	"github.com/golang/protobuf/ptypes"
 	"gorm.io/gorm"
 )
@@ -24,7 +27,11 @@ type Rule struct {
 }
 
 func (r *Rule) AfterCreate(tx *gorm.DB) (err error) {
-	pubErr := pubsub.Get().Publish(context.Background(), "create-rule", r.ToProto())
+	b, err := r.Bytes()
+	if err != nil {
+		log.Error("encode create rule message to bytes failed", log.Err(err))
+	}
+	pubErr := pubsub.Publish("create-rule", message.NewMessage(r.UUID, b))
 	if pubErr != nil {
 		log.Error("send new-rule event failed", log.Err(pubErr))
 	}
@@ -32,7 +39,12 @@ func (r *Rule) AfterCreate(tx *gorm.DB) (err error) {
 }
 
 func (r *Rule) AfterUpdate(tx *gorm.DB) (err error) {
-	pubErr := pubsub.Get().Publish(context.Background(), "update-rule", r.ToProto())
+	b, err := r.Bytes()
+	if err != nil {
+		log.Error("encode update rule message to bytes failed", log.Err(err))
+	}
+
+	pubErr := pubsub.Publish("update-rule", message.NewMessage(r.UUID, b))
 	if pubErr != nil {
 		log.Error("send new-rule event failed", log.Err(pubErr))
 	}
@@ -64,6 +76,14 @@ func (r Rule) ToProto() *auth.Rule {
 		UpdatedAt: u,
 	}
 	return rule
+}
+
+func (r Rule) Bytes() ([]byte, error) {
+	bytes, err := proto.Marshal(r.ToProto())
+	if err != nil {
+		return nil, err
+	}
+	return bytes, err
 }
 
 func RuleToProtoList(rml []Rule) []*auth.Rule {
