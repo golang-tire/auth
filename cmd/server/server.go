@@ -98,16 +98,16 @@ func setUp(ctx context.Context) error {
 		DB:       redisDb.Int(),
 	})
 
+	pubSub, err := pubsub.Init(ctx, rdb)
+	if err != nil {
+		return err
+	}
+
 	_, err = kv.InitWithConn(ctx, rdb)
 	if err != nil {
 		return err
 	}
 	dbInstance, err := db.Init(ctx)
-	if err != nil {
-		return err
-	}
-
-	_, err = pubsub.Init(ctx, dbInstance)
 	if err != nil {
 		return err
 	}
@@ -153,7 +153,7 @@ func setUp(ctx context.Context) error {
 	appsSrv := apps.NewService(appsRepo)
 	apps.New(appsSrv)
 
-	rbacSrv, err := auth.InitRbac(ctx, rulesSrv, usersSrv)
+	rbacSrv, err := auth.InitRbac(ctx, rulesSrv, usersSrv, pubSub)
 	if err != nil {
 		return err
 	}
@@ -173,6 +173,8 @@ func setUp(ctx context.Context) error {
 			DiscardUnknown: true,
 		},
 	}
+
+	pubSub.Run(ctx)
 
 	err = grpcgw.Serve(ctx,
 		grpcgw.GrpcPort(grpcPort.Int()),

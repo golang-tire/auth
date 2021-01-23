@@ -1,14 +1,12 @@
 package entity
 
 import (
+	"github.com/ThreeDotsLabs/watermill/message"
+	"github.com/golang-tire/auth/internal/pkg/pubsub"
+	"github.com/golang-tire/pkg/log"
 	"google.golang.org/protobuf/proto"
 
-	"github.com/ThreeDotsLabs/watermill/message"
-
-	"github.com/golang-tire/auth/internal/pkg/pubsub"
-
 	auth "github.com/golang-tire/auth/internal/proto/v1"
-	"github.com/golang-tire/pkg/log"
 	"github.com/golang/protobuf/ptypes"
 	"gorm.io/gorm"
 )
@@ -29,11 +27,12 @@ type Rule struct {
 func (r *Rule) AfterCreate(tx *gorm.DB) (err error) {
 	b, err := r.Bytes()
 	if err != nil {
-		log.Error("encode create rule message to bytes failed", log.Err(err))
+		log.Error("encode AfterCreate rule-change message to bytes failed", log.Err(err))
 	}
-	pubErr := pubsub.Publish("create-rule", message.NewMessage(r.UUID, b))
+	p := pubsub.Get()
+	pubErr := p.Publish("rule-change", message.NewMessage(r.UUID, b))
 	if pubErr != nil {
-		log.Error("send new-rule event failed", log.Err(pubErr))
+		log.Error("send AfterCreate rule-change event failed", log.Err(pubErr))
 	}
 	return nil
 }
@@ -41,12 +40,12 @@ func (r *Rule) AfterCreate(tx *gorm.DB) (err error) {
 func (r *Rule) AfterUpdate(tx *gorm.DB) (err error) {
 	b, err := r.Bytes()
 	if err != nil {
-		log.Error("encode update rule message to bytes failed", log.Err(err))
+		log.Error("encode afterUpdate rule-change message to bytes failed", log.Err(err))
 	}
-
-	pubErr := pubsub.Publish("update-rule", message.NewMessage(r.UUID, b))
+	p := pubsub.Get()
+	pubErr := p.Publish("rule-change", message.NewMessage(r.UUID, b))
 	if pubErr != nil {
-		log.Error("send new-rule event failed", log.Err(pubErr))
+		log.Error("send afterUpdate rule-change event failed", log.Err(pubErr))
 	}
 	return
 }

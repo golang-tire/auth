@@ -169,14 +169,17 @@ func (a *adapter) RemoveFilteredPolicy(sec string, ptype string, fieldIndex int,
 }
 
 func (a *rbacService) OnPolicyChange(msg *message.Message) error {
+	log.Info("policy changed")
 	err := a.enforcer.LoadPolicy()
 	if err != nil {
 		log.Error("reload polices failed", log.Err(err))
+		return err
 	}
-	return err
+	msg.Ack()
+	return nil
 }
 
-func InitRbac(ctx context.Context, rulesSrv rules.Service, usersSrv users.Service) (*rbacService, error) {
+func InitRbac(ctx context.Context, rulesSrv rules.Service, usersSrv users.Service, ps *pubsub.PubSub) (*rbacService, error) {
 
 	log.Info("init rbac module")
 	err := config.Load()
@@ -201,7 +204,13 @@ func InitRbac(ctx context.Context, rulesSrv rules.Service, usersSrv users.Servic
 
 	rbacSrv := &rbacService{enforcer: enf, regexPatterns: regexRules}
 
-	pubsub.AddHandler("rule-change", rbacSrv.OnPolicyChange)
-	pubsub.AddHandler("user-change", rbacSrv.OnPolicyChange)
+	err = ps.AddHandler("rule-change", rbacSrv.OnPolicyChange)
+	if err != nil {
+		return nil, err
+	}
+	err = ps.AddHandler("user-change", rbacSrv.OnPolicyChange)
+	if err != nil {
+		return nil, err
+	}
 	return rbacSrv, err
 }

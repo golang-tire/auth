@@ -4,14 +4,13 @@ go 1.15
 
 require (
 	github.com/ThreeDotsLabs/watermill v1.1.1
-	github.com/ThreeDotsLabs/watermill-sql v1.3.2
 	github.com/alicebob/miniredis/v2 v2.14.1
 	github.com/casbin/casbin/v2 v2.17.0
 	github.com/casbin/zap-logger v0.0.0-20201111160603-1487fd4c6e45
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/garsue/watermillzap v1.1.0
 	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
-	github.com/go-redis/redis/v8 v8.3.4
+	github.com/go-redis/redis/v8 v8.4.10
 	github.com/gogo/protobuf v1.3.1 // indirect
 	github.com/golang-tire/pkg v0.1.82
 	github.com/golang/protobuf v1.4.3
@@ -21,10 +20,10 @@ require (
 	github.com/jackc/pgx/v4 v4.9.2 // indirect
 	github.com/lib/pq v1.8.0 // indirect
 	github.com/lithammer/shortuuid/v3 v3.0.5 // indirect
+	github.com/mirzakhany/watermill-redisstream v0.1.0
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
-	github.com/pkg/errors v0.9.1 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
-	github.com/stretchr/testify v1.6.1
+	github.com/stretchr/testify v1.7.0
 	golang.org/x/crypto v0.0.0-20201112155050-0c6587e931a9
 	golang.org/x/text v0.3.4 // indirect
 	google.golang.org/genproto v0.0.0-20201119123407-9b1e624d6bc4

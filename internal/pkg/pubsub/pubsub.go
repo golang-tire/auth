@@ -3,33 +3,34 @@ package pubsub
 import (
 	"context"
 
+	"github.com/ThreeDotsLabs/watermill/message/router/middleware"
+
+	"github.com/ThreeDotsLabs/watermill"
+
+	"github.com/go-redis/redis/v8"
+
+	"github.com/mirzakhany/watermill-redisstream/pkg/redisstream"
+
 	"github.com/google/uuid"
 
 	"github.com/ThreeDotsLabs/watermill/message"
 
 	"github.com/garsue/watermillzap"
 	"github.com/golang-tire/pkg/log"
-
-	"github.com/golang-tire/auth/internal/pkg/db"
-
-	"github.com/ThreeDotsLabs/watermill-sql/pkg/sql"
-	watermillSql "github.com/ThreeDotsLabs/watermill-sql/pkg/sql"
 )
 
 type PubSub struct {
-	Subscriber *watermillSql.Subscriber
-	Publisher  *watermillSql.Publisher
+	ctx        context.Context
+	publisher  message.Publisher
+	subscriber message.Subscriber
 	router     *message.Router
+	logger     watermill.LoggerAdapter
+	rc         redis.UniversalClient
 }
 
 var pubSub *PubSub
 
-func Init(ctx context.Context, db *db.DB) (*PubSub, error) {
-
-	d, err := db.DB().DB()
-	if err != nil {
-		return nil, err
-	}
+func Init(ctx context.Context, rc redis.UniversalClient) (*PubSub, error) {
 
 	logger := watermillzap.NewLogger(log.Logger())
 	router, err := message.NewRouter(message.RouterConfig{}, logger)
@@ -37,62 +38,58 @@ func Init(ctx context.Context, db *db.DB) (*PubSub, error) {
 		return nil, err
 	}
 
-	pubSub = &PubSub{}
-	pubSub.router = router
-	subscriber, err := watermillSql.NewSubscriber(
-		d,
-		watermillSql.SubscriberConfig{
-			SchemaAdapter:    sql.DefaultPostgreSQLSchema{},
-			OffsetsAdapter:   sql.DefaultPostgreSQLOffsetsAdapter{},
-			InitializeSchema: true,
-		},
+	publisher, err := redisstream.NewPublisher(
+		ctx,
+		rc,
+		&redisstream.DefaultMarshaler{},
 		logger,
 	)
 
-	publisher, err := watermillSql.NewPublisher(
-		d,
-		sql.PublisherConfig{
-			SchemaAdapter: sql.DefaultPostgreSQLSchema{},
+	subscriber, err := redisstream.NewSubscriber(
+		ctx,
+		redisstream.SubscriberConfig{
+			Consumer:        "auth-consumer",
+			ConsumerGroup:   "auth-consumer-rbac",
+			DoNotDelMessage: false,
 		},
+		rc,
+		&redisstream.DefaultMarshaler{},
 		logger,
 	)
 
-	pubSub.Publisher = publisher
-	pubSub.Subscriber = subscriber
+	pubSub = &PubSub{
+		ctx:        ctx,
+		router:     router,
+		logger:     logger,
+		subscriber: subscriber,
+		publisher:  publisher,
+	}
 
-	errCh := make(chan error)
-	go func() {
-		err := pubSub.router.Run(ctx)
-		if err != nil {
-			errCh <- err
-			return
-		}
-	}()
-
-	go func() {
-		select {
-		case er := <-errCh:
-			log.Error("run pubSub failed", log.Err(er))
-		case <-ctx.Done():
-			_ = pubSub.router.Close()
-			_ = pubSub.Subscriber.Close()
-			_ = pubSub.Publisher.Close()
-			return
-		}
-	}()
-
+	router.AddMiddleware(middleware.Recoverer)
 	return pubSub, nil
 }
 
-func AddHandler(topic string, handler func(*message.Message) error) {
-	pubSub.router.AddNoPublisherHandler(
+func (ps *PubSub) AddHandler(topic string, handler func(*message.Message) error) error {
+	ps.router.AddNoPublisherHandler(
 		topic+"_"+uuid.New().String(),
 		topic,
-		pubSub.Subscriber,
+		ps.subscriber,
 		handler,
 	)
+	return nil
 }
 
-func Publish(topic string, message *message.Message) error {
-	return pubSub.Publisher.Publish(topic, message)
+func (ps *PubSub) Run(ctx context.Context) {
+	go func() {
+		_ = ps.router.Run(ctx)
+		<-ctx.Done()
+	}()
+}
+
+func Get() *PubSub {
+	return pubSub
+}
+
+func (ps *PubSub) Publish(topic string, message *message.Message) error {
+	return ps.publisher.Publish(topic, message)
 }
